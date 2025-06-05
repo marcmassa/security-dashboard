@@ -8,10 +8,17 @@ let uploadedReports = {
 // Initialize dashboard
 document.addEventListener('DOMContentLoaded', function() {
     setupFileUploads();
-    loadSummaryData();
+    
+    // Detect project ID from upload cards
+    const uploadCard = document.querySelector('.upload-card');
+    const projectId = uploadCard ? uploadCard.dataset.projectId : null;
+    
+    loadSummaryData(projectId);
     
     // Set up periodic refresh of summary data
-    setInterval(loadSummaryData, 5000);
+    if (projectId) {
+        setInterval(() => loadSummaryData(projectId), 5000);
+    }
 });
 
 // Setup file upload handlers
