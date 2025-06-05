@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+
+{% block title %}SonarQube Report Details - Security Dashboard{% endblock %}
+
+{% block content %}
+<div class="detail-container">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Dashboard</a></li>
+            <li class="breadcrumb-item active">SonarQube Details</li>
+        </ol>
+    </nav>
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 mb-0">SonarQube Analysis Report</h1>
+            <p class="text-muted">{{ data.project_name }} ({{ data.project_key }})</p>
+        </div>
+        <div>
+            <button class="btn btn-outline-primary me-2" onclick="exportToPDF()">
+                <i data-feather="download"></i> Export PDF
+            </button>
+            <button class="btn btn-outline-primary" onclick="exportToJSON()">
+                <i data-feather="file-text"></i> Export JSON
+            </button>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-2">
+            <div class="summary-card text-center">
+                <div class="metric-value severity-critical">{{ data.bugs }}</div>
+                <div class="metric-label">Bugs</div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="summary-card text-center">
+                <div class="metric-value severity-high">{{ data.vulnerabilities }}</div>
+                <div class="metric-label">Vulnerabilities</div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="summary-card text-center">
+                <div class="metric-value severity-medium">{{ data.code_smells }}</div>
+                <div class="metric-label">Code Smells</div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="summary-card text-center">
+                <div class="metric-value">{{ data.security_hotspots }}</div>
+                <div class="metric-label">Security Hotspots</div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="summary-card text-center">
+                <div class="metric-value severity-low">{{ data.coverage }}%</div>
+                <div class="metric-label">Test Coverage</div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="summary-card text-center">
+                <div class="metric-value">{{ data.duplicated_lines_density }}%</div>
+                <div class="metric-label">Duplication</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quality Ratings -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="summary-card">
+                <h5 class="card-title">Maintainability Rating</h5>
+                <div class="text-center">
+                    <span class="badge badge-{{ 'low' if data.sqale_rating == 'A' else 'medium' if data.sqale_rating == 'B' else 'high' }}">
+                        {{ data.sqale_rating }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="summary-card">
+                <h5 class="card-title">Reliability Rating</h5>
+                <div class="text-center">
+                    <span class="badge badge-{{ 'low' if data.reliability_rating == 'A' else 'medium' if data.reliability_rating == 'B' else 'high' }}">
+                        {{ data.reliability_rating }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="summary-card">
+                <h5 class="card-title">Security Rating</h5>
+                <div class="text-center">
+                    <span class="badge badge-{{ 'low' if data.security_rating == 'A' else 'medium' if data.security_rating == 'B' else 'high' }}">
+                        {{ data.security_rating }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Project Metrics -->
+    <div class="summary-card">
+        <h5 class="card-title mb-3">Project Metrics</h5>
+        
+        <!-- Filter Controls -->
+        <div class="filter-controls mb-3">
+            <div class="row">
+                <div class="col-md-6">
+                    <label class="form-label">Search Metrics</label>
+                    <input type="text" class="form-control" id="metric-search" placeholder="Search metrics...">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Sort By</label>
+                    <select class="form-select" id="metric-sort">
+                        <option value="name">Metric Name</option>
+                        <option value="value">Value</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button class="btn btn-outline-primary" onclick="sortMetricsTable()">
+                        <i data-feather="arrow-up-down"></i> Sort
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped" id="metrics-table">
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Value</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Lines of Code</td>
+                        <td>{{ data.ncloc }}</td>
+                        <td>Non-commenting lines of source code</td>
+                    </tr>
+                    <tr>
+                        <td>Total Lines</td>
+                        <td>{{ data.lines }}</td>
+                        <td>Total lines including comments and blank lines</td>
+                    </tr>
+                    <tr>
+                        <td>Complexity</td>
+                        <td>{{ data.complexity }}</td>
+                        <td>Cyclomatic complexity</td>
+                    </tr>
+                    <tr>
+                        <td>Bugs</td>
+                        <td><span class="badge badge-critical">{{ data.bugs }}</span></td>
+                        <td>Issues that represent wrong behavior</td>
+                    </tr>
+                    <tr>
+                        <td>Vulnerabilities</td>
+                        <td><span class="badge badge-high">{{ data.vulnerabilities }}</span></td>
+                        <td>Security-related issues</td>
+                    </tr>
+                    <tr>
+                        <td>Code Smells</td>
+                        <td><span class="badge badge-medium">{{ data.code_smells }}</span></td>
+                        <td>Maintainability-related issues</td>
+                    </tr>
+                    <tr>
+                        <td>Security Hotspots</td>
+                        <td>{{ data.security_hotspots }}</td>
+                        <td>Security-sensitive pieces of code to review</td>
+                    </tr>
+                    <tr>
+                        <td>Test Coverage</td>
+                        <td><span class="badge badge-{{ 'low' if data.coverage >= 80 else 'medium' if data.coverage >= 60 else 'high' }}">{{ data.coverage }}%</span></td>
+                        <td>Percentage of code covered by tests</td>
+                    </tr>
+                    <tr>
+                        <td>Duplication</td>
+                        <td>{{ data.duplicated_lines_density }}%</td>
+                        <td>Percentage of duplicated lines</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function sortMetricsTable() {
+    const sortBy = document.getElementById('metric-sort').value;
+    const columnIndex = sortBy === 'name' ? 0 : 1;
+    const isNumeric = sortBy === 'value';
+    
+    sortTable('metrics-table', columnIndex, isNumeric);
+}
+
+// Search functionality
+document.getElementById('metric-search').addEventListener('input', function() {
+    filterTable('metrics-table', this.value, 0);
+});
+
+function exportToPDF() {
+    window.print();
+}
+
+function exportToJSON() {
+    const data = {{ data | tojson }};
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'sonarqube-report.json';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+</script>
+{% endblock %}
