@@ -8,6 +8,7 @@ from flask_cors import CORS
 from werkzeug.utils import secure_filename
 from werkzeug.middleware.proxy_fix import ProxyFix
 from utils.parsers import parse_sonarqube_report, parse_sbom_report, parse_trivy_report, parse_trivy_html_report
+from models import db, Project, Report
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -19,6 +20,17 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 # Enable CORS
 CORS(app)
 
+# Configure database
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+    "pool_recycle": 300,
+    "pool_pre_ping": True,
+}
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+# Initialize database
+db.init_app(app)
+
 # Configure upload settings
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'json', 'xml', 'html'}
@@ -28,8 +40,9 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 # Create upload directory if it doesn't exist
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# In-memory storage for projects and their reports
-projects_data = {}
+# Initialize database tables
+with app.app_context():
+    db.create_all()
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -37,22 +50,17 @@ def allowed_file(filename):
 def create_project(name: str) -> str:
     """Create a new project and return its ID"""
     project_id = str(uuid.uuid4())
-    projects_data[project_id] = {
-        'id': project_id,
-        'name': name,
-        'created_at': datetime.now().isoformat(),
-        'reports': {
-            'sonarqube': None,
-            'sbom': None,
-            'trivy': None
-        }
-    }
+    project = Project(id=project_id, name=name)
+    db.session.add(project)
+    db.session.commit()
     return project_id
 
 @app.route('/')
 def home():
     """Home page showing all projects"""
-    return render_template('home.html', projects=projects_data)
+    projects = Project.query.order_by(Project.created_at.desc()).all()
+    projects_dict = {project.id: project.to_dict() for project in projects}
+    return render_template('home.html', projects=projects_dict)
 
 @app.route('/create-project', methods=['GET', 'POST'])
 def create_project_route():
@@ -72,16 +80,17 @@ def create_project_route():
 @app.route('/project/<project_id>')
 def project_dashboard(project_id):
     """Project dashboard page"""
-    if project_id not in projects_data:
+    project = Project.query.get(project_id)
+    if not project:
         flash('Project not found.', 'error')
         return redirect(url_for('home'))
     
-    project = projects_data[project_id]
-    return render_template('project_dashboard.html', project=project)
+    return render_template('project_dashboard.html', project=project.to_dict())
 
 @app.route('/project/<project_id>/upload', methods=['POST'])
 def upload_file(project_id):
-    if project_id not in projects_data:
+    project = Project.query.get(project_id)
+    if not project:
         return jsonify({'error': 'Project not found'}), 404
     
     if 'file' not in request.files:
@@ -118,8 +127,8 @@ def upload_file(project_id):
                 else:
                     parsed_data = parse_trivy_report(file_content)
             
-            # Store parsed data in project
-            projects_data[project_id]['reports'][report_type] = parsed_data
+            # Store parsed data in database
+            project.set_report(report_type, parsed_data)
             
             # Clean up uploaded file
             os.remove(filepath)
@@ -139,11 +148,12 @@ def upload_file(project_id):
 @app.route('/project/<project_id>/api/summary')
 def get_project_summary(project_id):
     """Get summary data for the project dashboard"""
-    if project_id not in projects_data:
+    project = Project.query.get(project_id)
+    if not project:
         return jsonify({'error': 'Project not found'}), 404
     
-    project = projects_data[project_id]
-    reports = project['reports']
+    project_data = project.to_dict()
+    reports = project_data['reports']
     
     summary = {
         'sonarqube': reports.get('sonarqube'),
@@ -155,55 +165,60 @@ def get_project_summary(project_id):
 
 @app.route('/project/<project_id>/sonarqube')
 def project_sonarqube_detail(project_id):
-    if project_id not in projects_data:
+    project = Project.query.get(project_id)
+    if not project:
         flash('Project not found.', 'error')
         return redirect(url_for('home'))
     
-    project = projects_data[project_id]
-    if not project['reports'].get('sonarqube'):
+    project_data = project.to_dict()
+    if not project_data['reports'].get('sonarqube'):
         flash('No SonarQube report data available. Please upload a report first.', 'warning')
         return redirect(url_for('project_dashboard', project_id=project_id))
     
     return render_template('sonarqube_detail.html', 
-                         data=project['reports']['sonarqube'], 
-                         project=project)
+                         data=project_data['reports']['sonarqube'], 
+                         project=project_data)
 
 @app.route('/project/<project_id>/sbom')
 def project_sbom_detail(project_id):
-    if project_id not in projects_data:
+    project = Project.query.get(project_id)
+    if not project:
         flash('Project not found.', 'error')
         return redirect(url_for('home'))
     
-    project = projects_data[project_id]
-    if not project['reports'].get('sbom'):
+    project_data = project.to_dict()
+    if not project_data['reports'].get('sbom'):
         flash('No SBOM report data available. Please upload a report first.', 'warning')
         return redirect(url_for('project_dashboard', project_id=project_id))
     
     return render_template('sbom_detail.html', 
-                         data=project['reports']['sbom'], 
-                         project=project)
+                         data=project_data['reports']['sbom'], 
+                         project=project_data)
 
 @app.route('/project/<project_id>/trivy')
 def project_trivy_detail(project_id):
-    if project_id not in projects_data:
+    project = Project.query.get(project_id)
+    if not project:
         flash('Project not found.', 'error')
         return redirect(url_for('home'))
     
-    project = projects_data[project_id]
-    if not project['reports'].get('trivy'):
+    project_data = project.to_dict()
+    if not project_data['reports'].get('trivy'):
         flash('No Trivy report data available. Please upload a report first.', 'warning')
         return redirect(url_for('project_dashboard', project_id=project_id))
     
     return render_template('trivy_detail.html', 
-                         data=project['reports']['trivy'], 
-                         project=project)
+                         data=project_data['reports']['trivy'], 
+                         project=project_data)
 
 @app.route('/project/<project_id>/delete', methods=['POST'])
 def delete_project(project_id):
     """Delete a project"""
-    if project_id in projects_data:
-        project_name = projects_data[project_id]['name']
-        del projects_data[project_id]
+    project = Project.query.get(project_id)
+    if project:
+        project_name = project.name
+        db.session.delete(project)
+        db.session.commit()
         flash(f'Project "{project_name}" deleted successfully.', 'success')
     else:
         flash('Project not found.', 'error')

@@ -163,10 +163,15 @@
                         </td>
                         <td>
                             {% if vuln.CVSS %}
+                                {% set cvss_scores = [] %}
                                 {% for cvss_version, cvss_data in vuln.CVSS.items() %}
-                                    {{ cvss_data.V3Score or cvss_data.V2Score or 'N/A' }}
-                                    {% break %}
+                                    {% if cvss_data.V3Score %}
+                                        {% set _ = cvss_scores.append(cvss_data.V3Score) %}
+                                    {% elif cvss_data.V2Score %}
+                                        {% set _ = cvss_scores.append(cvss_data.V2Score) %}
+                                    {% endif %}
                                 {% endfor %}
+                                {{ cvss_scores[0] if cvss_scores else 'N/A' }}
                             {% else %}
                             N/A
                             {% endif %}
