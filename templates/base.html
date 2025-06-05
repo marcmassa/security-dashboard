@@ -29,19 +29,22 @@
             </a>
             
             <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="{{ url_for('index') }}">Dashboard</a>
-                {% if reports_data and reports_data.sonarqube %}
-                <a class="nav-link" href="{{ url_for('sonarqube_detail') }}">SonarQube</a>
+                <a class="nav-link" href="{{ url_for('home') }}">Home</a>
+                {% if project %}
+                <a class="nav-link" href="{{ url_for('project_dashboard', project_id=project.id) }}">Dashboard</a>
+                {% if project.reports and project.reports.sonarqube %}
+                <a class="nav-link" href="{{ url_for('project_sonarqube_detail', project_id=project.id) }}">SonarQube</a>
                 {% endif %}
-                {% if reports_data and reports_data.sbom %}
-                <a class="nav-link" href="{{ url_for('sbom_detail') }}">SBOM</a>
+                {% if project.reports and project.reports.sbom %}
+                <a class="nav-link" href="{{ url_for('project_sbom_detail', project_id=project.id) }}">SBOM</a>
                 {% endif %}
-                {% if reports_data and reports_data.trivy %}
-                <a class="nav-link" href="{{ url_for('trivy_detail') }}">Trivy</a>
+                {% if project.reports and project.reports.trivy %}
+                <a class="nav-link" href="{{ url_for('project_trivy_detail', project_id=project.id) }}">Trivy</a>
                 {% endif %}
-                <a class="nav-link" href="{{ url_for('clear_data') }}" onclick="return confirm('Clear all data?')">
-                    <i data-feather="trash-2"></i>
-                    Clear Data
+                {% endif %}
+                <a class="nav-link" href="{{ url_for('create_project_route') }}">
+                    <i data-feather="plus-circle"></i>
+                    New Project
                 </a>
             </div>
         </div>

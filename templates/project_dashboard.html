@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+
+{% block title %}{{ project.name }} - Security Dashboard{% endblock %}
+
+{% block content %}
+<div class="main-container">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
+            <li class="breadcrumb-item active">{{ project.name }}</li>
+        </ol>
+    </nav>
+
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <h1 class="dashboard-title">{{ project.name }}</h1>
+        <p class="dashboard-subtitle">
+            Security analysis dashboard for your project
+        </p>
+    </div>
+
+    <!-- Upload Section -->
+    <div class="upload-section">
+        <h2 class="text-center mb-4">Upload Security Reports</h2>
+        <div class="upload-grid">
+            <!-- SonarQube Upload -->
+            <div class="upload-card" data-report-type="sonarqube" data-project-id="{{ project.id }}">
+                <div class="upload-icon">
+                    <i data-feather="code"></i>
+                </div>
+                <h3 class="upload-title">SonarQube Report</h3>
+                <p class="upload-description">Upload SonarQube analysis results (JSON format)</p>
+                <input type="file" class="file-input" accept=".json" />
+                <button class="upload-button">Upload Report</button>
+            </div>
+
+            <!-- SBOM Upload -->
+            <div class="upload-card" data-report-type="sbom" data-project-id="{{ project.id }}">
+                <div class="upload-icon">
+                    <i data-feather="package"></i>
+                </div>
+                <h3 class="upload-title">SBOM Report</h3>
+                <p class="upload-description">Upload CycloneDX SBOM file (JSON/XML format)</p>
+                <input type="file" class="file-input" accept=".json,.xml" />
+                <button class="upload-button">Upload Report</button>
+            </div>
+
+            <!-- Trivy Upload -->
+            <div class="upload-card" data-report-type="trivy" data-project-id="{{ project.id }}">
+                <div class="upload-icon">
+                    <i data-feather="search"></i>
+                </div>
+                <h3 class="upload-title">Trivy Report</h3>
+                <p class="upload-description">Upload Trivy container scan results (JSON/HTML format)</p>
+                <input type="file" class="file-input" accept=".json,.html" />
+                <button class="upload-button">Upload Report</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Dashboard -->
+    <div class="summary-grid">
+        <!-- SonarQube Summary -->
+        <div class="summary-card {% if not project.reports.sonarqube %}disabled{% endif %}" id="sonarqube-summary">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="card-icon" data-feather="code"></i>
+                    SonarQube Analysis
+                </h3>
+                <a href="{{ url_for('project_sonarqube_detail', project_id=project.id) }}" class="detail-button" {% if not project.reports.sonarqube %}style="display: none;"{% endif %}>
+                    View Details
+                </a>
+            </div>
+            
+            {% if project.reports.sonarqube %}
+            <div class="project-name mb-3">
+                <strong>Project:</strong> {{ project.reports.sonarqube.project_name }}
+            </div>
+            <div class="metrics-grid">
+                <div class="metric-item">
+                    <div class="metric-value severity-critical" data-metric="bugs">{{ project.reports.sonarqube.bugs }}</div>
+                    <div class="metric-label">Bugs</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value severity-high" data-metric="vulnerabilities">{{ project.reports.sonarqube.vulnerabilities }}</div>
+                    <div class="metric-label">Vulnerabilities</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value severity-medium" data-metric="code-smells">{{ project.reports.sonarqube.code_smells }}</div>
+                    <div class="metric-label">Code Smells</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value severity-low" data-metric="coverage">{{ project.reports.sonarqube.coverage }}%</div>
+                    <div class="metric-label">Coverage</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value severity-medium" data-metric="duplicated-lines">{{ project.reports.sonarqube.duplicated_lines_density }}%</div>
+                    <div class="metric-label">Duplication</div>
+                </div>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i data-feather="upload-cloud"></i>
+                </div>
+                <div class="empty-state-text">No SonarQube Data</div>
+                <div class="empty-state-subtext">Upload a SonarQube report to see code quality metrics</div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- SBOM Summary -->
+        <div class="summary-card {% if not project.reports.sbom %}disabled{% endif %}" id="sbom-summary">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="card-icon" data-feather="package"></i>
+                    SBOM Vulnerabilities
+                </h3>
+                <a href="{{ url_for('project_sbom_detail', project_id=project.id) }}" class="detail-button" {% if not project.reports.sbom %}style="display: none;"{% endif %}>
+                    View Details
+                </a>
+            </div>
+            
+            {% if project.reports.sbom %}
+            <div class="metrics-grid">
+                <div class="metric-item">
+                    <div class="metric-value severity-critical" data-metric="critical">{{ project.reports.sbom.vulnerabilities.by_severity.critical }}</div>
+                    <div class="metric-label">Critical</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value severity-high" data-metric="high">{{ project.reports.sbom.vulnerabilities.by_severity.high }}</div>
+                    <div class="metric-label">High</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value severity-medium" data-metric="medium">{{ project.reports.sbom.vulnerabilities.by_severity.medium }}</div>
+                    <div class="metric-label">Medium</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value severity-low" data-metric="low">{{ project.reports.sbom.vulnerabilities.by_severity.low }}</div>
+                    <div class="metric-label">Low</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value" data-metric="total-components">{{ project.reports.sbom.components.total }}</div>
+                    <div class="metric-label">Components</div>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="sbom-chart"></canvas>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i data-feather="upload-cloud"></i>
+                </div>
+                <div class="empty-state-text">No SBOM Data</div>
+                <div class="empty-state-subtext">Upload an SBOM report to see dependency vulnerabilities</div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Trivy Summary -->
+        <div class="summary-card {% if not project.reports.trivy %}disabled{% endif %}" id="trivy-summary">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="card-icon" data-feather="search"></i>
+                    Trivy Container Scan
+                </h3>
+                <a href="{{ url_for('project_trivy_detail', project_id=project.id) }}" class="detail-button" {% if not project.reports.trivy %}style="display: none;"{% endif %}>
+                    View Details
+                </a>
+            </div>
+            
+            {% if project.reports.trivy %}
+            <div class="artifact-name mb-3">
+                <strong>Artifact:</strong> {{ project.reports.trivy.artifact_name }}
+            </div>
+            <div class="metrics-grid">
+                <div class="metric-item">
+                    <div class="metric-value severity-critical" data-metric="critical">{{ project.reports.trivy.vulnerabilities.by_severity.CRITICAL }}</div>
+                    <div class="metric-label">Critical</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value severity-high" data-metric="high">{{ project.reports.trivy.vulnerabilities.by_severity.HIGH }}</div>
+                    <div class="metric-label">High</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value severity-medium" data-metric="medium">{{ project.reports.trivy.vulnerabilities.by_severity.MEDIUM }}</div>
+                    <div class="metric-label">Medium</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value severity-low" data-metric="low">{{ project.reports.trivy.vulnerabilities.by_severity.LOW }}</div>
+                    <div class="metric-label">Low</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value severity-unknown" data-metric="unknown">{{ project.reports.trivy.vulnerabilities.by_severity.UNKNOWN }}</div>
+                    <div class="metric-label">Unknown</div>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="trivy-chart"></canvas>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i data-feather="upload-cloud"></i>
+                </div>
+                <div class="empty-state-text">No Trivy Data</div>
+                <div class="empty-state-subtext">Upload a Trivy scan report to see container vulnerabilities</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Initialize charts on page load
+document.addEventListener('DOMContentLoaded', function() {
+    {% if project.reports.sbom %}
+    createSBOMChart({{ project.reports.sbom.vulnerabilities.by_severity | tojson }});
+    {% endif %}
+    
+    {% if project.reports.trivy %}
+    createTrivyChart({{ project.reports.trivy.vulnerabilities.by_severity | tojson }});
+    {% endif %}
+});
+</script>
+{% endblock %}

@@ -1,6 +1,8 @@
 import json
 import xml.etree.ElementTree as ET
 import logging
+import re
+from bs4 import BeautifulSoup
 from typing import Dict, List, Any, Optional
 
 def parse_sonarqube_report(content: str) -> Dict[str, Any]:
@@ -223,3 +225,107 @@ def parse_trivy_report(content: str) -> Dict[str, Any]:
     except Exception as e:
         logging.error(f"Error parsing Trivy report: {e}")
         raise ValueError(f"Error parsing Trivy report: {e}")
+
+def parse_trivy_html_report(content: str) -> Dict[str, Any]:
+    """Parse Trivy HTML report"""
+    try:
+        soup = BeautifulSoup(content, 'html.parser')
+        
+        # Initialize counters
+        severity_counts = {
+            'CRITICAL': 0,
+            'HIGH': 0,
+            'MEDIUM': 0,
+            'LOW': 0,
+            'UNKNOWN': 0
+        }
+        
+        # Extract artifact name from title or h1
+        artifact_name = 'Unknown'
+        title = soup.find('title')
+        if title:
+            artifact_name = title.get_text().strip()
+        elif soup.find('h1'):
+            artifact_name = soup.find('h1').get_text().strip()
+        
+        # Try to extract vulnerability information from tables
+        results = []
+        total_vulnerabilities = 0
+        
+        # Look for vulnerability tables
+        tables = soup.find_all('table')
+        for table in tables:
+            rows = table.find_all('tr')
+            for row in rows[1:]:  # Skip header row
+                cells = row.find_all('td')
+                if len(cells) >= 4:  # Minimum expected columns
+                    vulnerability = {}
+                    
+                    # Try to extract CVE ID
+                    if cells[0].get_text().strip().startswith('CVE-'):
+                        vulnerability['VulnerabilityID'] = cells[0].get_text().strip()
+                    
+                    # Try to extract package name
+                    if len(cells) > 1:
+                        vulnerability['PkgName'] = cells[1].get_text().strip()
+                    
+                    # Try to extract severity
+                    severity_cell = None
+                    for cell in cells:
+                        cell_text = cell.get_text().strip().upper()
+                        if cell_text in ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW', 'UNKNOWN']:
+                            severity_cell = cell_text
+                            break
+                    
+                    if severity_cell:
+                        vulnerability['Severity'] = severity_cell
+                        severity_counts[severity_cell] += 1
+                        total_vulnerabilities += 1
+                    
+                    # Try to extract other fields
+                    if len(cells) > 2:
+                        vulnerability['InstalledVersion'] = cells[2].get_text().strip()
+                    if len(cells) > 3:
+                        vulnerability['Title'] = cells[3].get_text().strip()
+                    
+                    if vulnerability:
+                        # Create a result structure similar to JSON format
+                        if not results:
+                            results.append({
+                                'Target': artifact_name,
+                                'Type': 'container',
+                                'Vulnerabilities': []
+                            })
+                        
+                        results[0]['Vulnerabilities'].append(vulnerability)
+        
+        # If no structured data found, try to extract summary information
+        if total_vulnerabilities == 0:
+            # Look for severity badges or spans
+            for severity in ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW']:
+                elements = soup.find_all(text=re.compile(severity, re.IGNORECASE))
+                for element in elements:
+                    # Try to extract numbers near severity keywords
+                    parent = element.parent if hasattr(element, 'parent') else None
+                    if parent:
+                        numbers = re.findall(r'\d+', parent.get_text())
+                        if numbers:
+                            count = int(numbers[0])
+                            severity_counts[severity] += count
+                            total_vulnerabilities += count
+        
+        return {
+            'artifact_name': artifact_name,
+            'artifact_type': 'container',
+            'schema_version': 'HTML',
+            'vulnerabilities': {
+                'total': total_vulnerabilities,
+                'by_severity': severity_counts
+            },
+            'results': results,
+            'raw_data': {'html_content': content}
+        }
+        
+    except Exception as e:
+        logging.error(f"Error parsing Trivy HTML report: {e}")
+        raise ValueError(f"Error parsing Trivy HTML report: {e}")

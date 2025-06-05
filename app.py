@@ -1,11 +1,13 @@
 import os
 import json
 import logging
+import uuid
+from datetime import datetime
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 from werkzeug.middleware.proxy_fix import ProxyFix
-from utils.parsers import parse_sonarqube_report, parse_sbom_report, parse_trivy_report
+from utils.parsers import parse_sonarqube_report, parse_sbom_report, parse_trivy_report, parse_trivy_html_report
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -19,36 +21,76 @@ CORS(app)
 
 # Configure upload settings
 UPLOAD_FOLDER = 'uploads'
-ALLOWED_EXTENSIONS = {'json', 'xml'}
+ALLOWED_EXTENSIONS = {'json', 'xml', 'html'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
 # Create upload directory if it doesn't exist
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# In-memory storage for processed reports
-reports_data = {
-    'sonarqube': None,
-    'sbom': None,
-    'trivy': None
-}
+# In-memory storage for projects and their reports
+projects_data = {}
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-@app.route('/')
-def index():
-    return render_template('index.html', reports_data=reports_data)
+def create_project(name: str) -> str:
+    """Create a new project and return its ID"""
+    project_id = str(uuid.uuid4())
+    projects_data[project_id] = {
+        'id': project_id,
+        'name': name,
+        'created_at': datetime.now().isoformat(),
+        'reports': {
+            'sonarqube': None,
+            'sbom': None,
+            'trivy': None
+        }
+    }
+    return project_id
 
-@app.route('/upload', methods=['POST'])
-def upload_file():
+@app.route('/')
+def home():
+    """Home page showing all projects"""
+    return render_template('home.html', projects=projects_data)
+
+@app.route('/create-project', methods=['GET', 'POST'])
+def create_project_route():
+    """Create a new project"""
+    if request.method == 'POST':
+        project_name = request.form.get('project_name', '').strip()
+        if not project_name:
+            flash('Project name is required.', 'error')
+            return render_template('create_project.html')
+        
+        project_id = create_project(project_name)
+        flash(f'Project "{project_name}" created successfully.', 'success')
+        return redirect(url_for('project_dashboard', project_id=project_id))
+    
+    return render_template('create_project.html')
+
+@app.route('/project/<project_id>')
+def project_dashboard(project_id):
+    """Project dashboard page"""
+    if project_id not in projects_data:
+        flash('Project not found.', 'error')
+        return redirect(url_for('home'))
+    
+    project = projects_data[project_id]
+    return render_template('project_dashboard.html', project=project)
+
+@app.route('/project/<project_id>/upload', methods=['POST'])
+def upload_file(project_id):
+    if project_id not in projects_data:
+        return jsonify({'error': 'Project not found'}), 404
+    
     if 'file' not in request.files:
         return jsonify({'error': 'No file selected'}), 400
     
     file = request.files['file']
     report_type = request.form.get('report_type')
     
-    if file.filename == '':
+    if not file.filename:
         return jsonify({'error': 'No file selected'}), 400
     
     if not report_type or report_type not in ['sonarqube', 'sbom', 'trivy']:
@@ -60,19 +102,24 @@ def upload_file():
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(filepath)
             
-            # Parse the file based on report type
+            # Parse the file based on report type and file extension
             with open(filepath, 'r', encoding='utf-8') as f:
                 file_content = f.read()
             
+            parsed_data = None
             if report_type == 'sonarqube':
                 parsed_data = parse_sonarqube_report(file_content)
             elif report_type == 'sbom':
                 parsed_data = parse_sbom_report(file_content)
             elif report_type == 'trivy':
-                parsed_data = parse_trivy_report(file_content)
+                # Check if it's HTML or JSON
+                if filename.lower().endswith('.html'):
+                    parsed_data = parse_trivy_html_report(file_content)
+                else:
+                    parsed_data = parse_trivy_report(file_content)
             
-            # Store parsed data in memory
-            reports_data[report_type] = parsed_data
+            # Store parsed data in project
+            projects_data[project_id]['reports'][report_type] = parsed_data
             
             # Clean up uploaded file
             os.remove(filepath)
@@ -87,51 +134,81 @@ def upload_file():
             logging.error(f"Error processing {report_type} file: {str(e)}")
             return jsonify({'error': f'Error processing file: {str(e)}'}), 500
     
-    return jsonify({'error': 'Invalid file format. Please upload JSON or XML files.'}), 400
+    return jsonify({'error': 'Invalid file format. Please upload JSON, XML, or HTML files.'}), 400
 
-@app.route('/api/summary')
-def get_summary():
-    """Get summary data for the dashboard"""
+@app.route('/project/<project_id>/api/summary')
+def get_project_summary(project_id):
+    """Get summary data for the project dashboard"""
+    if project_id not in projects_data:
+        return jsonify({'error': 'Project not found'}), 404
+    
+    project = projects_data[project_id]
+    reports = project['reports']
+    
     summary = {
-        'sonarqube': reports_data.get('sonarqube'),
-        'sbom': reports_data.get('sbom'),
-        'trivy': reports_data.get('trivy'),
-        'total_reports': sum(1 for report in reports_data.values() if report is not None)
+        'sonarqube': reports.get('sonarqube'),
+        'sbom': reports.get('sbom'),
+        'trivy': reports.get('trivy'),
+        'total_reports': sum(1 for report in reports.values() if report is not None)
     }
     return jsonify(summary)
 
-@app.route('/sonarqube')
-def sonarqube_detail():
-    if not reports_data.get('sonarqube'):
+@app.route('/project/<project_id>/sonarqube')
+def project_sonarqube_detail(project_id):
+    if project_id not in projects_data:
+        flash('Project not found.', 'error')
+        return redirect(url_for('home'))
+    
+    project = projects_data[project_id]
+    if not project['reports'].get('sonarqube'):
         flash('No SonarQube report data available. Please upload a report first.', 'warning')
-        return redirect(url_for('index'))
-    return render_template('sonarqube_detail.html', data=reports_data['sonarqube'])
+        return redirect(url_for('project_dashboard', project_id=project_id))
+    
+    return render_template('sonarqube_detail.html', 
+                         data=project['reports']['sonarqube'], 
+                         project=project)
 
-@app.route('/sbom')
-def sbom_detail():
-    if not reports_data.get('sbom'):
+@app.route('/project/<project_id>/sbom')
+def project_sbom_detail(project_id):
+    if project_id not in projects_data:
+        flash('Project not found.', 'error')
+        return redirect(url_for('home'))
+    
+    project = projects_data[project_id]
+    if not project['reports'].get('sbom'):
         flash('No SBOM report data available. Please upload a report first.', 'warning')
-        return redirect(url_for('index'))
-    return render_template('sbom_detail.html', data=reports_data['sbom'])
+        return redirect(url_for('project_dashboard', project_id=project_id))
+    
+    return render_template('sbom_detail.html', 
+                         data=project['reports']['sbom'], 
+                         project=project)
 
-@app.route('/trivy')
-def trivy_detail():
-    if not reports_data.get('trivy'):
+@app.route('/project/<project_id>/trivy')
+def project_trivy_detail(project_id):
+    if project_id not in projects_data:
+        flash('Project not found.', 'error')
+        return redirect(url_for('home'))
+    
+    project = projects_data[project_id]
+    if not project['reports'].get('trivy'):
         flash('No Trivy report data available. Please upload a report first.', 'warning')
-        return redirect(url_for('index'))
-    return render_template('trivy_detail.html', data=reports_data['trivy'])
+        return redirect(url_for('project_dashboard', project_id=project_id))
+    
+    return render_template('trivy_detail.html', 
+                         data=project['reports']['trivy'], 
+                         project=project)
 
-@app.route('/clear')
-def clear_data():
-    """Clear all stored report data"""
-    global reports_data
-    reports_data = {
-        'sonarqube': None,
-        'sbom': None,
-        'trivy': None
-    }
-    flash('All report data cleared successfully.', 'success')
-    return redirect(url_for('index'))
+@app.route('/project/<project_id>/delete', methods=['POST'])
+def delete_project(project_id):
+    """Delete a project"""
+    if project_id in projects_data:
+        project_name = projects_data[project_id]['name']
+        del projects_data[project_id]
+        flash(f'Project "{project_name}" deleted successfully.', 'success')
+    else:
+        flash('Project not found.', 'error')
+    
+    return redirect(url_for('home'))
 
 @app.errorhandler(404)
 def not_found_error(error):

@@ -22,6 +22,7 @@ function setupFileUploads() {
         const fileInput = card.querySelector('.file-input');
         const uploadButton = card.querySelector('.upload-button');
         const reportType = card.dataset.reportType;
+        const projectId = card.dataset.projectId;
         
         // Handle card click
         card.addEventListener('click', () => {
@@ -40,14 +41,14 @@ function setupFileUploads() {
         fileInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file) {
-                uploadFile(file, reportType, card);
+                uploadFile(file, reportType, card, projectId);
             }
         });
     });
 }
 
 // Upload file function
-async function uploadFile(file, reportType, card) {
+async function uploadFile(file, reportType, card, projectId) {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('report_type', reportType);
@@ -56,7 +57,8 @@ async function uploadFile(file, reportType, card) {
     showUploadLoading(card, true);
     
     try {
-        const response = await fetch('/upload', {
+        const uploadUrl = projectId ? `/project/${projectId}/upload` : '/upload';
+        const response = await fetch(uploadUrl, {
             method: 'POST',
             body: formData
         });
@@ -72,7 +74,7 @@ async function uploadFile(file, reportType, card) {
             showNotification('success', result.message);
             
             // Refresh summary data
-            await loadSummaryData();
+            await loadSummaryData(projectId);
         } else {
             showNotification('error', result.error || 'Upload failed');
         }
@@ -117,9 +119,10 @@ function showUploadLoading(card, loading) {
 }
 
 // Load summary data
-async function loadSummaryData() {
+async function loadSummaryData(projectId) {
     try {
-        const response = await fetch('/api/summary');
+        const summaryUrl = projectId ? `/project/${projectId}/api/summary` : '/api/summary';
+        const response = await fetch(summaryUrl);
         const data = await response.json();
         
         updateSonarQubeSummary(data.sonarqube);

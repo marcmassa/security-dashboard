@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Create New Project - Security Dashboard{% endblock %}
+
+{% block content %}
+<div class="detail-container">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
+            <li class="breadcrumb-item active">Create Project</li>
+        </ol>
+    </nav>
+
+    <!-- Header -->
+    <div class="text-center mb-5">
+        <h1 class="h2 mb-3">Create New Security Analysis Project</h1>
+        <p class="text-muted">Start analyzing your project's security by creating a new project workspace</p>
+    </div>
+
+    <!-- Create Project Form -->
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="summary-card">
+                <form method="POST">
+                    <div class="mb-4">
+                        <label for="project_name" class="form-label">
+                            <i data-feather="folder"></i>
+                            Project Name
+                        </label>
+                        <input type="text" 
+                               class="form-control form-control-lg" 
+                               id="project_name" 
+                               name="project_name" 
+                               placeholder="Enter your project name"
+                               required
+                               maxlength="100">
+                        <div class="form-text">
+                            Choose a descriptive name for your security analysis project
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i data-feather="plus-circle"></i>
+                            Create Project
+                        </button>
+                        <a href="{{ url_for('home') }}" class="btn btn-outline-secondary">
+                            <i data-feather="arrow-left"></i>
+                            Back to Home
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Section -->
+    <div class="row mt-5">
+        <div class="col-md-4">
+            <div class="text-center mb-4">
+                <div class="mb-3">
+                    <i data-feather="code" style="width: 48px; height: 48px; color: hsl(var(--primary));"></i>
+                </div>
+                <h5>SonarQube Analysis</h5>
+                <p class="text-muted small">Upload code quality and security analysis reports from SonarQube in JSON format</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="text-center mb-4">
+                <div class="mb-3">
+                    <i data-feather="package" style="width: 48px; height: 48px; color: hsl(var(--primary));"></i>
+                </div>
+                <h5>SBOM Analysis</h5>
+                <p class="text-muted small">Upload Software Bill of Materials in CycloneDX format (JSON or XML)</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="text-center mb-4">
+                <div class="mb-3">
+                    <i data-feather="search" style="width: 48px; height: 48px; color: hsl(var(--primary));"></i>
+                </div>
+                <h5>Trivy Scanning</h5>
+                <p class="text-muted small">Upload container vulnerability scan results from Trivy (JSON or HTML format)</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
