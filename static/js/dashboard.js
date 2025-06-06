@@ -271,6 +271,7 @@ function createSBOMChart(vulnerabilities) {
     if (!canvas || !window.Chart) return;
     
     const ctx = canvas.getContext('2d');
+    if (!ctx) return;
     
     // Destroy existing chart
     if (canvas.chart) {
@@ -281,16 +282,16 @@ function createSBOMChart(vulnerabilities) {
         labels: ['Critical', 'High', 'Medium', 'Low'],
         datasets: [{
             data: [
-                vulnerabilities.critical,
-                vulnerabilities.high,
-                vulnerabilities.medium,
-                vulnerabilities.low
+                vulnerabilities.critical || 0,
+                vulnerabilities.high || 0,
+                vulnerabilities.medium || 0,
+                vulnerabilities.low || 0
             ],
             backgroundColor: [
-                'hsl(var(--critical))',
-                'hsl(var(--high))',
-                'hsl(var(--medium))',
-                'hsl(var(--low))'
+                '#dc3545',
+                '#fd7e14',
+                '#ffc107',
+                '#20c997'
             ],
             borderWidth: 0
         }]
@@ -317,6 +318,7 @@ function createTrivyChart(vulnerabilities) {
     if (!canvas || !window.Chart) return;
     
     const ctx = canvas.getContext('2d');
+    if (!ctx) return;
     
     // Destroy existing chart
     if (canvas.chart) {
@@ -327,18 +329,18 @@ function createTrivyChart(vulnerabilities) {
         labels: ['Critical', 'High', 'Medium', 'Low', 'Unknown'],
         datasets: [{
             data: [
-                vulnerabilities.CRITICAL,
-                vulnerabilities.HIGH,
-                vulnerabilities.MEDIUM,
-                vulnerabilities.LOW,
-                vulnerabilities.UNKNOWN
+                vulnerabilities.CRITICAL || 0,
+                vulnerabilities.HIGH || 0,
+                vulnerabilities.MEDIUM || 0,
+                vulnerabilities.LOW || 0,
+                vulnerabilities.UNKNOWN || 0
             ],
             backgroundColor: [
-                'hsl(var(--critical))',
-                'hsl(var(--high))',
-                'hsl(var(--medium))',
-                'hsl(var(--low))',
-                'hsl(var(--unknown))'
+                '#dc3545',
+                '#fd7e14',
+                '#ffc107',
+                '#20c997',
+                '#6c757d'
             ],
             borderWidth: 0
         }]

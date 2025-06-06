@@ -19,20 +19,48 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h1 class="h2 mb-0">SonarQube Analysis Report</h1>
-            <p class="text-muted">{{ data.project_name }} ({{ data.project_key }})</p>
+            {% if data and data.project_name %}
+            <p class="text-muted">{{ data.project_name }} 
+                {% if data.project_key %}({{ data.project_key }}){% endif %}
+                {% if project and project.sonar_project_key %}
+                <button class="btn btn-sm btn-outline-secondary ms-2" onclick="editSonarProjectKey()">
+                    <i data-feather="edit-2"></i> Edit Key
+                </button>
+                {% endif %}
+            </p>
+            {% else %}
+            <p class="text-muted">
+                {% if project %}
+                Project: {{ project.name }}
+                {% if project.sonar_project_key %}
+                <span class="badge bg-info">Key: {{ project.sonar_project_key }}</span>
+                <button class="btn btn-sm btn-outline-secondary ms-2" onclick="editSonarProjectKey()">
+                    <i data-feather="edit-2"></i> Edit Key
+                </button>
+                {% else %}
+                <span class="badge bg-warning">No SonarQube key configured</span>
+                <button class="btn btn-sm btn-primary ms-2" onclick="editSonarProjectKey()">
+                    <i data-feather="plus"></i> Set Key
+                </button>
+                {% endif %}
+                {% endif %}
+            </p>
+            {% endif %}
         </div>
         <div>
+            {% if data %}
             <button class="btn btn-outline-primary me-2" onclick="exportToPDF()">
                 <i data-feather="download"></i> Export PDF
             </button>
             <button class="btn btn-outline-primary" onclick="exportToJSON()">
                 <i data-feather="file-text"></i> Export JSON
             </button>
+            {% endif %}
         </div>
     </div>
 
+    {% if data and data.quality_gate_status %}
     <!-- Quality Gate Status -->
-    {% if data.quality_gate_status %}
     <div class="row mb-4">
         <div class="col-12">
             <div class="summary-card">
@@ -48,6 +76,46 @@
                             {{ data.quality_gate_status }}
                         </span>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if not data %}
+    <!-- No Data State -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="text-center py-5">
+                <div class="mb-4">
+                    <i data-feather="database" style="width: 64px; height: 64px; color: #6c757d;"></i>
+                </div>
+                <h3 class="text-muted mb-3">No SonarQube Data Available</h3>
+                <p class="text-muted mb-4">This project doesn't have SonarQube analysis data yet.</p>
+                
+                {% if project and project.sonar_project_key %}
+                <div class="alert alert-info">
+                    <i data-feather="info"></i>
+                    SonarQube project key is configured: <strong>{{ project.sonar_project_key }}</strong>
+                    <br>
+                    <small>Data should appear here after running SonarQube analysis on your project.</small>
+                </div>
+                {% else %}
+                <div class="alert alert-warning">
+                    <i data-feather="alert-triangle"></i>
+                    No SonarQube project key configured yet.
+                </div>
+                {% endif %}
+                
+                <div class="d-flex justify-content-center gap-3">
+                    {% if project and project.sonar_project_key %}
+                    <button class="btn btn-primary" onclick="refreshSonarQubeData()">
+                        <i data-feather="refresh-cw"></i> Refresh Data
+                    </button>
+                    {% endif %}
+                    <button class="btn btn-outline-primary" onclick="editSonarProjectKey()">
+                        <i data-feather="settings"></i> Configure Project Key
+                    </button>
                 </div>
             </div>
         </div>
@@ -353,7 +421,7 @@
                 </div>
                 <div class="col-md-3 d-flex align-items-end">
                     <button class="btn btn-outline-primary" onclick="sortMetricsTable()">
-                        <i data-feather="arrow-up-down"></i> Sort
+                        <i data-feather="arrow-up"></i> Sort
                     </button>
                 </div>
             </div>
@@ -422,6 +490,53 @@
 
 
 </div>
+    <!-- Back to Dashboard Button -->
+    <div class="text-center mt-4">
+        <a href="{{ url_for('project_dashboard', project_id=project.id) }}" class="btn btn-primary">
+            <i data-feather="arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <!-- Edit SonarQube Project Key Modal -->
+    <div class="modal fade" id="editSonarKeyModal" tabindex="-1" aria-labelledby="editSonarKeyModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="editSonarKeyModalLabel">
+                        <i data-feather="edit-2"></i> SonarQube Project Key
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <i data-feather="info"></i>
+                        Enter the project key from your SonarQube server. This should match the project key configured in your SonarQube analysis.
+                    </div>
+                    
+                    <form id="sonarKeyForm">
+                        <div class="mb-3">
+                            <label for="sonarProjectKey" class="form-label fw-bold">Project Key</label>
+                            <input type="text" class="form-control form-control-lg" id="sonarProjectKey" 
+                                   placeholder="my-project-key" value="{{ project.sonar_project_key or '' }}" required>
+                            <div class="form-text">
+                                This key identifies your project in SonarQube (e.g., "my-app", "com.company:project")
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i data-feather="x"></i> Cancel
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="saveSonarProjectKey()">
+                        <i data-feather="save"></i> Save & Connect
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
 {% endblock %}
 
 {% block scripts %}
@@ -429,14 +544,95 @@
 <script>
 // Initialize SonarQube detail charts
 document.addEventListener('DOMContentLoaded', function() {
-    {% if data.bugs is defined %}
+    {% if data and data.bugs is defined %}
     // Create issues type chart
     createIssuesTypeChart();
     {% endif %}
 });
 
+// Edit SonarQube Project Key Functions
+function editSonarProjectKey() {
+    const modal = new bootstrap.Modal(document.getElementById('editSonarKeyModal'));
+    modal.show();
+}
+
+async function saveSonarProjectKey() {
+    const form = document.getElementById('sonarKeyForm');
+    const projectKey = document.getElementById('sonarProjectKey').value;
+    const saveBtn = document.querySelector('button[onclick="saveSonarProjectKey()"]');
+    
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+    
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = '<i data-feather="loader"></i> Connecting...';
+    
+    try {
+        const response = await fetch(`/api/projects/{{ project.id }}/sonarqube/connect`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ project_key: projectKey })
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok && result.success) {
+            showNotification('success', 'SonarQube configuration saved successfully');
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editSonarKeyModal'));
+            modal.hide();
+            // Reload page to show new data
+            setTimeout(() => window.location.reload(), 1000);
+        } else {
+            showNotification('error', result.message || result.error || 'Failed to save configuration');
+        }
+    } catch (error) {
+        showNotification('error', 'Failed to save configuration. Please try again.');
+    } finally {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '<i data-feather="save"></i> Save & Connect';
+        feather.replace();
+    }
+}
+
+async function refreshSonarQubeData() {
+    const refreshBtn = document.querySelector('button[onclick="refreshSonarQubeData()"]');
+    if (!refreshBtn) return;
+    
+    refreshBtn.disabled = true;
+    refreshBtn.innerHTML = '<i data-feather="loader"></i> Refreshing...';
+    
+    try {
+        const projectKey = '{{ project.sonar_project_key }}';
+        const response = await fetch(`/api/projects/{{ project.id }}/sonarqube/connect`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ project_key: projectKey })
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok && result.success) {
+            showNotification('success', 'Data refreshed successfully');
+            setTimeout(() => window.location.reload(), 1000);
+        } else {
+            showNotification('error', result.message || result.error || 'Failed to refresh data');
+        }
+    } catch (error) {
+        showNotification('error', 'Failed to refresh data. Please try again.');
+    } finally {
+        refreshBtn.disabled = false;
+        refreshBtn.innerHTML = '<i data-feather="refresh-cw"></i> Refresh Data';
+        feather.replace();
+    }
+}
+
 function createIssuesTypeChart() {
-    const ctx = document.getElementById('issuesTypeChart').getContext('2d');
+    const canvas = document.getElementById('issuesTypeChart');
+    if (!canvas || !window.Chart) return;
+    
+    const ctx = canvas.getContext('2d');
     
     const issuesData = {
         labels: ['Bugs', 'Vulnerabilities', 'Code Smells', 'Security Hotspots'],
@@ -448,10 +644,10 @@ function createIssuesTypeChart() {
                 {{ data.security_hotspots | default(0) }}
             ],
             backgroundColor: [
-                'hsl(var(--critical))',
-                'hsl(var(--high))', 
-                'hsl(var(--medium))',
-                'hsl(var(--warning))'
+                '#dc3545',
+                '#fd7e14', 
+                '#ffc107',
+                '#6f42c1'
             ],
             borderWidth: 0
         }]
@@ -467,7 +663,6 @@ function createIssuesTypeChart() {
                 legend: {
                     position: 'bottom',
                     labels: {
-                        color: 'hsl(var(--foreground))',
                         usePointStyle: true,
                         padding: 20
                     }
