@@ -16,6 +16,7 @@ class Project(db.Model):
     
     id = db.Column(db.String(36), primary_key=True)
     name = db.Column(db.String(255), nullable=False)
+    sonar_project_key = db.Column(db.String(255), nullable=True)  # SonarQube project key
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     

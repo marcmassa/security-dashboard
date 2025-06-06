@@ -105,21 +105,31 @@
                     <i data-feather="bar-chart-2"></i>
                 </div>
                 <div class="empty-state-text">No SonarQube Data</div>
-                <div class="empty-state-subtext">Configure connection or upload a report to see code quality metrics</div>
+                <div class="empty-state-subtext">Connect to SonarQube or upload a report</div>
                 
-                <!-- Configuration and Upload Options -->
                 <div class="mt-4">
-                    {% include 'sonarqube_config.html' %}
-                    
-                    <div class="mt-3 text-center">
-                        <span class="text-muted">or</span>
+                    <!-- Project Key Input -->
+                    <div class="mb-3">
+                        <label for="projectKey" class="form-label">SonarQube Project Key</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="projectKey" 
+                                   placeholder="Enter project key (e.g., my-project-key)"
+                                   value="{{ project.sonar_project_key or '' }}">
+                            <button class="btn btn-primary" onclick="connectWithProjectKey()">
+                                <i data-feather="link"></i> Connect
+                            </button>
+                        </div>
+                        <div class="form-text">Project key from your SonarQube server</div>
                     </div>
                     
-                    <div class="mt-3 text-center">
-                        <label class="btn btn-outline-primary">
-                            <i data-feather="upload"></i> Upload JSON Report
-                            <input type="file" class="d-none upload-input" data-report-type="sonarqube" accept=".json">
-                        </label>
+                    <div class="text-center">
+                        <span class="text-muted">or</span>
+                        <div class="mt-2">
+                            <label class="btn btn-outline-primary">
+                                <i data-feather="upload"></i> Upload JSON Report
+                                <input type="file" class="d-none upload-input" data-report-type="sonarqube" accept=".json">
+                            </label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -245,170 +255,61 @@ document.addEventListener('DOMContentLoaded', function() {
     {% endif %}
 });
 
-// SonarQube configuration functions
-async function connectToSonarQube() {
-    const connectBtn = document.querySelector('.btn-primary');
-    const spinner = connectBtn.querySelector('.spinner-border');
+// Simple SonarQube connection function
+async function connectWithProjectKey() {
+    const projectKey = document.getElementById('projectKey').value;
+    const connectBtn = document.querySelector('button[onclick="connectWithProjectKey()"]');
     
-    // Get configuration values
-    const globalUrl = document.getElementById('globalSonarUrl').value;
-    const globalToken = document.getElementById('globalSonarToken').value;
-    const projectKey = document.getElementById('projectSonarKey').value;
-    const projectToken = document.getElementById('projectSonarToken').value;
-    
-    // Validate required fields
-    if (!globalUrl || !projectKey) {
-        showNotification('error', 'Please provide SonarQube server URL and project key');
+    if (!projectKey) {
+        showSimpleNotification('error', 'Please enter a project key');
         return;
     }
     
-    if (!globalToken && !projectToken) {
-        showNotification('error', 'Please provide either a global token or project-specific token');
-        return;
-    }
-    
-    // Use project token if available, otherwise global token
-    const tokenToUse = projectToken || globalToken;
-    
-    // Show loading state
-    connectBtn.disabled = true;
-    if (spinner) spinner.classList.remove('d-none');
-    
+    // Check if global config exists
     try {
-        const response = await fetch(`/api/projects/{{ project.id }}/sonarqube/fetch`, {
+        const response = await fetch('/api/sonarqube/get-global-config');
+        const globalConfig = await response.json();
+        
+        if (!globalConfig.sonar_url) {
+            showSimpleNotification('error', 'Please configure SonarQube server first using the "SonarQube Config" button in the top menu');
+            return;
+        }
+        
+        // Save project key and connect
+        connectBtn.disabled = true;
+        connectBtn.innerHTML = '<i data-feather="loader"></i> Connecting...';
+        
+        const connectResponse = await fetch(`/api/projects/{{ project.id }}/sonarqube/connect`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                sonar_url: globalUrl,
-                sonar_token: tokenToUse,
-                sonar_project_key: projectKey
-            })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ project_key: projectKey })
         });
         
-        const result = await response.json();
+        const result = await connectResponse.json();
         
-        if (response.ok && result.success) {
-            showNotification('success', `Successfully connected to SonarQube! Project: ${result.project_name}`);
-            
-            // Reload page after short delay
-            setTimeout(() => {
-                window.location.reload();
-            }, 1500);
+        if (connectResponse.ok && result.success) {
+            showSimpleNotification('success', 'Connected successfully!');
+            setTimeout(() => window.location.reload(), 1500);
         } else {
-            // Show detailed error message with suggestions
-            let errorMessage = result.message || result.error || 'Failed to connect to SonarQube';
-            if (result.suggestions && result.suggestions.length > 0) {
-                errorMessage += '\n\nSuggestions:\n• ' + result.suggestions.join('\n• ');
-            }
-            showNotification('error', errorMessage);
+            showSimpleNotification('error', result.error || 'Connection failed');
         }
     } catch (error) {
-        console.error('Connection error:', error);
-        showNotification('error', 'Connection failed. Please check your network and try again.');
+        showSimpleNotification('error', 'Connection failed. Check network and configuration.');
     } finally {
-        // Reset loading state
         connectBtn.disabled = false;
-        if (spinner) spinner.classList.add('d-none');
+        connectBtn.innerHTML = '<i data-feather="link"></i> Connect';
+        feather.replace();
     }
 }
 
-async function testSonarQubeConnection() {
-    const globalUrl = document.getElementById('globalSonarUrl').value;
-    const globalToken = document.getElementById('globalSonarToken').value;
-    const projectToken = document.getElementById('projectSonarToken').value;
-    
-    if (!globalUrl) {
-        showNotification('error', 'Please provide SonarQube server URL');
-        return;
-    }
-    
-    const tokenToUse = projectToken || globalToken;
-    if (!tokenToUse) {
-        showNotification('error', 'Please provide a token');
-        return;
-    }
-    
-    try {
-        const response = await fetch('/api/sonarqube/test-connection', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                sonar_url: globalUrl,
-                sonar_token: tokenToUse
-            })
-        });
-        
-        const result = await response.json();
-        
-        if (response.ok && result.success) {
-            showNotification('success', `Connection successful! SonarQube version: ${result.version}`);
-        } else {
-            showNotification('error', result.error || 'Connection test failed');
-        }
-    } catch (error) {
-        showNotification('error', 'Connection test failed. Please check your network.');
-    }
-}
-
-async function saveGlobalConfig() {
-    const globalUrl = document.getElementById('globalSonarUrl').value;
-    const globalToken = document.getElementById('globalSonarToken').value;
-    
-    if (!globalUrl) {
-        showNotification('error', 'Please provide SonarQube server URL');
-        return;
-    }
-    
-    try {
-        const response = await fetch('/api/sonarqube/save-config', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                sonar_url: globalUrl,
-                sonar_token: globalToken
-            })
-        });
-        
-        const result = await response.json();
-        
-        if (response.ok && result.success) {
-            showNotification('success', 'Global configuration saved successfully');
-        } else {
-            showNotification('error', result.error || 'Failed to save configuration');
-        }
-    } catch (error) {
-        showNotification('error', 'Failed to save configuration. Please try again.');
-    }
-}
-
-// Notification function
-function showNotification(type, message) {
+// Simple notification function
+function showSimpleNotification(type, message) {
     const notification = document.createElement('div');
     notification.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed`;
-    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 400px; max-width: 500px; white-space: pre-line;';
-    notification.innerHTML = `
-        <div style="font-weight: 500; margin-bottom: ${message.includes('\n') ? '8px' : '0'};">
-            ${message.split('\n')[0]}
-        </div>
-        ${message.includes('\n') ? `<div style="font-size: 0.9em; opacity: 0.9;">${message.split('\n').slice(1).join('\n')}</div>` : ''}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
-    
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    notification.innerHTML = `${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>`;
     document.body.appendChild(notification);
-    
-    // Auto-remove after longer time for error messages
-    const timeout = type === 'error' ? 10000 : 5000;
-    setTimeout(() => {
-        if (notification.parentNode) {
-            notification.remove();
-        }
-    }, timeout);
+    setTimeout(() => { if (notification.parentNode) notification.remove(); }, 4000);
 }
 </script>
 {% endblock %}
