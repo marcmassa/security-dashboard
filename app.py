@@ -172,13 +172,11 @@ def project_sonarqube_detail(project_id):
         return redirect(url_for('home'))
     
     project_data = project.to_dict()
-    if not project_data['reports'].get('sonarqube'):
-        flash('No SonarQube report data available. Please upload a report first.', 'warning')
-        return redirect(url_for('project_dashboard', project_id=project_id))
+    sonarqube_data = project_data['reports'].get('sonarqube')
     
     return render_template('sonarqube_detail.html', 
-                         data=project_data['reports']['sonarqube'], 
-                         project=project_data)
+                         data=sonarqube_data, 
+                         project=project)
 
 @app.route('/project/<project_id>/sbom')
 def project_sbom_detail(project_id):
@@ -188,13 +186,11 @@ def project_sbom_detail(project_id):
         return redirect(url_for('home'))
     
     project_data = project.to_dict()
-    if not project_data['reports'].get('sbom'):
-        flash('No SBOM report data available. Please upload a report first.', 'warning')
-        return redirect(url_for('project_dashboard', project_id=project_id))
+    sbom_data = project_data['reports'].get('sbom')
     
     return render_template('sbom_detail.html', 
-                         data=project_data['reports']['sbom'], 
-                         project=project_data)
+                         data=sbom_data, 
+                         project=project)
 
 @app.route('/project/<project_id>/trivy')
 def project_trivy_detail(project_id):
@@ -204,13 +200,11 @@ def project_trivy_detail(project_id):
         return redirect(url_for('home'))
     
     project_data = project.to_dict()
-    if not project_data['reports'].get('trivy'):
-        flash('No Trivy report data available. Please upload a report first.', 'warning')
-        return redirect(url_for('project_dashboard', project_id=project_id))
+    trivy_data = project_data['reports'].get('trivy')
     
     return render_template('trivy_detail.html', 
-                         data=project_data['reports']['trivy'], 
-                         project=project_data)
+                         data=trivy_data, 
+                         project=project)
 
 @app.route('/project/<project_id>/delete', methods=['POST'])
 def delete_project(project_id):
