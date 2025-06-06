@@ -549,54 +549,68 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-/* Upload section styles */
-.upload-section {
-  padding: 2rem 0;
+/* SonarQube Configuration styles */
+.sonarqube-config {
+  margin: 1rem 0;
 }
 
-.upload-options {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.upload-option {
+.config-toggle {
   text-align: center;
-  padding: 2rem;
-  border: 2px dashed hsl(var(--border));
-  border-radius: 12px;
-  transition: all 0.3s ease;
-}
-
-.upload-option:hover {
-  border-color: hsl(var(--primary));
-  background-color: hsl(var(--primary) / 0.05);
-}
-
-.upload-icon {
   margin-bottom: 1rem;
 }
 
-.upload-icon i {
-  width: 48px;
-  height: 48px;
-  color: hsl(var(--primary));
+.sonarqube-config .card {
+  border: 1px solid hsl(var(--border));
+  background-color: hsl(var(--card));
 }
 
-.upload-option h4 {
-  margin-bottom: 0.5rem;
+.sonarqube-config .card-header {
+  background-color: hsl(var(--muted) / 0.3);
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+.sonarqube-config .card-title {
   color: hsl(var(--foreground));
   font-weight: 600;
 }
 
-.upload-option p {
-  margin-bottom: 1.5rem;
-  color: hsl(var(--secondary-foreground));
-  font-size: 0.9rem;
+.sonarqube-config .form-label {
+  color: hsl(var(--foreground));
+  font-weight: 500;
 }
 
-.upload-option .btn {
-  min-width: 140px;
+.sonarqube-config .form-control {
+  background-color: hsl(var(--background));
+  border: 1px solid hsl(var(--border));
+  color: hsl(var(--foreground));
+}
+
+.sonarqube-config .form-control:focus {
+  border-color: hsl(var(--primary));
+  box-shadow: 0 0 0 0.2rem hsl(var(--primary) / 0.25);
+}
+
+.sonarqube-config .form-text {
+  color: hsl(var(--muted-foreground));
+  font-size: 0.875rem;
+}
+
+.sonarqube-config .text-muted {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+.sonarqube-config .alert-info {
+  background-color: hsl(var(--info) / 0.1);
+  border-color: hsl(var(--info) / 0.3);
+  color: hsl(var(--info-foreground));
+}
+
+.sonarqube-config .btn {
+  font-size: 0.875rem;
+}
+
+.sonarqube-config .btn i {
+  width: 16px;
+  height: 16px;
+  margin-right: 0.5rem;
 }

@@ -3,7 +3,7 @@ import json
 import logging
 import uuid
 from datetime import datetime
-from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
+from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -442,6 +442,71 @@ def fetch_sonarqube_data_api(project_id):
                 'message': 'An unexpected error occurred while connecting to SonarQube.',
                 'details': error_msg
             }), 500
+
+@app.route('/api/sonarqube/test-connection', methods=['POST'])
+def test_sonarqube_connection():
+    """Test SonarQube server connection"""
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'Request body required'}), 400
+    
+    sonar_url = data.get('sonar_url')
+    sonar_token = data.get('sonar_token')
+    
+    if not all([sonar_url, sonar_token]):
+        return jsonify({
+            'error': 'Missing required fields',
+            'required': ['sonar_url', 'sonar_token']
+        }), 400
+    
+    try:
+        from utils.sonarqube_client import SonarQubeClient
+        client = SonarQubeClient(sonar_url, sonar_token)
+        
+        if client.test_connection():
+            # Get system info for version
+            response = client.session.get(f"{sonar_url}/api/system/status")
+            system_info = response.json() if response.ok else {}
+            
+            return jsonify({
+                'success': True,
+                'message': 'Connection successful',
+                'version': system_info.get('version', 'Unknown'),
+                'status': system_info.get('status', 'UP')
+            }), 200
+        else:
+            return jsonify({
+                'error': 'Connection failed',
+                'message': 'Unable to connect to SonarQube server'
+            }), 503
+    except Exception as e:
+        return jsonify({
+            'error': 'Connection test failed',
+            'details': str(e)
+        }), 500
+
+@app.route('/api/sonarqube/save-config', methods=['POST'])
+def save_sonarqube_config():
+    """Save global SonarQube configuration to session"""
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'Request body required'}), 400
+    
+    sonar_url = data.get('sonar_url')
+    sonar_token = data.get('sonar_token')
+    
+    if not sonar_url:
+        return jsonify({'error': 'SonarQube URL is required'}), 400
+    
+    # Store in session
+    session['sonar_url'] = sonar_url
+    if sonar_token:
+        session['sonar_token'] = sonar_token
+    
+    return jsonify({
+        'success': True,
+        'message': 'Configuration saved successfully'
+    }), 200
 
 @app.errorhandler(404)
 def not_found_error(error):

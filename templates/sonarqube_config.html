@@ -1,0 +1,86 @@
+<!-- SonarQube Configuration Component -->
+<div class="sonarqube-config">
+    <div class="config-toggle">
+        <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#sonarQubeConfig" aria-expanded="false" aria-controls="sonarQubeConfig">
+            <i data-feather="settings"></i> Configure SonarQube
+        </button>
+    </div>
+    
+    <div class="collapse mt-3" id="sonarQubeConfig">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i data-feather="server"></i> SonarQube Configuration
+                </h6>
+            </div>
+            <div class="card-body">
+                <!-- Global Server Configuration -->
+                <div class="mb-4">
+                    <h6 class="text-muted mb-3">Global Server Settings</h6>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <label for="globalSonarUrl" class="form-label">SonarQube Server URL</label>
+                            <input type="url" class="form-control" id="globalSonarUrl" 
+                                   placeholder="https://sonarqube.yourcompany.com"
+                                   value="{{ session.get('sonar_url', '') }}">
+                            <div class="form-text">Global SonarQube server URL for your organization</div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="globalSonarToken" class="form-label">Global Token</label>
+                            <input type="password" class="form-control" id="globalSonarToken" 
+                                   placeholder="squ_xxxxxxxxxxxxxxxxxxxxxxxxxx">
+                            <div class="form-text">Optional global token</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <hr class="my-4">
+                
+                <!-- Project-Specific Configuration -->
+                <div class="mb-4">
+                    <h6 class="text-muted mb-3">Project Settings</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="projectSonarKey" class="form-label">Project Key</label>
+                            <input type="text" class="form-control" id="projectSonarKey" 
+                                   placeholder="my-project-key" required>
+                            <div class="form-text">SonarQube project key (found in project settings)</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="projectSonarToken" class="form-label">Project Token (Optional)</label>
+                            <input type="password" class="form-control" id="projectSonarToken" 
+                                   placeholder="Project-specific token">
+                            <div class="form-text">Override global token if needed</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Connection Actions -->
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-primary" onclick="connectToSonarQube()">
+                        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                        <i data-feather="link"></i> Connect & Fetch Data
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="testSonarQubeConnection()">
+                        <i data-feather="check-circle"></i> Test Connection
+                    </button>
+                    <button type="button" class="btn btn-outline-info" onclick="saveGlobalConfig()">
+                        <i data-feather="save"></i> Save Global Config
+                    </button>
+                </div>
+                
+                <!-- Help Section -->
+                <div class="alert alert-info mt-3 mb-0">
+                    <i data-feather="info"></i>
+                    <strong>Configuration Tips:</strong>
+                    <ul class="mb-0 mt-2">
+                        <li>Set global server URL once for all projects</li>
+                        <li>Use project-specific tokens for better security</li>
+                        <li>Ensure tokens have "Browse" permission</li>
+                        <li>Test connection before fetching data</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
