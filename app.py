@@ -8,6 +8,7 @@ from flask_cors import CORS
 from werkzeug.utils import secure_filename
 from werkzeug.middleware.proxy_fix import ProxyFix
 from utils.parsers import parse_sonarqube_report, parse_sbom_report, parse_trivy_report, parse_trivy_html_report
+from utils.sonarqube_client import fetch_sonarqube_data
 from models import db, Project, Report
 
 # Configure logging
@@ -341,6 +342,56 @@ def project_webhook(project_id):
         'event': event_type,
         'timestamp': datetime.utcnow().isoformat()
     }), 200
+
+@app.route('/api/projects/<project_id>/sonarqube/fetch', methods=['POST'])
+def fetch_sonarqube_data_api(project_id):
+    """Fetch SonarQube data directly from server API"""
+    project = Project.query.get(project_id)
+    if not project:
+        return jsonify({'error': 'Project not found'}), 404
+    
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'Request body required'}), 400
+    
+    # Extract SonarQube connection details
+    sonar_url = data.get('sonar_url')
+    sonar_token = data.get('sonar_token') 
+    sonar_project_key = data.get('sonar_project_key')
+    
+    if not all([sonar_url, sonar_token, sonar_project_key]):
+        return jsonify({
+            'error': 'Missing required fields',
+            'required': ['sonar_url', 'sonar_token', 'sonar_project_key']
+        }), 400
+    
+    try:
+        # Fetch data from SonarQube API
+        sonar_data = fetch_sonarqube_data(sonar_url, sonar_token, sonar_project_key)
+        
+        # Store in database
+        project.set_report('sonarqube', sonar_data)
+        
+        return jsonify({
+            'success': True,
+            'message': 'SonarQube data fetched and stored successfully',
+            'project_name': sonar_data.get('project_name'),
+            'last_analysis': sonar_data.get('last_analysis'),
+            'metrics_summary': {
+                'bugs': sonar_data.get('bugs', 0),
+                'vulnerabilities': sonar_data.get('vulnerabilities', 0),
+                'code_smells': sonar_data.get('code_smells', 0),
+                'coverage': sonar_data.get('coverage', 0),
+                'quality_gate': sonar_data.get('quality_gate_status', 'UNKNOWN')
+            }
+        }), 200
+        
+    except Exception as e:
+        logging.error(f"Error fetching SonarQube data: {str(e)}")
+        return jsonify({
+            'error': 'Failed to fetch SonarQube data',
+            'details': str(e)
+        }), 500
 
 @app.errorhandler(404)
 def not_found_error(error):
