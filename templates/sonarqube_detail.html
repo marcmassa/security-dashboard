@@ -57,6 +57,31 @@
     </div>
     {% endif %}
 
+    <!-- Empty State or Summary Cards -->
+    {% if not data or not data.bugs %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="summary-card text-center py-5">
+                <div class="empty-state-icon mb-3">
+                    <i data-feather="server" style="width: 64px; height: 64px; color: hsl(var(--secondary-foreground));"></i>
+                </div>
+                <h3 class="mb-3">No SonarQube Data Available</h3>
+                <p class="text-muted mb-4">Connect to your SonarQube server to fetch real-time analysis data or upload a JSON report</p>
+                
+                <div class="d-flex justify-content-center gap-3">
+                    <button class="btn btn-primary" onclick="showSonarQubeConnectionModal()">
+                        <i data-feather="server"></i> Connect to SonarQube Server
+                    </button>
+                    <label class="btn btn-outline-secondary">
+                        <i data-feather="upload"></i> Upload JSON Report
+                        <input type="file" class="d-none upload-input" data-report-type="sonarqube" accept=".json">
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    
     <!-- Summary Cards -->
     <div class="row mb-4">
         <div class="col-md-2">
@@ -308,6 +333,7 @@
             </table>
         </div>
     </div>
+    {% endif %}
 
     <!-- SonarQube Connection Modal -->
     <div class="modal fade" id="sonarQubeModal" tabindex="-1" aria-labelledby="sonarQubeModalLabel" aria-hidden="true">
