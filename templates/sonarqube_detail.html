@@ -425,11 +425,61 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="/static/js/dashboard.js"></script>
 <script>
-// SonarQube Connection Functions
+// Initialize SonarQube detail charts
+document.addEventListener('DOMContentLoaded', function() {
+    {% if data.bugs is defined %}
+    // Create issues type chart
+    createIssuesTypeChart();
+    {% endif %}
+});
+
+function createIssuesTypeChart() {
+    const ctx = document.getElementById('issuesTypeChart').getContext('2d');
+    
+    const issuesData = {
+        labels: ['Bugs', 'Vulnerabilities', 'Code Smells', 'Security Hotspots'],
+        datasets: [{
+            data: [
+                {{ data.bugs | default(0) }},
+                {{ data.vulnerabilities | default(0) }},
+                {{ data.code_smells | default(0) }},
+                {{ data.security_hotspots | default(0) }}
+            ],
+            backgroundColor: [
+                'hsl(var(--critical))',
+                'hsl(var(--high))', 
+                'hsl(var(--medium))',
+                'hsl(var(--warning))'
+            ],
+            borderWidth: 0
+        }]
+    };
+
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: issuesData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        color: 'hsl(var(--foreground))',
+                        usePointStyle: true,
+                        padding: 20
+                    }
+                }
+            }
+        }
+    });
+}
+
+// SonarQube Connection Functions (deprecated - use dashboard configuration)
 function showSonarQubeConnectionModal() {
-    const modal = new bootstrap.Modal(document.getElementById('sonarQubeModal'));
-    modal.show();
+    showNotification('info', 'Please configure SonarQube connection from the project dashboard.');
 }
 
 async function connectToSonarQube() {
