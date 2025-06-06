@@ -100,12 +100,31 @@
                 </div>
             </div>
             {% else %}
-            <div class="empty-state">
-                <div class="empty-state-icon">
-                    <i data-feather="upload-cloud"></i>
+            <div class="upload-section">
+                <div class="upload-options">
+                    <div class="upload-option">
+                        <div class="upload-icon">
+                            <i data-feather="server"></i>
+                        </div>
+                        <h4>Connect to SonarQube</h4>
+                        <p>Fetch real-time data from your SonarQube server</p>
+                        <button class="btn btn-primary" onclick="showSonarQubeModal()">
+                            <i data-feather="link"></i> Connect Server
+                        </button>
+                    </div>
+                    
+                    <div class="upload-option">
+                        <div class="upload-icon">
+                            <i data-feather="upload"></i>
+                        </div>
+                        <h4>Upload Report</h4>
+                        <p>Upload a SonarQube JSON report file</p>
+                        <label class="btn btn-outline-primary upload-button">
+                            <i data-feather="file-plus"></i> Upload JSON
+                            <input type="file" class="d-none upload-input" data-report-type="sonarqube" accept=".json">
+                        </label>
+                    </div>
                 </div>
-                <div class="empty-state-text">No SonarQube Data</div>
-                <div class="empty-state-subtext">Upload a SonarQube report to see code quality metrics</div>
             </div>
             {% endif %}
         </div>
@@ -211,6 +230,48 @@
             {% endif %}
         </div>
     </div>
+
+    <!-- SonarQube Connection Modal -->
+    <div class="modal fade" id="sonarQubeModal" tabindex="-1" aria-labelledby="sonarQubeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="sonarQubeModalLabel">Connect to SonarQube Server</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="sonarQubeForm">
+                        <div class="mb-3">
+                            <label for="sonarUrl" class="form-label">SonarQube Server URL</label>
+                            <input type="url" class="form-control" id="sonarUrl" placeholder="https://sonarqube.yourcompany.com" required>
+                            <div class="form-text">URL of your SonarQube server</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="sonarToken" class="form-label">Authentication Token</label>
+                            <input type="password" class="form-control" id="sonarToken" placeholder="squ_xxxxxxxxxxxxxxxxxxxxxxxxxx" required>
+                            <div class="form-text">User token or project analysis token from SonarQube</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="sonarProjectKey" class="form-label">Project Key</label>
+                            <input type="text" class="form-control" id="sonarProjectKey" placeholder="my-project-key" required>
+                            <div class="form-text">SonarQube project key (found in project settings)</div>
+                        </div>
+                        <div class="alert alert-info">
+                            <i data-feather="info"></i>
+                            <strong>Note:</strong> This will fetch the latest analysis data directly from your SonarQube server, including detailed issues and security hotspots.
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="connectToSonarQube()" id="connectBtn">
+                        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                        Connect & Fetch Data
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
 
@@ -226,5 +287,89 @@ document.addEventListener('DOMContentLoaded', function() {
     createTrivyChart({{ project.reports.trivy.vulnerabilities.by_severity | tojson }});
     {% endif %}
 });
+
+// SonarQube modal functions
+function showSonarQubeModal() {
+    const modal = new bootstrap.Modal(document.getElementById('sonarQubeModal'));
+    modal.show();
+}
+
+async function connectToSonarQube() {
+    const form = document.getElementById('sonarQubeForm');
+    const connectBtn = document.getElementById('connectBtn');
+    const spinner = connectBtn.querySelector('.spinner-border');
+    
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+    
+    const sonarUrl = document.getElementById('sonarUrl').value;
+    const sonarToken = document.getElementById('sonarToken').value;
+    const sonarProjectKey = document.getElementById('sonarProjectKey').value;
+    
+    // Show loading state
+    connectBtn.disabled = true;
+    spinner.classList.remove('d-none');
+    
+    try {
+        const response = await fetch(`/api/projects/{{ project.id }}/sonarqube/fetch`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                sonar_url: sonarUrl,
+                sonar_token: sonarToken,
+                sonar_project_key: sonarProjectKey
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok && result.success) {
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('sonarQubeModal'));
+            modal.hide();
+            
+            // Show success message
+            showNotification('success', `Successfully connected to SonarQube! Project: ${result.project_name}`);
+            
+            // Reload page after short delay
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        } else {
+            showNotification('error', result.error || 'Failed to connect to SonarQube');
+        }
+    } catch (error) {
+        console.error('Connection error:', error);
+        showNotification('error', 'Connection failed. Please check your network and try again.');
+    } finally {
+        // Reset loading state
+        connectBtn.disabled = false;
+        spinner.classList.add('d-none');
+    }
+}
+
+// Notification function
+function showNotification(type, message) {
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed`;
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    notification.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, 5000);
+}
 </script>
 {% endblock %}

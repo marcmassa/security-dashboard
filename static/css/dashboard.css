@@ -548,3 +548,55 @@ body {
   font-weight: 600;
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
+
+/* Upload section styles */
+.upload-section {
+  padding: 2rem 0;
+}
+
+.upload-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.upload-option {
+  text-align: center;
+  padding: 2rem;
+  border: 2px dashed hsl(var(--border));
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.upload-option:hover {
+  border-color: hsl(var(--primary));
+  background-color: hsl(var(--primary) / 0.05);
+}
+
+.upload-icon {
+  margin-bottom: 1rem;
+}
+
+.upload-icon i {
+  width: 48px;
+  height: 48px;
+  color: hsl(var(--primary));
+}
+
+.upload-option h4 {
+  margin-bottom: 0.5rem;
+  color: hsl(var(--foreground));
+  font-weight: 600;
+}
+
+.upload-option p {
+  margin-bottom: 1.5rem;
+  color: hsl(var(--secondary-foreground));
+  font-size: 0.9rem;
+}
+
+.upload-option .btn {
+  min-width: 140px;
+}
