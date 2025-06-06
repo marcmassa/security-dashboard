@@ -249,6 +249,95 @@
         </div>
     </div>
 
+    <!-- Technical Debt and Effort -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="summary-card">
+                <h5 class="card-title mb-3">Technical Debt</h5>
+                <div class="debt-info">
+                    {% if data.sqale_index %}
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="fw-bold">Estimated Effort:</span>
+                        <span class="badge bg-info fs-6">{{ data.sqale_index }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>Maintainability Rating:</span>
+                        <span class="badge badge-{{ 'low' if data.sqale_rating == 'A' else 'medium' if data.sqale_rating in ['B', 'C'] else 'high' }}">
+                            {{ data.sqale_rating }}
+                        </span>
+                    </div>
+                    <div class="progress mb-3" style="height: 10px;">
+                        <div class="progress-bar bg-{{ 'success' if data.sqale_rating == 'A' else 'warning' if data.sqale_rating in ['B', 'C'] else 'danger' }}" 
+                             style="width: {{ 100 if data.sqale_rating == 'A' else 75 if data.sqale_rating == 'B' else 50 if data.sqale_rating == 'C' else 25 }}%"></div>
+                    </div>
+                    <small class="text-muted">
+                        A = ≤ 5%, B = 6-10%, C = 11-20%, D = 21-50%, E = > 50% of development time
+                    </small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="summary-card">
+                <h5 class="card-title mb-3">Code Quality Metrics</h5>
+                <div class="metrics-overview">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>Lines of Code:</span>
+                        <span class="fw-bold text-primary">{{ "{:,}".format(data.ncloc) }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>Complexity:</span>
+                        <span class="fw-bold text-warning">{{ "{:,}".format(data.complexity) }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>Duplication:</span>
+                        <span class="badge badge-{{ 'low' if data.duplicated_lines_density < 3 else 'medium' if data.duplicated_lines_density < 5 else 'high' }}">
+                            {{ data.duplicated_lines_density }}%
+                        </span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>Test Coverage:</span>
+                        <span class="badge badge-{{ 'low' if data.coverage >= 80 else 'medium' if data.coverage >= 60 else 'high' }}">
+                            {{ data.coverage }}%
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Issues Tracking -->
+    {% if data.new_bugs is defined or data.new_vulnerabilities is defined or data.new_code_smells is defined %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="summary-card">
+                <h5 class="card-title mb-3">New Code Issues</h5>
+                <p class="text-muted mb-3">Issues introduced in recent changes</p>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <div class="metric-value severity-critical">{{ data.new_bugs | default(0) }}</div>
+                            <div class="metric-label">New Bugs</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <div class="metric-value severity-high">{{ data.new_vulnerabilities | default(0) }}</div>
+                            <div class="metric-label">New Vulnerabilities</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <div class="metric-value severity-medium">{{ data.new_code_smells | default(0) }}</div>
+                            <div class="metric-label">New Code Smells</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
     <!-- Charts and Visualizations -->
     <div class="row mb-4">
         <div class="col-md-6">
@@ -314,8 +403,101 @@
         </div>
     </div>
 
-    <!-- Issues Detail -->
+    <!-- Enhanced Issues Analysis -->
     {% if data.issues %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="summary-card">
+                <h5 class="card-title mb-3">Issues Analysis & Breakdown</h5>
+                <p class="text-muted mb-4">Detailed analysis of code quality issues found in your project</p>
+                
+                <!-- Issue Statistics -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="text-center p-3 border rounded">
+                            <h6 class="text-muted mb-1">Total Issues</h6>
+                            <div class="h4 mb-0">{{ data.issues|length }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center p-3 border rounded">
+                            <h6 class="text-muted mb-1">Critical/Blocker</h6>
+                            <div class="h4 mb-0 text-danger">
+                                {{ data.issues|selectattr('severity', 'in', ['BLOCKER', 'CRITICAL'])|list|length }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center p-3 border rounded">
+                            <h6 class="text-muted mb-1">Security Issues</h6>
+                            <div class="h4 mb-0 text-warning">
+                                {{ data.issues|selectattr('type', 'equalto', 'VULNERABILITY')|list|length }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center p-3 border rounded">
+                            <h6 class="text-muted mb-1">Bugs</h6>
+                            <div class="h4 mb-0 text-danger">
+                                {{ data.issues|selectattr('type', 'equalto', 'BUG')|list|length }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Security Hotspots Detail -->
+    {% if data.security_hotspots %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="summary-card">
+                <h5 class="card-title mb-3">Security Hotspots</h5>
+                <p class="text-muted mb-3">Security-sensitive code that requires manual review</p>
+                <div class="alert alert-warning">
+                    <i data-feather="shield"></i>
+                    <strong>{{ data.security_hotspots|length }} security hotspots</strong> found that need manual review to determine if they are vulnerabilities.
+                </div>
+                {% if data.security_hotspots|length > 0 %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Priority</th>
+                                <th>Rule</th>
+                                <th>Component</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for hotspot in data.security_hotspots[:10] %}
+                            <tr>
+                                <td>
+                                    <span class="badge badge-{{ 'high' if hotspot.vulnerabilityProbability == 'HIGH' else 'medium' if hotspot.vulnerabilityProbability == 'MEDIUM' else 'low' }}">
+                                        {{ hotspot.vulnerabilityProbability }}
+                                    </span>
+                                </td>
+                                <td><small>{{ hotspot.ruleKey }}</small></td>
+                                <td><small>{{ hotspot.component.split(':')[-1] if ':' in hotspot.component else hotspot.component }}</small></td>
+                                <td>
+                                    <span class="badge bg-secondary">{{ hotspot.status }}</span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% if data.security_hotspots|length > 10 %}
+                    <small class="text-muted">Showing first 10 of {{ data.security_hotspots|length }} security hotspots</small>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Detailed Issues Table -->
     <div class="summary-card mb-4">
         <h5 class="card-title mb-3">Issues Detail</h5>
         
