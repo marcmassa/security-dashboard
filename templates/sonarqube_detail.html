@@ -22,9 +22,6 @@
             <p class="text-muted">{{ data.project_name }} ({{ data.project_key }})</p>
         </div>
         <div>
-            <button class="btn btn-primary me-2" onclick="showSonarQubeConnectionModal()">
-                <i data-feather="refresh-cw"></i> Connect to SonarQube
-            </button>
             <button class="btn btn-outline-primary me-2" onclick="exportToPDF()">
                 <i data-feather="download"></i> Export PDF
             </button>
@@ -43,7 +40,7 @@
                     <div>
                         <h5 class="card-title">Quality Gate Status</h5>
                         {% if data.last_analysis %}
-                        <p class="text-muted mb-0">Last analysis: {{ data.last_analysis }}</p>
+                        <p class="text-secondary mb-0">Last analysis: {{ data.last_analysis }}</p>
                         {% endif %}
                     </div>
                     <div>
@@ -66,22 +63,45 @@
                     <i data-feather="server" style="width: 64px; height: 64px; color: hsl(var(--secondary-foreground));"></i>
                 </div>
                 <h3 class="mb-3">No SonarQube Data Available</h3>
-                <p class="text-muted mb-4">Connect to your SonarQube server to fetch real-time analysis data or upload a JSON report</p>
+                <p class="text-muted mb-4">Go back to the project dashboard to configure SonarQube connection and fetch analysis data</p>
                 
-                <div class="d-flex justify-content-center gap-3">
-                    <button class="btn btn-primary" onclick="showSonarQubeConnectionModal()">
-                        <i data-feather="server"></i> Connect to SonarQube Server
-                    </button>
-                    <label class="btn btn-outline-secondary">
-                        <i data-feather="upload"></i> Upload JSON Report
-                        <input type="file" class="d-none upload-input" data-report-type="sonarqube" accept=".json">
-                    </label>
+                <div class="d-flex justify-content-center">
+                    <a href="{{ url_for('project_dashboard', project_id=project.id) }}" class="btn btn-primary">
+                        <i data-feather="arrow-left"></i> Back to Dashboard
+                    </a>
                 </div>
             </div>
         </div>
     </div>
     {% else %}
     
+    <!-- Project Information -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="summary-card">
+                <h5 class="card-title mb-3">Project Information</h5>
+                <div class="row">
+                    <div class="col-md-3">
+                        <strong>Project Key:</strong><br>
+                        <code class="text-primary">{{ data.project_key }}</code>
+                    </div>
+                    <div class="col-md-3">
+                        <strong>Lines of Code:</strong><br>
+                        <span class="text-info">{{ "{:,}".format(data.ncloc) }}</span>
+                    </div>
+                    <div class="col-md-3">
+                        <strong>Total Lines:</strong><br>
+                        <span class="text-secondary">{{ "{:,}".format(data.lines) }}</span>
+                    </div>
+                    <div class="col-md-3">
+                        <strong>Complexity:</strong><br>
+                        <span class="text-warning">{{ "{:,}".format(data.complexity) }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Summary Cards -->
     <div class="row mb-4">
         <div class="col-md-2">
@@ -160,6 +180,71 @@
                     <span class="badge badge-{{ 'low' if data.security_rating == 'A' else 'medium' if data.security_rating == 'B' else 'high' }}">
                         {{ data.security_rating }}
                     </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts and Visualizations -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="summary-card">
+                <h5 class="card-title mb-3">Issues by Type</h5>
+                <canvas id="issuesTypeChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="summary-card">
+                <h5 class="card-title mb-3">Quality Ratings Overview</h5>
+                <div class="rating-overview">
+                    <div class="rating-item mb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>Maintainability</span>
+                            <span class="badge badge-{{ 'low' if data.sqale_rating == 'A' else 'medium' if data.sqale_rating in ['B', 'C'] else 'high' }} fs-6">
+                                {{ data.sqale_rating }}
+                            </span>
+                        </div>
+                        <div class="progress mt-1" style="height: 8px;">
+                            <div class="progress-bar bg-{{ 'success' if data.sqale_rating == 'A' else 'warning' if data.sqale_rating in ['B', 'C'] else 'danger' }}" 
+                                 style="width: {{ 100 if data.sqale_rating == 'A' else 75 if data.sqale_rating == 'B' else 50 if data.sqale_rating == 'C' else 25 }}%"></div>
+                        </div>
+                    </div>
+                    <div class="rating-item mb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>Reliability</span>
+                            <span class="badge badge-{{ 'low' if data.reliability_rating == 'A' else 'medium' if data.reliability_rating in ['B', 'C'] else 'high' }} fs-6">
+                                {{ data.reliability_rating }}
+                            </span>
+                        </div>
+                        <div class="progress mt-1" style="height: 8px;">
+                            <div class="progress-bar bg-{{ 'success' if data.reliability_rating == 'A' else 'warning' if data.reliability_rating in ['B', 'C'] else 'danger' }}" 
+                                 style="width: {{ 100 if data.reliability_rating == 'A' else 75 if data.reliability_rating == 'B' else 50 if data.reliability_rating == 'C' else 25 }}%"></div>
+                        </div>
+                    </div>
+                    <div class="rating-item mb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>Security</span>
+                            <span class="badge badge-{{ 'low' if data.security_rating == 'A' else 'medium' if data.security_rating in ['B', 'C'] else 'high' }} fs-6">
+                                {{ data.security_rating }}
+                            </span>
+                        </div>
+                        <div class="progress mt-1" style="height: 8px;">
+                            <div class="progress-bar bg-{{ 'success' if data.security_rating == 'A' else 'warning' if data.security_rating in ['B', 'C'] else 'danger' }}" 
+                                 style="width: {{ 100 if data.security_rating == 'A' else 75 if data.security_rating == 'B' else 50 if data.security_rating == 'C' else 25 }}%"></div>
+                        </div>
+                    </div>
+                    <div class="rating-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>Test Coverage</span>
+                            <span class="badge badge-{{ 'low' if data.coverage >= 80 else 'medium' if data.coverage >= 60 else 'high' }} fs-6">
+                                {{ data.coverage }}%
+                            </span>
+                        </div>
+                        <div class="progress mt-1" style="height: 8px;">
+                            <div class="progress-bar bg-{{ 'success' if data.coverage >= 80 else 'warning' if data.coverage >= 60 else 'danger' }}" 
+                                 style="width: {{ data.coverage }}%"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -335,47 +420,7 @@
     </div>
     {% endif %}
 
-    <!-- SonarQube Connection Modal -->
-    <div class="modal fade" id="sonarQubeModal" tabindex="-1" aria-labelledby="sonarQubeModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="sonarQubeModalLabel">Connect to SonarQube Server</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="sonarQubeForm">
-                        <div class="mb-3">
-                            <label for="sonarUrl" class="form-label">SonarQube Server URL</label>
-                            <input type="url" class="form-control" id="sonarUrl" placeholder="https://sonarqube.yourcompany.com" required>
-                            <div class="form-text">URL of your SonarQube server</div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="sonarToken" class="form-label">Authentication Token</label>
-                            <input type="password" class="form-control" id="sonarToken" placeholder="squ_xxxxxxxxxxxxxxxxxxxxxxxxxx" required>
-                            <div class="form-text">User token or project analysis token from SonarQube</div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="sonarProjectKey" class="form-label">Project Key</label>
-                            <input type="text" class="form-control" id="sonarProjectKey" placeholder="my-project-key" required>
-                            <div class="form-text">SonarQube project key (found in project settings)</div>
-                        </div>
-                        <div class="alert alert-info">
-                            <i data-feather="info"></i>
-                            <strong>Note:</strong> This will fetch the latest analysis data directly from your SonarQube server, including detailed issues and security hotspots.
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" onclick="connectToSonarQube()" id="connectBtn">
-                        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-                        Connect & Fetch Data
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+
 </div>
 {% endblock %}
 
