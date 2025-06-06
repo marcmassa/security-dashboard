@@ -1,0 +1,31 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: security-dashboard-ingress
+  namespace: security-dashboard
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+    kubernetes.io/ingress.global-static-ip-name: "security-dashboard-ip"
+    networking.gke.io/managed-certificates: "security-dashboard-ssl"
+    kubernetes.io/ingress.allow-http: "false"
+spec:
+  rules:
+  - host: security-dashboard.yourdomain.com
+    http:
+      paths:
+      - path: /*
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: security-dashboard-service
+            port:
+              number: 80
+---
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: security-dashboard-ssl
+  namespace: security-dashboard
+spec:
+  domains:
+    - security-dashboard.yourdomain.com
