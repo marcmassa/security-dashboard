@@ -508,6 +508,84 @@ def save_sonarqube_config():
         'message': 'Configuration saved successfully'
     }), 200
 
+@app.route('/api/sonarqube/get-global-config', methods=['GET'])
+def get_global_sonarqube_config():
+    """Get global SonarQube configuration from session"""
+    return jsonify({
+        'sonar_url': session.get('sonar_url', ''),
+        'has_token': bool(session.get('sonar_token'))
+    }), 200
+
+@app.route('/api/projects/<project_id>/sonarqube/connect', methods=['POST'])
+def connect_project_sonarqube(project_id):
+    """Connect project to SonarQube using project key and global config"""
+    project = Project.query.get(project_id)
+    if not project:
+        return jsonify({'error': 'Project not found'}), 404
+    
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'Request body required'}), 400
+    
+    project_key = data.get('project_key')
+    if not project_key:
+        return jsonify({'error': 'Project key is required'}), 400
+    
+    # Get global configuration
+    sonar_url = session.get('sonar_url')
+    sonar_token = session.get('sonar_token')
+    
+    if not sonar_url:
+        return jsonify({
+            'error': 'Global SonarQube configuration not found',
+            'message': 'Please configure SonarQube server first'
+        }), 400
+    
+    if not sonar_token:
+        return jsonify({
+            'error': 'SonarQube token not configured',
+            'message': 'Please provide a token in global configuration'
+        }), 400
+    
+    try:
+        # Save project key
+        project.sonar_project_key = project_key
+        db.session.commit()
+        
+        # Fetch data from SonarQube API
+        sonar_data = fetch_sonarqube_data(sonar_url, sonar_token, project_key)
+        
+        # Store in database
+        project.set_report('sonarqube', sonar_data)
+        
+        return jsonify({
+            'success': True,
+            'message': 'Successfully connected to SonarQube',
+            'project_name': sonar_data.get('project_name'),
+            'project_key': project_key
+        }), 200
+        
+    except Exception as e:
+        error_msg = str(e)
+        logging.error(f"Error connecting project to SonarQube: {error_msg}")
+        
+        # Provide user-friendly error messages
+        if "Access denied" in error_msg or "403" in error_msg:
+            return jsonify({
+                'error': 'Access denied to SonarQube project',
+                'message': 'Your token does not have permission to access this project'
+            }), 403
+        elif "not found" in error_msg.lower() or "404" in error_msg:
+            return jsonify({
+                'error': 'Project not found in SonarQube',
+                'message': f'Project key "{project_key}" was not found'
+            }), 404
+        else:
+            return jsonify({
+                'error': 'Connection failed',
+                'message': 'Unable to connect to SonarQube. Check your configuration.'
+            }), 500
+
 @app.errorhandler(404)
 def not_found_error(error):
     return render_template('404.html'), 404
