@@ -46,8 +46,8 @@ class SonarQubeClient:
                 'bugs', 'vulnerabilities', 'code_smells', 'security_hotspots',
                 'coverage', 'duplicated_lines_density', 'lines', 'ncloc',
                 'complexity', 'sqale_rating', 'reliability_rating', 'security_rating',
-                'quality_gate_status', 'alert_status', 'sqale_index',
-                'technical_debt', 'new_bugs', 'new_vulnerabilities', 'new_code_smells'
+                'alert_status', 'sqale_index',
+                'new_bugs', 'new_vulnerabilities', 'new_code_smells'
             ]
             
             url = f"{self.base_url}/api/measures/component"
@@ -57,6 +57,18 @@ class SonarQubeClient:
             }
             
             response = self.session.get(url, params=params, timeout=30)
+            
+            # Handle specific HTTP errors with detailed messages
+            if response.status_code == 403:
+                raise Exception(f"Access denied to SonarQube project '{project_key}'. Please verify:\n"
+                              f"• Your token has 'Browse' permission for this project\n"
+                              f"• The project key '{project_key}' is correct\n"
+                              f"• Your token is valid and not expired")
+            elif response.status_code == 404:
+                raise Exception(f"Project '{project_key}' not found in SonarQube. Please check the project key.")
+            elif response.status_code == 401:
+                raise Exception("Authentication failed. Please verify your SonarQube token is correct.")
+            
             response.raise_for_status()
             
             data = response.json()

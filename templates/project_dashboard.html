@@ -340,7 +340,12 @@ async function connectToSonarQube() {
                 window.location.reload();
             }, 1500);
         } else {
-            showNotification('error', result.error || 'Failed to connect to SonarQube');
+            // Show detailed error message with suggestions
+            let errorMessage = result.message || result.error || 'Failed to connect to SonarQube';
+            if (result.suggestions && result.suggestions.length > 0) {
+                errorMessage += '\n\nSuggestions:\n• ' + result.suggestions.join('\n• ');
+            }
+            showNotification('error', errorMessage);
         }
     } catch (error) {
         console.error('Connection error:', error);
@@ -356,20 +361,24 @@ async function connectToSonarQube() {
 function showNotification(type, message) {
     const notification = document.createElement('div');
     notification.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed`;
-    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 400px; max-width: 500px; white-space: pre-line;';
     notification.innerHTML = `
-        ${message}
+        <div style="font-weight: 500; margin-bottom: ${message.includes('\n') ? '8px' : '0'};">
+            ${message.split('\n')[0]}
+        </div>
+        ${message.includes('\n') ? `<div style="font-size: 0.9em; opacity: 0.9;">${message.split('\n').slice(1).join('\n')}</div>` : ''}
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     `;
     
     document.body.appendChild(notification);
     
-    // Auto-remove after 5 seconds
+    // Auto-remove after longer time for error messages
+    const timeout = type === 'error' ? 10000 : 5000;
     setTimeout(() => {
         if (notification.parentNode) {
             notification.remove();
         }
-    }, 5000);
+    }, timeout);
 }
 </script>
 {% endblock %}

@@ -387,11 +387,61 @@ def fetch_sonarqube_data_api(project_id):
         }), 200
         
     except Exception as e:
-        logging.error(f"Error fetching SonarQube data: {str(e)}")
-        return jsonify({
-            'error': 'Failed to fetch SonarQube data',
-            'details': str(e)
-        }), 500
+        error_msg = str(e)
+        logging.error(f"Error fetching SonarQube data: {error_msg}")
+        
+        # Provide user-friendly error messages based on the error type
+        if "Access denied" in error_msg or "403" in error_msg:
+            return jsonify({
+                'error': 'Access Denied',
+                'message': 'Your SonarQube token does not have sufficient permissions.',
+                'suggestions': [
+                    'Verify your token has "Browse" permission for this project',
+                    'Check that the project key is correct',
+                    'Ensure your token is valid and not expired',
+                    'Contact your SonarQube administrator for proper permissions'
+                ],
+                'details': error_msg
+            }), 403
+        elif "not found" in error_msg.lower() or "404" in error_msg:
+            return jsonify({
+                'error': 'Project Not Found',
+                'message': f'The project "{sonar_project_key}" was not found in SonarQube.',
+                'suggestions': [
+                    'Verify the project key is spelled correctly',
+                    'Check that the project exists in your SonarQube instance',
+                    'Ensure you have access to view this project'
+                ],
+                'details': error_msg
+            }), 404
+        elif "Authentication failed" in error_msg or "401" in error_msg:
+            return jsonify({
+                'error': 'Authentication Failed',
+                'message': 'Invalid SonarQube token or credentials.',
+                'suggestions': [
+                    'Verify your SonarQube token is correct',
+                    'Generate a new token if the current one has expired',
+                    'Ensure the token format is correct (starts with squ_)'
+                ],
+                'details': error_msg
+            }), 401
+        elif "Connection" in error_msg or "timeout" in error_msg.lower():
+            return jsonify({
+                'error': 'Connection Error',
+                'message': 'Unable to connect to SonarQube server.',
+                'suggestions': [
+                    'Check that the SonarQube URL is correct and accessible',
+                    'Verify your network connection',
+                    'Ensure the SonarQube server is running and accessible'
+                ],
+                'details': error_msg
+            }), 503
+        else:
+            return jsonify({
+                'error': 'SonarQube Integration Error',
+                'message': 'An unexpected error occurred while connecting to SonarQube.',
+                'details': error_msg
+            }), 500
 
 @app.errorhandler(404)
 def not_found_error(error):
