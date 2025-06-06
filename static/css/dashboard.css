@@ -479,3 +479,72 @@ body {
   background-color: hsl(var(--primary));
   color: hsl(var(--primary-foreground));
 }
+
+/* ===== TRIVY TABLE VISIBILITY FIXES ===== */
+
+/* Force table text visibility in dark theme */
+.table {
+  color: hsl(var(--foreground)) !important;
+  background-color: hsl(var(--card)) !important;
+}
+
+.table th {
+  color: hsl(var(--foreground)) !important;
+  background-color: hsl(var(--secondary)) !important;
+  border-color: hsl(var(--border)) !important;
+  font-weight: 600;
+}
+
+.table td {
+  color: hsl(var(--foreground)) !important;
+  background-color: hsl(var(--card)) !important;
+  border-color: hsl(var(--border)) !important;
+  font-weight: 500;
+}
+
+.table-striped tbody tr:nth-of-type(odd) td {
+  background-color: hsl(var(--secondary) / 0.3) !important;
+}
+
+/* Ensure CVE links are visible */
+.table a {
+  color: hsl(var(--info)) !important;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.table a:hover {
+  color: hsl(var(--info)) !important;
+  text-decoration: underline;
+}
+
+/* Dark theme Bootstrap table overrides */
+[data-bs-theme="dark"] .table {
+  --bs-table-color: hsl(var(--foreground));
+  --bs-table-bg: hsl(var(--card));
+  --bs-table-border-color: hsl(var(--border));
+  --bs-table-striped-bg: hsl(var(--secondary) / 0.2);
+}
+
+[data-bs-theme="dark"] .table th,
+[data-bs-theme="dark"] .table td {
+  color: hsl(var(--foreground)) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
+/* Trivy specific table cells - package, version, CVSS, fixed version, title */
+.table tbody tr td:nth-child(2),  /* Package */
+.table tbody tr td:nth-child(3),  /* Version */
+.table tbody tr td:nth-child(5),  /* CVSS Score */
+.table tbody tr td:nth-child(6),  /* Fixed Version */
+.table tbody tr td:nth-child(7) { /* Title */
+  color: hsl(var(--foreground)) !important;
+  font-weight: 500;
+}
+
+/* Badge visibility improvements */
+.table .badge {
+  color: white !important;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
