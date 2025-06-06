@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: security-dashboard-config
+  namespace: security-dashboard
+data:
+  FLASK_ENV: "production"
+  SQLALCHEMY_TRACK_MODIFICATIONS: "false"
+  MAX_CONTENT_LENGTH: "16777216"  # 16MB
+  UPLOAD_FOLDER: "/app/uploads"

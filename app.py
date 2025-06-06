@@ -225,12 +225,129 @@ def delete_project(project_id):
     
     return redirect(url_for('home'))
 
+@app.route('/health')
+def health_check():
+    """Health check endpoint for Kubernetes"""
+    try:
+        # Check database connection
+        db.session.execute('SELECT 1')
+        return jsonify({
+            'status': 'healthy',
+            'timestamp': datetime.utcnow().isoformat(),
+            'version': '1.0.0'
+        }), 200
+    except Exception as e:
+        return jsonify({
+            'status': 'unhealthy',
+            'error': str(e),
+            'timestamp': datetime.utcnow().isoformat()
+        }), 503
+
+@app.route('/api/projects/find-or-create', methods=['POST'])
+def find_or_create_project():
+    """Find existing project by name or create new one - for Jenkins integration"""
+    data = request.get_json()
+    if not data or 'name' not in data:
+        return jsonify({'error': 'Project name is required'}), 400
+    
+    project_name = data['name'].strip()
+    if not project_name:
+        return jsonify({'error': 'Project name cannot be empty'}), 400
+    
+    # Try to find existing project by name
+    existing_project = Project.query.filter_by(name=project_name).first()
+    if existing_project:
+        return jsonify({
+            'project_id': existing_project.id,
+            'name': existing_project.name,
+            'created': False,
+            'created_at': existing_project.created_at.isoformat()
+        }), 200
+    
+    # Create new project
+    try:
+        project_id = create_project(project_name)
+        project = Project.query.get(project_id)
+        return jsonify({
+            'project_id': project.id,
+            'name': project.name,
+            'created': True,
+            'created_at': project.created_at.isoformat()
+        }), 201
+    except Exception as e:
+        logging.error(f"Error creating project: {str(e)}")
+        return jsonify({'error': 'Failed to create project'}), 500
+
+@app.route('/api/projects/<project_id>/status')
+def get_project_status(project_id):
+    """Get project status - for Jenkins integration"""
+    project = Project.query.get(project_id)
+    if not project:
+        return jsonify({'error': 'Project not found'}), 404
+    
+    project_data = project.to_dict()
+    reports = project_data['reports']
+    
+    status = {
+        'project_id': project.id,
+        'name': project.name,
+        'created_at': project.created_at.isoformat(),
+        'updated_at': project.updated_at.isoformat(),
+        'reports_status': {
+            'sonarqube': {
+                'uploaded': reports.get('sonarqube') is not None,
+                'last_updated': None
+            },
+            'sbom': {
+                'uploaded': reports.get('sbom') is not None,
+                'last_updated': None
+            },
+            'trivy': {
+                'uploaded': reports.get('trivy') is not None,
+                'last_updated': None
+            }
+        },
+        'total_reports': sum(1 for report in reports.values() if report is not None)
+    }
+    
+    # Add last updated timestamps for each report type
+    for report_type in ['sonarqube', 'sbom', 'trivy']:
+        report = project.get_report(report_type)
+        if report:
+            status['reports_status'][report_type]['last_updated'] = report.updated_at.isoformat()
+    
+    return jsonify(status), 200
+
+@app.route('/api/projects/<project_id>/webhook', methods=['POST'])
+def project_webhook(project_id):
+    """Webhook endpoint for external integrations like Jenkins"""
+    project = Project.query.get(project_id)
+    if not project:
+        return jsonify({'error': 'Project not found'}), 404
+    
+    data = request.get_json()
+    event_type = data.get('event', 'unknown')
+    
+    logging.info(f"Webhook received for project {project_id}: {event_type}")
+    
+    # Update project timestamp
+    project.updated_at = datetime.utcnow()
+    db.session.commit()
+    
+    return jsonify({
+        'status': 'received',
+        'project_id': project_id,
+        'event': event_type,
+        'timestamp': datetime.utcnow().isoformat()
+    }), 200
+
 @app.errorhandler(404)
 def not_found_error(error):
     return render_template('404.html'), 404
 
 @app.errorhandler(500)
 def internal_error(error):
+    db.session.rollback()
     return render_template('500.html'), 500
 
 if __name__ == '__main__':

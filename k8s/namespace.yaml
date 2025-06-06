@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: security-dashboard
+  labels:
+    name: security-dashboard
+    environment: production
