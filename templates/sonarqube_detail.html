@@ -355,6 +355,151 @@
 
 {% block scripts %}
 <script>
+// SonarQube Connection Functions
+function showSonarQubeConnectionModal() {
+    const modal = new bootstrap.Modal(document.getElementById('sonarQubeModal'));
+    modal.show();
+}
+
+async function connectToSonarQube() {
+    const form = document.getElementById('sonarQubeForm');
+    const connectBtn = document.getElementById('connectBtn');
+    const spinner = connectBtn.querySelector('.spinner-border');
+    
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+    
+    const sonarUrl = document.getElementById('sonarUrl').value;
+    const sonarToken = document.getElementById('sonarToken').value;
+    const sonarProjectKey = document.getElementById('sonarProjectKey').value;
+    
+    // Show loading state
+    connectBtn.disabled = true;
+    spinner.classList.remove('d-none');
+    
+    try {
+        const response = await fetch(`/api/projects/{{ project.id }}/sonarqube/fetch`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                sonar_url: sonarUrl,
+                sonar_token: sonarToken,
+                sonar_project_key: sonarProjectKey
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok && result.success) {
+            // Close modal and reload page to show new data
+            const modal = bootstrap.Modal.getInstance(document.getElementById('sonarQubeModal'));
+            modal.hide();
+            
+            // Show success message
+            showNotification('success', `Successfully connected to SonarQube! Project: ${result.project_name}`);
+            
+            // Reload page after short delay
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        } else {
+            showNotification('error', result.error || 'Failed to connect to SonarQube');
+        }
+    } catch (error) {
+        console.error('Connection error:', error);
+        showNotification('error', 'Connection failed. Please check your network and try again.');
+    } finally {
+        // Reset loading state
+        connectBtn.disabled = false;
+        spinner.classList.add('d-none');
+    }
+}
+
+// Issues table filtering
+function setupIssueFilters() {
+    // Type filter
+    document.getElementById('issue-type-filter')?.addEventListener('change', function() {
+        filterIssuesByColumn(this.value, 0); // Type column
+    });
+    
+    // Severity filter
+    document.getElementById('issue-severity-filter')?.addEventListener('change', function() {
+        filterIssuesByColumn(this.value, 1); // Severity column
+    });
+    
+    // Search filter
+    document.getElementById('issue-search')?.addEventListener('input', function() {
+        filterIssuesBySearch(this.value);
+    });
+}
+
+function filterIssuesByColumn(filterValue, columnIndex) {
+    const table = document.getElementById('issues-table');
+    if (!table) return;
+    
+    const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+    
+    for (let row of rows) {
+        const cell = row.cells[columnIndex];
+        if (cell) {
+            const cellText = cell.textContent.trim();
+            if (filterValue === '' || cellText.includes(filterValue)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        }
+    }
+}
+
+function filterIssuesBySearch(searchValue) {
+    const table = document.getElementById('issues-table');
+    if (!table) return;
+    
+    const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+    
+    for (let row of rows) {
+        const component = row.cells[2]?.textContent || '';
+        const message = row.cells[4]?.textContent || '';
+        const searchText = (component + ' ' + message).toLowerCase();
+        
+        if (searchValue === '' || searchText.includes(searchValue.toLowerCase())) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    }
+}
+
+function sortIssueTable() {
+    const table = document.getElementById('issues-table');
+    if (!table) return;
+    
+    const tbody = table.getElementsByTagName('tbody')[0];
+    const rows = Array.from(tbody.getElementsByTagName('tr'));
+    
+    rows.sort((a, b) => {
+        const severityA = a.cells[1].textContent.trim();
+        const severityB = b.cells[1].textContent.trim();
+        
+        // Severity order: BLOCKER > CRITICAL > MAJOR > MINOR > INFO
+        const severityOrder = { 'BLOCKER': 5, 'CRITICAL': 4, 'MAJOR': 3, 'MINOR': 2, 'INFO': 1 };
+        const orderA = severityOrder[severityA] || 0;
+        const orderB = severityOrder[severityB] || 0;
+        
+        return orderB - orderA; // Descending order
+    });
+    
+    // Clear tbody and re-append sorted rows
+    tbody.innerHTML = '';
+    rows.forEach(row => tbody.appendChild(row));
+}
+
+// Metrics table functions
 function sortMetricsTable() {
     const sortBy = document.getElementById('metric-sort').value;
     const columnIndex = sortBy === 'name' ? 0 : 1;
@@ -363,11 +508,12 @@ function sortMetricsTable() {
     sortTable('metrics-table', columnIndex, isNumeric);
 }
 
-// Search functionality
-document.getElementById('metric-search').addEventListener('input', function() {
+// Search functionality for metrics
+document.getElementById('metric-search')?.addEventListener('input', function() {
     filterTable('metrics-table', this.value, 0);
 });
 
+// Export functions
 function exportToPDF() {
     window.print();
 }
@@ -382,5 +528,34 @@ function exportToJSON() {
     a.click();
     URL.revokeObjectURL(url);
 }
+
+// Notification function
+function showNotification(type, message) {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed`;
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    notification.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, 5000);
+}
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    setupIssueFilters();
+    
+    // Refresh feather icons after modal content is loaded
+    feather.replace();
+});
 </script>
 {% endblock %}
