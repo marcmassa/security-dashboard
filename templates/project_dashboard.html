@@ -68,8 +68,8 @@
                     <i class="card-icon" data-feather="code"></i>
                     SonarQube Analysis
                 </h3>
-                <a href="{{ url_for('project_sonarqube_detail', project_id=project.id) }}" class="detail-button" {% if not project.reports.sonarqube %}style="display: none;"{% endif %}>
-                    View Details
+                <a href="{{ url_for('project_sonarqube_detail', project_id=project.id) }}" class="detail-button">
+                    {% if project.reports.sonarqube %}View Details{% else %}Configure SonarQube{% endif %}
                 </a>
             </div>
             
@@ -117,8 +117,8 @@
                     <i class="card-icon" data-feather="package"></i>
                     SBOM Vulnerabilities
                 </h3>
-                <a href="{{ url_for('project_sbom_detail', project_id=project.id) }}" class="detail-button" {% if not project.reports.sbom %}style="display: none;"{% endif %}>
-                    View Details
+                <a href="{{ url_for('project_sbom_detail', project_id=project.id) }}" class="detail-button">
+                    {% if project.reports.sbom %}View Details{% else %}Upload SBOM{% endif %}
                 </a>
             </div>
             
@@ -166,8 +166,8 @@
                     <i class="card-icon" data-feather="search"></i>
                     Trivy Container Scan
                 </h3>
-                <a href="{{ url_for('project_trivy_detail', project_id=project.id) }}" class="detail-button" {% if not project.reports.trivy %}style="display: none;"{% endif %}>
-                    View Details
+                <a href="{{ url_for('project_trivy_detail', project_id=project.id) }}" class="detail-button">
+                    {% if project.reports.trivy %}View Details{% else %}Upload Trivy{% endif %}
                 </a>
             </div>
             
