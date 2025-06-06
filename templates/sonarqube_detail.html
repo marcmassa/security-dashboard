@@ -20,42 +20,38 @@
         <div>
             <h1 class="h2 mb-0">SonarQube Analysis Report</h1>
             {% if data and data.project_name %}
-            <p class="text-muted">{{ data.project_name }} 
+            <p class="text-secondary mb-0">{{ data.project_name }} 
                 {% if data.project_key %}({{ data.project_key }}){% endif %}
-                {% if project and project.sonar_project_key %}
-                <button class="btn btn-sm btn-outline-secondary ms-2" onclick="editSonarProjectKey()">
-                    <i data-feather="edit-2"></i> Edit Key
-                </button>
-                {% endif %}
             </p>
             {% else %}
-            <p class="text-muted">
+            <p class="text-secondary mb-0">
                 {% if project %}
                 Project: {{ project.name }}
                 {% if project.sonar_project_key %}
-                <span class="badge bg-info">Key: {{ project.sonar_project_key }}</span>
-                <button class="btn btn-sm btn-outline-secondary ms-2" onclick="editSonarProjectKey()">
-                    <i data-feather="edit-2"></i> Edit Key
-                </button>
+                <span class="badge bg-info ms-2">Key: {{ project.sonar_project_key }}</span>
                 {% else %}
-                <span class="badge bg-warning">No SonarQube key configured</span>
-                <button class="btn btn-sm btn-primary ms-2" onclick="editSonarProjectKey()">
-                    <i data-feather="plus"></i> Set Key
-                </button>
+                <span class="badge bg-warning ms-2">No SonarQube key configured</span>
                 {% endif %}
                 {% endif %}
             </p>
             {% endif %}
         </div>
         <div>
+            <button class="btn btn-outline-secondary me-2" onclick="editSonarProjectKey()">
+                <i data-feather="edit-2"></i> 
+                {% if project.sonar_project_key %}Edit Key{% else %}Set Key{% endif %}
+            </button>
             {% if data %}
             <button class="btn btn-outline-primary me-2" onclick="exportToPDF()">
                 <i data-feather="download"></i> Export PDF
             </button>
-            <button class="btn btn-outline-primary" onclick="exportToJSON()">
+            <button class="btn btn-outline-primary me-2" onclick="exportToJSON()">
                 <i data-feather="file-text"></i> Export JSON
             </button>
             {% endif %}
+            <a href="{{ url_for('project_dashboard', project_id=project.id) }}" class="btn btn-primary">
+                <i data-feather="arrow-left"></i> Back to Dashboard
+            </a>
         </div>
     </div>
 
@@ -490,12 +486,6 @@
 
 
 </div>
-    <!-- Back to Dashboard Button -->
-    <div class="text-center mt-4">
-        <a href="{{ url_for('project_dashboard', project_id=project.id) }}" class="btn btn-primary">
-            <i data-feather="arrow-left"></i> Back to Dashboard
-        </a>
-    </div>
 
     <!-- Edit SonarQube Project Key Modal -->
     <div class="modal fade" id="editSonarKeyModal" tabindex="-1" aria-labelledby="editSonarKeyModalLabel" aria-hidden="true">
