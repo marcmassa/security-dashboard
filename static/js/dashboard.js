@@ -127,9 +127,20 @@ function showUploadLoading(card, loading) {
 
 // Load summary data
 async function loadSummaryData(projectId) {
+    if (!projectId) {
+        console.log('No project ID available for summary data loading');
+        return;
+    }
+    
     try {
-        const summaryUrl = projectId ? `/project/${projectId}/api/summary` : '/api/summary';
+        const summaryUrl = `/project/${projectId}/api/summary`;
         const response = await fetch(summaryUrl);
+        
+        if (!response.ok) {
+            console.log(`Summary API returned ${response.status}`);
+            return;
+        }
+        
         const data = await response.json();
         
         updateSonarQubeSummary(data.sonarqube);
@@ -321,10 +332,16 @@ function createSBOMChart(vulnerabilities) {
 // Create Trivy chart
 function createTrivyChart(vulnerabilities) {
     const canvas = document.getElementById('trivy-chart');
-    if (!canvas || !window.Chart) return;
+    if (!canvas || !window.Chart) {
+        console.log('Trivy chart canvas not found or Chart.js not loaded');
+        return;
+    }
     
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+        console.log('Unable to get canvas context for Trivy chart');
+        return;
+    }
     
     // Destroy existing chart
     if (canvas.chart) {
