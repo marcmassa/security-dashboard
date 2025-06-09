@@ -205,19 +205,19 @@ body {
 
 .metrics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 0.75rem;
 }
 
 .metric-item {
   text-align: center;
-  padding: 1rem;
+  padding: 0.75rem;
   background-color: hsl(var(--secondary));
   border-radius: 8px;
 }
 
 .metric-value {
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: 700;
   margin-bottom: 0.25rem;
 }
@@ -342,23 +342,51 @@ body {
 
 @media (max-width: 768px) {
   .main-container {
-    padding: 1rem;
+    padding: 1rem 0.75rem;
   }
   
   .dashboard-title {
     font-size: 2rem;
   }
   
+  .dashboard-header {
+    margin-bottom: 1rem;
+  }
+  
+  .upload-section {
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
   .upload-grid {
     grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  .upload-card {
+    padding: 0.75rem;
   }
   
   .summary-grid {
     grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .summary-card {
+    padding: 0.75rem;
   }
   
   .metrics-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+  
+  .metric-item {
+    padding: 0.5rem;
+  }
+  
+  .metric-value {
+    font-size: 1.5rem;
   }
 }
 
