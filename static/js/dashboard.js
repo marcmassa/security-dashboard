@@ -268,10 +268,16 @@ function showEmptyState(card, type) {
 // Create SBOM chart
 function createSBOMChart(vulnerabilities) {
     const canvas = document.getElementById('sbom-chart');
-    if (!canvas || !window.Chart) return;
+    if (!canvas || !window.Chart) {
+        console.log('SBOM chart canvas not found or Chart.js not loaded');
+        return;
+    }
     
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+        console.log('Unable to get canvas context for SBOM chart');
+        return;
+    }
     
     // Destroy existing chart
     if (canvas.chart) {

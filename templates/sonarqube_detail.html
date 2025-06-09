@@ -55,21 +55,7 @@
         </div>
     </div>
 
-    <!-- Debug Information -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="alert alert-info">
-                <strong>Debug Info:</strong> 
-                {% if data %}
-                    Data available with keys: {{ data.keys()|list|join(', ') }}
-                    <br>Bugs: {{ data.bugs if data.bugs is defined else 'undefined' }}
-                    <br>Project key: {{ data.project_key if data.project_key is defined else 'undefined' }}
-                {% else %}
-                    No data available
-                {% endif %}
-            </div>
-        </div>
-    </div>
+
 
     {% if not data %}
     <!-- No Data State -->
@@ -378,7 +364,9 @@
         <div class="col-md-6">
             <div class="summary-card">
                 <h5 class="card-title mb-3">Issues by Type</h5>
-                <canvas id="issuesTypeChart" width="400" height="200"></canvas>
+                <div style="position: relative; height: 300px;">
+                    <canvas id="issuesTypeChart"></canvas>
+                </div>
             </div>
         </div>
         <div class="col-md-6">
@@ -841,15 +829,26 @@ function createIssuesTypeChart() {
     
     const ctx = canvas.getContext('2d');
     
+    // Get data values
+    const bugs = {{ data.bugs | default(0) }};
+    const vulnerabilities = {{ data.vulnerabilities | default(0) }};
+    const codeSmells = {{ data.code_smells | default(0) }};
+    const securityHotspots = {{ data.security_hotspots | default(0) }};
+    
+    // Check if we have any data to display
+    const totalIssues = bugs + vulnerabilities + codeSmells + securityHotspots;
+    
+    if (totalIssues === 0) {
+        // Show "no data" message instead of empty chart
+        canvas.parentElement.innerHTML = '<div class="text-center text-muted py-4"><i data-feather="pie-chart" style="width: 48px; height: 48px;"></i><p class="mt-2">No issues data available</p></div>';
+        feather.replace();
+        return;
+    }
+    
     const issuesData = {
         labels: ['Bugs', 'Vulnerabilities', 'Code Smells', 'Security Hotspots'],
         datasets: [{
-            data: [
-                {{ data.bugs | default(0) }},
-                {{ data.vulnerabilities | default(0) }},
-                {{ data.code_smells | default(0) }},
-                {{ data.security_hotspots | default(0) }}
-            ],
+            data: [bugs, vulnerabilities, codeSmells, securityHotspots],
             backgroundColor: [
                 '#dc3545',
                 '#fd7e14', 
