@@ -55,23 +55,56 @@
         </div>
     </div>
 
-    {% if data and data.quality_gate_status %}
-    <!-- Quality Gate Status -->
+    <!-- Debug Information -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="summary-card">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div>
-                        <h5 class="card-title">Quality Gate Status</h5>
-                        {% if data.last_analysis %}
-                        <p class="text-secondary mb-0">Last analysis: {{ data.last_analysis }}</p>
-                        {% endif %}
-                    </div>
-                    <div>
-                        <span class="badge badge-{{ 'low' if data.quality_gate_status == 'OK' else 'critical' }} fs-5">
-                            {{ data.quality_gate_status }}
-                        </span>
-                    </div>
+            <div class="alert alert-info">
+                <strong>Debug Info:</strong> 
+                {% if data %}
+                    Data available with keys: {{ data.keys()|list|join(', ') }}
+                    <br>Bugs: {{ data.bugs if data.bugs is defined else 'undefined' }}
+                    <br>Project key: {{ data.project_key if data.project_key is defined else 'undefined' }}
+                {% else %}
+                    No data available
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% if not data %}
+    <!-- No Data State -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="text-center py-5">
+                <div class="mb-4">
+                    <i data-feather="database" style="width: 64px; height: 64px; color: #6c757d;"></i>
+                </div>
+                <h3 class="text-muted mb-3">No SonarQube Data Available</h3>
+                <p class="text-muted mb-4">This project doesn't have SonarQube analysis data yet.</p>
+                
+                {% if project and project.sonar_project_key %}
+                <div class="alert alert-info">
+                    <i data-feather="info"></i>
+                    SonarQube project key is configured: <strong>{{ project.sonar_project_key }}</strong>
+                    <br>
+                    <small>Data should appear here after running SonarQube analysis on your project.</small>
+                </div>
+                {% else %}
+                <div class="alert alert-warning">
+                    <i data-feather="alert-triangle"></i>
+                    No SonarQube project key configured yet.
+                </div>
+                {% endif %}
+                
+                <div class="d-flex justify-content-center gap-3">
+                    {% if project and project.sonar_project_key %}
+                    <button class="btn btn-primary" onclick="refreshSonarQubeData()">
+                        <i data-feather="refresh-cw"></i> Refresh Data
+                    </button>
+                    {% endif %}
+                    <button class="btn btn-outline-primary" onclick="editSonarProjectKey()">
+                        <i data-feather="settings"></i> Configure Project Key
+                    </button>
                 </div>
             </div>
         </div>
@@ -116,28 +149,30 @@
             </div>
         </div>
     </div>
-    {% endif %}
-
-    <!-- Empty State or Summary Cards -->
-    {% if not data or not data.bugs %}
+    {% else %}
+    
+    <!-- Quality Gate Status -->
+    {% if data.quality_gate_status %}
     <div class="row mb-4">
         <div class="col-12">
-            <div class="summary-card text-center py-5">
-                <div class="empty-state-icon mb-3">
-                    <i data-feather="server" style="width: 64px; height: 64px; color: hsl(var(--secondary-foreground));"></i>
-                </div>
-                <h3 class="mb-3">No SonarQube Data Available</h3>
-                <p class="text-muted mb-4">Go back to the project dashboard to configure SonarQube connection and fetch analysis data</p>
-                
-                <div class="d-flex justify-content-center">
-                    <a href="{{ url_for('project_dashboard', project_id=project.id) }}" class="btn btn-primary">
-                        <i data-feather="arrow-left"></i> Back to Dashboard
-                    </a>
+            <div class="summary-card">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h5 class="card-title">Quality Gate Status</h5>
+                        {% if data.last_analysis %}
+                        <p class="text-secondary mb-0">Last analysis: {{ data.last_analysis }}</p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <span class="badge badge-{{ 'low' if data.quality_gate_status == 'OK' else 'critical' }} fs-5">
+                            {{ data.quality_gate_status }}
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    {% else %}
+    {% endif %}
     
     <!-- Project Information -->
     <div class="row mb-4">
