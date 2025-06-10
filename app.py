@@ -251,6 +251,11 @@ def project_trivy_detail(project_id):
 @app.route('/project/<project_id>/delete', methods=['POST'])
 def delete_project(project_id):
     """Delete a project"""
+    # Check admin permissions
+    if not is_admin():
+        flash('Access denied. Administrator privileges required.', 'error')
+        return redirect(url_for('home'))
+    
     project = Project.query.get(project_id)
     if project:
         project_name = project.name

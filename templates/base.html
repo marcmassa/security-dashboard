@@ -137,12 +137,44 @@
     {% endwith %}
 
     <!-- Main Content -->
+    <!-- Flash Messages Container -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="container mt-3">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                        <strong>
+                            {% if category == 'success' %}
+                                <i data-feather="check-circle" style="width: 16px; height: 16px;"></i>
+                            {% elif category == 'error' %}
+                                <i data-feather="alert-circle" style="width: 16px; height: 16px;"></i>
+                            {% elif category == 'warning' %}
+                                <i data-feather="alert-triangle" style="width: 16px; height: 16px;"></i>
+                            {% else %}
+                                <i data-feather="info" style="width: 16px; height: 16px;"></i>
+                            {% endif %}
+                        </strong>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Notification Container for JavaScript notifications -->
+    <div id="notification-container" class="position-fixed top-0 end-0 p-3" style="z-index: 9999;"></div>
+
     <main>
         {% block content %}{% endblock %}
     </main>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script src="/static/js/notifications.js"></script>
+    <script src="/static/js/dashboard.js"></script>
     
     <!-- Initialize Feather Icons -->
     <script>
