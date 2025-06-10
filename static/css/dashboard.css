@@ -33,6 +33,11 @@
   --border: 210 11% 25%; /* #334155 */
   --input: 210 11% 20%; /* #1E293B */
   --ring: 94 100% 70%; /* #80FF80 */
+  
+  /* Enhanced contrast variables */
+  --text-on-dark: 210 11% 95%; /* Light text for dark backgrounds */
+  --text-on-light: 210 13% 15%; /* Dark text for light backgrounds */
+  --muted-text: 210 11% 70%; /* Muted but visible text */
 }
 
 * {
@@ -943,4 +948,199 @@ body {
 
 .breadcrumb-item + .breadcrumb-item::before {
   color: hsl(var(--secondary-foreground)) !important;
+}
+
+/* ===== DARK TEXT ON DARK BACKGROUND FIXES ===== */
+
+/* Force all text elements to have proper contrast */
+[data-bs-theme="dark"] * {
+  color: hsl(var(--text-on-dark)) !important;
+}
+
+/* Override for elements that should have specific colors */
+[data-bs-theme="dark"] .navbar-brand,
+[data-bs-theme="dark"] .text-primary,
+[data-bs-theme="dark"] .btn-primary {
+  color: hsl(var(--primary)) !important;
+}
+
+[data-bs-theme="dark"] .text-success,
+[data-bs-theme="dark"] .badge-success {
+  color: hsl(var(--low)) !important;
+}
+
+[data-bs-theme="dark"] .text-danger,
+[data-bs-theme="dark"] .badge-danger {
+  color: hsl(var(--critical)) !important;
+}
+
+[data-bs-theme="dark"] .text-warning,
+[data-bs-theme="dark"] .badge-warning {
+  color: hsl(var(--medium)) !important;
+}
+
+[data-bs-theme="dark"] .text-info,
+[data-bs-theme="dark"] .badge-info {
+  color: hsl(var(--info)) !important;
+}
+
+/* Specific fixes for commonly problematic elements */
+[data-bs-theme="dark"] .card-text,
+[data-bs-theme="dark"] .card-body,
+[data-bs-theme="dark"] .list-group-item,
+[data-bs-theme="dark"] .nav-link,
+[data-bs-theme="dark"] .dropdown-item,
+[data-bs-theme="dark"] p,
+[data-bs-theme="dark"] span,
+[data-bs-theme="dark"] div,
+[data-bs-theme="dark"] label,
+[data-bs-theme="dark"] h1,
+[data-bs-theme="dark"] h2,
+[data-bs-theme="dark"] h3,
+[data-bs-theme="dark"] h4,
+[data-bs-theme="dark"] h5,
+[data-bs-theme="dark"] h6 {
+  color: hsl(var(--text-on-dark)) !important;
+}
+
+/* Table content visibility */
+[data-bs-theme="dark"] .table,
+[data-bs-theme="dark"] .table th,
+[data-bs-theme="dark"] .table td,
+[data-bs-theme="dark"] .table-responsive {
+  color: hsl(var(--text-on-dark)) !important;
+  background-color: hsl(var(--card)) !important;
+}
+
+/* Form elements */
+[data-bs-theme="dark"] .form-label,
+[data-bs-theme="dark"] .form-control,
+[data-bs-theme="dark"] .form-select,
+[data-bs-theme="dark"] .form-text,
+[data-bs-theme="dark"] input,
+[data-bs-theme="dark"] textarea,
+[data-bs-theme="dark"] select {
+  color: hsl(var(--text-on-dark)) !important;
+  background-color: hsl(var(--input)) !important;
+}
+
+/* Navigation and menu items */
+[data-bs-theme="dark"] .navbar-nav .nav-link,
+[data-bs-theme="dark"] .navbar-text,
+[data-bs-theme="dark"] .dropdown-menu .dropdown-item {
+  color: hsl(var(--text-on-dark)) !important;
+}
+
+/* Button text visibility */
+[data-bs-theme="dark"] .btn-outline-primary,
+[data-bs-theme="dark"] .btn-outline-secondary,
+[data-bs-theme="dark"] .btn-outline-success,
+[data-bs-theme="dark"] .btn-outline-danger,
+[data-bs-theme="dark"] .btn-outline-warning,
+[data-bs-theme="dark"] .btn-outline-info {
+  color: hsl(var(--text-on-dark)) !important;
+}
+
+/* Muted text should still be visible */
+[data-bs-theme="dark"] .text-muted,
+[data-bs-theme="dark"] .small,
+[data-bs-theme="dark"] small {
+  color: hsl(var(--muted-text)) !important;
+}
+
+/* Configuration page specific fixes */
+[data-bs-theme="dark"] .configuration-container *,
+[data-bs-theme="dark"] .card-header *,
+[data-bs-theme="dark"] .card-body *,
+[data-bs-theme="dark"] .form-group *,
+[data-bs-theme="dark"] .input-group *,
+[data-bs-theme="dark"] .help-text * {
+  color: hsl(var(--text-on-dark)) !important;
+}
+
+/* Override Bootstrap's text utilities for dark theme */
+[data-bs-theme="dark"] .text-dark {
+  color: hsl(var(--text-on-dark)) !important;
+}
+
+[data-bs-theme="dark"] .text-body {
+  color: hsl(var(--text-on-dark)) !important;
+}
+
+[data-bs-theme="dark"] .text-body-secondary {
+  color: hsl(var(--muted-text)) !important;
+}
+
+/* Ensure links are visible */
+[data-bs-theme="dark"] a {
+  color: hsl(var(--info)) !important;
+}
+
+[data-bs-theme="dark"] a:hover {
+  color: hsl(var(--primary)) !important;
+}
+
+/* Progress indicators and status elements */
+[data-bs-theme="dark"] .progress-bar {
+  background-color: hsl(var(--primary)) !important;
+}
+
+[data-bs-theme="dark"] .badge {
+  color: white !important;
+  font-weight: 600;
+}
+
+/* Specific fixes for dashboard elements */
+[data-bs-theme="dark"] .dashboard-title,
+[data-bs-theme="dark"] .dashboard-subtitle,
+[data-bs-theme="dark"] .card-title,
+[data-bs-theme="dark"] .metric-label,
+[data-bs-theme="dark"] .metric-value,
+[data-bs-theme="dark"] .upload-title,
+[data-bs-theme="dark"] .upload-description {
+  color: hsl(var(--text-on-dark)) !important;
+}
+
+/* Modal and popup text */
+[data-bs-theme="dark"] .modal-body *,
+[data-bs-theme="dark"] .modal-header *,
+[data-bs-theme="dark"] .modal-footer *,
+[data-bs-theme="dark"] .toast-body *,
+[data-bs-theme="dark"] .alert * {
+  color: hsl(var(--text-on-dark)) !important;
+}
+
+/* Override any remaining dark text */
+[data-bs-theme="dark"] .text-black,
+[data-bs-theme="dark"] .text-gray-900,
+[data-bs-theme="dark"] .text-slate-900 {
+  color: hsl(var(--text-on-dark)) !important;
+}
+
+/* Ensure all Bootstrap components use proper colors */
+[data-bs-theme="dark"] .list-group-item {
+  background-color: hsl(var(--card)) !important;
+  border-color: hsl(var(--border)) !important;
+  color: hsl(var(--text-on-dark)) !important;
+}
+
+[data-bs-theme="dark"] .accordion-item {
+  background-color: hsl(var(--card)) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
+[data-bs-theme="dark"] .accordion-button {
+  background-color: hsl(var(--secondary)) !important;
+  color: hsl(var(--text-on-dark)) !important;
+}
+
+/* Tab navigation */
+[data-bs-theme="dark"] .nav-tabs .nav-link {
+  color: hsl(var(--text-on-dark)) !important;
+}
+
+[data-bs-theme="dark"] .nav-tabs .nav-link.active {
+  background-color: hsl(var(--card)) !important;
+  border-color: hsl(var(--border)) !important;
+  color: hsl(var(--text-on-dark)) !important;
 }
