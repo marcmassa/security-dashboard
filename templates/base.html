@@ -61,7 +61,7 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link d-flex align-items-center {% if request.endpoint == 'project_trivy_detail' %}active{% endif %}" href="{{ url_for('project_trivy_detail', project_id=project.id) }}">
-                            <i data-feather="shield-alert" class="me-1" style="width: 16px; height: 16px;"></i>
+                            <i data-feather="alert-triangle" class="me-1" style="width: 16px; height: 16px;"></i>
                             Trivy
                         </a>
                     </li>
