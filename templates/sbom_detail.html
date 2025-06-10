@@ -25,11 +25,48 @@
 }
 
 #component-details-table code {
-    background-color: var(--bs-gray-100);
-    color: var(--bs-gray-800);
+    background-color: rgba(108, 117, 125, 0.1);
+    color: #212529;
     padding: 0.125rem 0.25rem;
     border-radius: 0.25rem;
     font-size: 0.8rem;
+    border: 1px solid rgba(108, 117, 125, 0.2);
+}
+
+[data-bs-theme="dark"] #component-details-table code {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #f8f9fa;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+#component-details-table .text-muted {
+    color: #6c757d !important;
+}
+
+[data-bs-theme="dark"] #component-details-table .text-muted {
+    color: #adb5bd !important;
+}
+
+#component-details-table .component-description {
+    color: #495057 !important;
+    font-size: 0.75rem;
+}
+
+[data-bs-theme="dark"] #component-details-table .component-description {
+    color: #ced4da !important;
+}
+
+#component-details-table .fw-bold {
+    color: #212529;
+}
+
+[data-bs-theme="dark"] #component-details-table .fw-bold {
+    color: #f8f9fa;
+}
+
+#component-details-table .badge {
+    font-size: 0.7rem !important;
+    font-weight: 500;
 }
 
 .table-responsive {
@@ -234,7 +271,7 @@
                         <td style="max-width: 250px;">
                             <div class="fw-bold text-truncate">{{ component.name }}</div>
                             {% if component.description and component.description != 'Unknown' %}
-                            <small class="text-muted text-truncate d-block">{{ component.description[:80] }}{% if component.description|length > 80 %}...{% endif %}</small>
+                            <small class="component-description text-truncate d-block">{{ component.description[:80] }}{% if component.description|length > 80 %}...{% endif %}</small>
                             {% endif %}
                         </td>
                         <td style="min-width: 100px;"><code class="small">{{ component.version }}</code></td>
@@ -271,8 +308,7 @@
         {% if data.components.total > data.components.details|length %}
         <div class="text-center mt-3">
             <small class="text-muted">
-                Showing {{ data.components.details|length }} of {{ data.components.total }} components. 
-                <a href="#" class="text-decoration-none">Load more components</a>
+                Showing {{ data.components.details|length }} of {{ data.components.total }} components
             </small>
         </div>
         {% endif %}
