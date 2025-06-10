@@ -21,46 +21,80 @@
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{{ url_for('home') }}">
-                <i data-feather="shield"></i>
+            <a class="navbar-brand fw-bold d-flex align-items-center" href="{{ url_for('home') }}">
+                <i data-feather="shield" class="me-2"></i>
                 Security Dashboard
             </a>
             
-            <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="{{ url_for('home') }}">Home</a>
-                {% if project %}
-                <a class="nav-link" href="{{ url_for('project_dashboard', project_id=project.id) }}">Dashboard</a>
-                {% if project.reports and project.reports.sonarqube %}
-                <a class="nav-link" href="{{ url_for('project_sonarqube_detail', project_id=project.id) }}">SonarQube</a>
-                {% endif %}
-                {% if project.reports and project.reports.sbom %}
-                <a class="nav-link" href="{{ url_for('project_sbom_detail', project_id=project.id) }}">SBOM</a>
-                {% endif %}
-                {% if project.reports and project.reports.trivy %}
-                <a class="nav-link" href="{{ url_for('project_trivy_detail', project_id=project.id) }}">Trivy</a>
-                {% endif %}
-                {% endif %}
-                <div class="dropdown me-2">
-                    <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i data-feather="settings"></i>
-                        Configuration
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#" onclick="showGlobalSonarQubeConfig()">
-                            <i data-feather="server"></i> SonarQube Server
-                        </a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#" onclick="showSystemSettings()">
-                            <i data-feather="settings"></i> System Settings
-                        </a></li>
-                    </ul>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center {% if request.endpoint == 'home' %}active{% endif %}" href="{{ url_for('home') }}">
+                            <i data-feather="home" class="me-1" style="width: 16px; height: 16px;"></i>
+                            Home
+                        </a>
+                    </li>
+                    {% if project %}
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center {% if request.endpoint == 'project_dashboard' %}active{% endif %}" href="{{ url_for('project_dashboard', project_id=project.id) }}">
+                            <i data-feather="bar-chart-2" class="me-1" style="width: 16px; height: 16px;"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center {% if request.endpoint == 'project_sonarqube_detail' %}active{% endif %}" href="{{ url_for('project_sonarqube_detail', project_id=project.id) }}">
+                            <i data-feather="code" class="me-1" style="width: 16px; height: 16px;"></i>
+                            SonarQube
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center {% if request.endpoint == 'project_sbom_detail' %}active{% endif %}" href="{{ url_for('project_sbom_detail', project_id=project.id) }}">
+                            <i data-feather="package" class="me-1" style="width: 16px; height: 16px;"></i>
+                            SBOM
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center {% if request.endpoint == 'project_trivy_detail' %}active{% endif %}" href="{{ url_for('project_trivy_detail', project_id=project.id) }}">
+                            <i data-feather="shield-alert" class="me-1" style="width: 16px; height: 16px;"></i>
+                            Trivy
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+                
+                <div class="navbar-nav">
+                    <div class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i data-feather="settings" class="me-1" style="width: 16px; height: 16px;"></i>
+                            Configuration
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item d-flex align-items-center" href="{{ url_for('configuration') }}">
+                                <i data-feather="sliders" class="me-2" style="width: 16px; height: 16px;"></i>
+                                General Settings
+                            </a></li>
+                            <li><a class="dropdown-item d-flex align-items-center" href="{{ url_for('configuration') }}#sonarqube">
+                                <i data-feather="server" class="me-2" style="width: 16px; height: 16px;"></i>
+                                SonarQube Integration
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item d-flex align-items-center text-muted" href="#" onclick="return false;">
+                                <i data-feather="users" class="me-2" style="width: 16px; height: 16px;"></i>
+                                SSO/SAML <small>(Coming Soon)</small>
+                            </a></li>
+                        </ul>
+                    </div>
+                    <a class="btn btn-outline-primary d-flex align-items-center ms-2" href="{{ url_for('create_project_route') }}">
+                        <i data-feather="plus-circle" class="me-1" style="width: 16px; height: 16px;"></i>
+                        New Project
+                    </a>
                 </div>
-                <a class="nav-link" href="{{ url_for('create_project_route') }}">
-                    <i data-feather="plus-circle"></i>
-                    New Project
-                </a>
             </div>
         </div>
     </nav>

@@ -510,6 +510,16 @@ def get_global_sonarqube_config():
         'has_token': bool(session.get('sonar_token'))
     }), 200
 
+@app.route('/configuration')
+def configuration():
+    """Configuration page"""
+    # Get current SonarQube configuration from session
+    sonarqube_config = {
+        'sonar_url': session.get('sonar_url', ''),
+        'has_token': bool(session.get('sonar_token'))
+    }
+    return render_template('configuration.html', sonarqube_config=sonarqube_config)
+
 @app.route('/api/projects/<project_id>/sonarqube/connect', methods=['POST'])
 def connect_project_sonarqube(project_id):
     """Connect project to SonarQube using project key and global config"""

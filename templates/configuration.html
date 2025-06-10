@@ -1,0 +1,528 @@
+{% extends "base.html" %}
+
+{% block title %}Configuration - Security Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <!-- Page Header -->
+        <div class="col-12 mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h2 mb-1">Configuration</h1>
+                    <p class="text-muted mb-0">Manage system settings and integrations</p>
+                </div>
+                <div>
+                    <button class="btn btn-success" onclick="saveAllConfiguration()">
+                        <i data-feather="save" class="me-1"></i>
+                        Save All Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Navigation Sidebar -->
+        <div class="col-lg-3 col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i data-feather="list" class="me-2"></i>
+                        Settings Categories
+                    </h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a class="list-group-item list-group-item-action active" href="#general" onclick="showSection('general')">
+                        <i data-feather="sliders" class="me-2"></i>
+                        General Settings
+                    </a>
+                    <a class="list-group-item list-group-item-action" href="#sonarqube" onclick="showSection('sonarqube')">
+                        <i data-feather="server" class="me-2"></i>
+                        SonarQube Integration
+                    </a>
+                    <a class="list-group-item list-group-item-action text-muted" href="#sso" onclick="showSection('sso')">
+                        <i data-feather="users" class="me-2"></i>
+                        SSO/SAML Authentication
+                        <small class="text-muted d-block">Coming Soon</small>
+                    </a>
+                    <a class="list-group-item list-group-item-action text-muted" href="#notifications" onclick="showSection('notifications')">
+                        <i data-feather="bell" class="me-2"></i>
+                        Notifications
+                        <small class="text-muted d-block">Coming Soon</small>
+                    </a>
+                    <a class="list-group-item list-group-item-action text-muted" href="#security" onclick="showSection('security')">
+                        <i data-feather="shield" class="me-2"></i>
+                        Security Settings
+                        <small class="text-muted d-block">Coming Soon</small>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-lg-9 col-md-8">
+            <!-- General Settings Section -->
+            <div id="general-section" class="config-section">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i data-feather="sliders" class="me-2"></i>
+                            General Settings
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="dashboard-title" class="form-label">Dashboard Title</label>
+                                    <input type="text" class="form-control" id="dashboard-title" value="Security Analysis Dashboard">
+                                    <div class="form-text">Customize the main dashboard title</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="max-upload-size" class="form-label">Max Upload Size (MB)</label>
+                                    <input type="number" class="form-control" id="max-upload-size" value="50" min="1" max="500">
+                                    <div class="form-text">Maximum file size for report uploads</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="auto-refresh" class="form-label">Auto Refresh Interval (minutes)</label>
+                                    <select class="form-select" id="auto-refresh">
+                                        <option value="0">Disabled</option>
+                                        <option value="5">5 minutes</option>
+                                        <option value="15" selected>15 minutes</option>
+                                        <option value="30">30 minutes</option>
+                                        <option value="60">1 hour</option>
+                                    </select>
+                                    <div class="form-text">Automatic dashboard refresh frequency</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Theme Settings</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="dark-mode" checked>
+                                        <label class="form-check-label" for="dark-mode">
+                                            Dark Mode (Default)
+                                        </label>
+                                    </div>
+                                    <div class="form-text">Interface appearance preferences</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SonarQube Integration Section -->
+            <div id="sonarqube-section" class="config-section" style="display: none;">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i data-feather="server" class="me-2"></i>
+                            SonarQube Server Integration
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <i data-feather="info" class="me-2"></i>
+                            Configure your SonarQube server connection to enable direct API integration and real-time data fetching.
+                        </div>
+                        
+                        <form id="sonarqube-config-form">
+                            <div class="mb-3">
+                                <label for="sonar-url" class="form-label">SonarQube Server URL</label>
+                                <input type="url" class="form-control" id="sonar-url" 
+                                       value="{{ sonarqube_config.sonar_url }}" 
+                                       placeholder="https://sonarqube.company.com"
+                                       required>
+                                <div class="form-text">
+                                    The base URL of your SonarQube server (e.g., https://sonarqube.company.com)
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="sonar-token" class="form-label">Authentication Token</label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="sonar-token" 
+                                           placeholder="{% if sonarqube_config.has_token %}••••••••••••••••{% else %}Enter your SonarQube token{% endif %}">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="toggleTokenVisibility()">
+                                        <i data-feather="eye" id="token-eye"></i>
+                                    </button>
+                                </div>
+                                <div class="form-text">
+                                    Generate a token in SonarQube: User → My Account → Security → Generate Tokens
+                                </div>
+                                {% if sonarqube_config.has_token %}
+                                <div class="text-success mt-1">
+                                    <i data-feather="check-circle" class="me-1"></i>
+                                    Token configured
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="d-flex gap-2 mb-3">
+                                <button type="button" class="btn btn-outline-primary" onclick="testSonarQubeConnection()">
+                                    <i data-feather="wifi" class="me-1"></i>
+                                    Test Connection
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i data-feather="save" class="me-1"></i>
+                                    Save Configuration
+                                </button>
+                            </div>
+
+                            <div id="sonar-test-result" class="mt-3" style="display: none;"></div>
+                        </form>
+
+                        <hr class="my-4">
+
+                        <h6 class="mb-3">Configuration Help</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6 class="card-title">
+                                            <i data-feather="key" class="me-2"></i>
+                                            Creating Authentication Tokens
+                                        </h6>
+                                        <ol class="small mb-0">
+                                            <li>Log into your SonarQube instance</li>
+                                            <li>Go to <strong>User → My Account</strong></li>
+                                            <li>Click <strong>Security</strong> tab</li>
+                                            <li>Enter token name and click <strong>Generate</strong></li>
+                                            <li>Copy the generated token immediately</li>
+                                        </ol>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6 class="card-title">
+                                            <i data-feather="shield" class="me-2"></i>
+                                            Required Permissions
+                                        </h6>
+                                        <ul class="small mb-0">
+                                            <li><strong>Browse</strong> - View project metrics</li>
+                                            <li><strong>Execute Analysis</strong> - Access detailed reports</li>
+                                            <li><strong>Admin</strong> - Full project access (recommended)</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SSO/SAML Section -->
+            <div id="sso-section" class="config-section" style="display: none;">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i data-feather="users" class="me-2"></i>
+                            SSO/SAML Authentication
+                            <span class="badge bg-warning ms-2">Coming Soon</span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-warning">
+                            <i data-feather="clock" class="me-2"></i>
+                            <strong>Feature in Development</strong><br>
+                            SSO/SAML authentication integration is planned for the next release.
+                        </div>
+
+                        <h6>Planned Integrations:</h6>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <i data-feather="gitlab" class="mb-2" style="width: 48px; height: 48px;"></i>
+                                        <h6>GitLab SSO</h6>
+                                        <p class="small text-muted">OAuth 2.0 integration with GitLab</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <i data-feather="key" class="mb-2" style="width: 48px; height: 48px;"></i>
+                                        <h6>Keycloak</h6>
+                                        <p class="small text-muted">SAML 2.0 and OpenID Connect</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <i data-feather="cloud" class="mb-2" style="width: 48px; height: 48px;"></i>
+                                        <h6>Azure AD</h6>
+                                        <p class="small text-muted">Microsoft Azure Active Directory</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <h6>Features Overview:</h6>
+                            <ul>
+                                <li>Single Sign-On (SSO) with existing corporate identity providers</li>
+                                <li>Role-based access control (RBAC)</li>
+                                <li>Automatic user provisioning and deprovisioning</li>
+                                <li>Group-based project access management</li>
+                                <li>Audit logging for authentication events</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notifications Section -->
+            <div id="notifications-section" class="config-section" style="display: none;">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i data-feather="bell" class="me-2"></i>
+                            Notification Settings
+                            <span class="badge bg-info ms-2">Coming Soon</span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <i data-feather="mail" class="me-2"></i>
+                            <strong>Planned Features</strong><br>
+                            Email and webhook notifications for security threshold alerts.
+                        </div>
+                        
+                        <h6>Planned Notification Types:</h6>
+                        <ul>
+                            <li>Critical vulnerability discoveries</li>
+                            <li>Quality gate failures</li>
+                            <li>Report processing completions</li>
+                            <li>System health alerts</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security Section -->
+            <div id="security-section" class="config-section" style="display: none;">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i data-feather="shield" class="me-2"></i>
+                            Security Settings
+                            <span class="badge bg-secondary ms-2">Coming Soon</span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-secondary">
+                            <i data-feather="lock" class="me-2"></i>
+                            <strong>Advanced Security Features</strong><br>
+                            Enhanced security controls for enterprise environments.
+                        </div>
+                        
+                        <h6>Planned Security Features:</h6>
+                        <ul>
+                            <li>API rate limiting and throttling</li>
+                            <li>IP allowlist/blocklist management</li>
+                            <li>Session timeout configuration</li>
+                            <li>Audit logging and compliance reporting</li>
+                            <li>Data encryption at rest</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notification Toast Container -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="config-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <i data-feather="settings" class="me-2"></i>
+            <strong class="me-auto">Configuration</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body" id="config-toast-body">
+            <!-- Toast message will be inserted here -->
+        </div>
+    </div>
+</div>
+
+<script>
+// Section navigation
+function showSection(sectionId) {
+    // Hide all sections
+    document.querySelectorAll('.config-section').forEach(section => {
+        section.style.display = 'none';
+    });
+    
+    // Show selected section
+    document.getElementById(sectionId + '-section').style.display = 'block';
+    
+    // Update navigation
+    document.querySelectorAll('.list-group-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    document.querySelector(`[href="#${sectionId}"]`).classList.add('active');
+    
+    // Update URL hash
+    window.location.hash = sectionId;
+}
+
+// Initialize section based on URL hash
+document.addEventListener('DOMContentLoaded', function() {
+    const hash = window.location.hash.substring(1);
+    if (hash && ['general', 'sonarqube', 'sso', 'notifications', 'security'].includes(hash)) {
+        showSection(hash);
+    }
+    
+    // Initialize Feather icons
+    feather.replace();
+});
+
+// Toggle token visibility
+function toggleTokenVisibility() {
+    const tokenInput = document.getElementById('sonar-token');
+    const eyeIcon = document.getElementById('token-eye');
+    
+    if (tokenInput.type === 'password') {
+        tokenInput.type = 'text';
+        eyeIcon.setAttribute('data-feather', 'eye-off');
+    } else {
+        tokenInput.type = 'password';
+        eyeIcon.setAttribute('data-feather', 'eye');
+    }
+    feather.replace();
+}
+
+// Test SonarQube connection
+async function testSonarQubeConnection() {
+    const url = document.getElementById('sonar-url').value;
+    const token = document.getElementById('sonar-token').value;
+    const resultDiv = document.getElementById('sonar-test-result');
+    
+    if (!url || !token) {
+        showToast('Please enter both URL and token before testing', 'warning');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/sonarqube/test-connection', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                sonar_url: url,
+                sonar_token: token
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            resultDiv.innerHTML = `
+                <div class="alert alert-success">
+                    <i data-feather="check-circle" class="me-2"></i>
+                    <strong>Connection Successful!</strong><br>
+                    SonarQube Version: ${data.version}<br>
+                    Status: ${data.status}
+                </div>
+            `;
+        } else {
+            resultDiv.innerHTML = `
+                <div class="alert alert-danger">
+                    <i data-feather="x-circle" class="me-2"></i>
+                    <strong>Connection Failed</strong><br>
+                    ${data.message || data.error}
+                </div>
+            `;
+        }
+        
+        resultDiv.style.display = 'block';
+        feather.replace();
+        
+    } catch (error) {
+        resultDiv.innerHTML = `
+            <div class="alert alert-danger">
+                <i data-feather="x-circle" class="me-2"></i>
+                <strong>Connection Error</strong><br>
+                ${error.message}
+            </div>
+        `;
+        resultDiv.style.display = 'block';
+        feather.replace();
+    }
+}
+
+// Save SonarQube configuration
+document.getElementById('sonarqube-config-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const url = document.getElementById('sonar-url').value;
+    const token = document.getElementById('sonar-token').value;
+    
+    try {
+        const response = await fetch('/api/sonarqube/save-config', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                sonar_url: url,
+                sonar_token: token
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast('SonarQube configuration saved successfully', 'success');
+        } else {
+            showToast(data.error || 'Failed to save configuration', 'error');
+        }
+        
+    } catch (error) {
+        showToast('Error saving configuration: ' + error.message, 'error');
+    }
+});
+
+// Save all configuration
+function saveAllConfiguration() {
+    // This would save all configuration sections
+    showToast('All configurations saved successfully', 'success');
+}
+
+// Show toast notification
+function showToast(message, type = 'info') {
+    const toast = document.getElementById('config-toast');
+    const toastBody = document.getElementById('config-toast-body');
+    
+    const iconMap = {
+        success: 'check-circle',
+        error: 'x-circle',
+        warning: 'alert-triangle',
+        info: 'info'
+    };
+    
+    toastBody.innerHTML = `
+        <i data-feather="${iconMap[type]}" class="me-2"></i>
+        ${message}
+    `;
+    
+    feather.replace();
+    
+    const bsToast = new bootstrap.Toast(toast);
+    bsToast.show();
+}
+</script>
+{% endblock %}

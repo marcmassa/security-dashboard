@@ -277,7 +277,7 @@ function showEmptyState(card, type) {
 }
 
 // Create SBOM chart
-function createSBOMChart(vulnerabilities) {
+function createSBOMChart(data) {
     const canvas = document.getElementById('sbom-chart');
     if (!canvas || !window.Chart) {
         console.log('SBOM chart canvas not found or Chart.js not loaded');
@@ -295,15 +295,28 @@ function createSBOMChart(vulnerabilities) {
         canvas.chart.destroy();
     }
     
-    const data = {
-        labels: ['Critical', 'High', 'Medium', 'Low'],
+    // For SBOM, show component types or vulnerability severity if available
+    let chartData, labels;
+    if (data && typeof data === 'object') {
+        if (data.critical !== undefined) {
+            // Vulnerability data format
+            labels = ['Critical', 'High', 'Medium', 'Low'];
+            chartData = [data.critical || 0, data.high || 0, data.medium || 0, data.low || 0];
+        } else {
+            // Component types or other data
+            labels = Object.keys(data);
+            chartData = Object.values(data);
+        }
+    } else {
+        // Default empty state
+        labels = ['No Data'];
+        chartData = [1];
+    }
+    
+    const chartConfig = {
+        labels: labels,
         datasets: [{
-            data: [
-                vulnerabilities.critical || 0,
-                vulnerabilities.high || 0,
-                vulnerabilities.medium || 0,
-                vulnerabilities.low || 0
-            ],
+            data: chartData,
             backgroundColor: [
                 '#dc3545',
                 '#fd7e14',
