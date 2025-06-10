@@ -525,10 +525,10 @@
         <h5 class="card-title mb-3">Issues Detail</h5>
         
         <!-- Issue Filters -->
-        <div class="filter-controls mb-3">
-            <div class="row">
+        <div class="filter-controls mb-3 p-3 bg-light rounded">
+            <div class="row g-3">
                 <div class="col-md-3">
-                    <label class="form-label">Filter by Type</label>
+                    <label class="form-label fw-semibold">Filter by Type</label>
                     <select class="form-select" id="issue-type-filter">
                         <option value="">All Types</option>
                         <option value="BUG">Bugs</option>
@@ -537,7 +537,7 @@
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label">Filter by Severity</label>
+                    <label class="form-label fw-semibold">Filter by Severity</label>
                     <select class="form-select" id="issue-severity-filter">
                         <option value="">All Severities</option>
                         <option value="BLOCKER">Blocker</option>
@@ -548,13 +548,28 @@
                     </select>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">Search Issues</label>
-                    <input type="text" class="form-control" id="issue-search" placeholder="Search by message or component...">
+                    <label class="form-label fw-semibold">Search Issues</label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i data-feather="search" style="width: 16px; height: 16px;"></i>
+                        </span>
+                        <input type="text" class="form-control" id="issue-search" placeholder="Search by message or component...">
+                    </div>
                 </div>
                 <div class="col-md-2 d-flex align-items-end">
-                    <button class="btn btn-outline-primary" onclick="sortIssueTable()">
-                        <i data-feather="arrow-up"></i> Sort
+                    <button class="btn btn-outline-primary w-100" onclick="sortIssueTable()">
+                        <i data-feather="arrow-up" style="width: 16px; height: 16px;"></i> Sort
                     </button>
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div id="issues-results-counter" class="text-muted small"></div>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="clearIssueFilters()">
+                            <i data-feather="x" style="width: 14px; height: 14px;"></i> Clear Filters
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -737,12 +752,22 @@
 {% block scripts %}
 <script src="/static/js/dashboard.js"></script>
 <script>
-// Initialize SonarQube detail charts
+// Initialize SonarQube detail charts and filters
 document.addEventListener('DOMContentLoaded', function() {
     {% if data and data.bugs is defined %}
     // Create issues type chart
     createIssuesTypeChart();
     {% endif %}
+    
+    // Initialize table filters
+    initializeIssueFilters();
+    
+    // Initialize issues counter
+    const issuesTable = document.getElementById('issues-table');
+    if (issuesTable) {
+        const totalRows = issuesTable.querySelectorAll('tbody tr').length;
+        updateIssuesResultsCount(totalRows, totalRows);
+    }
 });
 
 // Edit SonarQube Project Key Functions
@@ -876,6 +901,129 @@ function createIssuesTypeChart() {
             }
         }
     });
+}
+
+// Initialize issue table filters and search
+function initializeIssueFilters() {
+    const typeFilter = document.getElementById('issue-type-filter');
+    const severityFilter = document.getElementById('issue-severity-filter');
+    const searchInput = document.getElementById('issue-search');
+    
+    if (typeFilter) {
+        typeFilter.addEventListener('change', filterIssuesTable);
+    }
+    if (severityFilter) {
+        severityFilter.addEventListener('change', filterIssuesTable);
+    }
+    if (searchInput) {
+        searchInput.addEventListener('input', filterIssuesTable);
+    }
+}
+
+// Filter issues table based on type, severity, and search term
+function filterIssuesTable() {
+    const table = document.getElementById('issues-table');
+    if (!table) return;
+    
+    const typeFilter = document.getElementById('issue-type-filter').value;
+    const severityFilter = document.getElementById('issue-severity-filter').value;
+    const searchTerm = document.getElementById('issue-search').value.toLowerCase();
+    const rows = table.querySelectorAll('tbody tr');
+    
+    let visibleCount = 0;
+    
+    rows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+        if (cells.length < 5) return;
+        
+        const type = cells[0].textContent.trim();
+        const severity = cells[1].textContent.trim();
+        const component = cells[2].textContent.toLowerCase();
+        const message = cells[4].textContent.toLowerCase();
+        
+        // Check filters
+        const typeMatch = !typeFilter || type === typeFilter;
+        const severityMatch = !severityFilter || severity === severityFilter;
+        const searchMatch = !searchTerm || 
+            component.includes(searchTerm) || 
+            message.includes(searchTerm) ||
+            type.toLowerCase().includes(searchTerm);
+        
+        if (typeMatch && severityMatch && searchMatch) {
+            row.style.display = '';
+            visibleCount++;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+    
+    // Update results count
+    updateIssuesResultsCount(visibleCount, rows.length);
+}
+
+// Update the results counter
+function updateIssuesResultsCount(visible, total) {
+    const counter = document.getElementById('issues-results-counter');
+    if (!counter) return;
+    
+    if (visible === total) {
+        counter.textContent = `Showing all ${total} issues`;
+    } else {
+        counter.textContent = `Showing ${visible} of ${total} issues`;
+    }
+}
+
+// Sort issues table
+function sortIssueTable() {
+    const table = document.getElementById('issues-table');
+    if (!table) return;
+    
+    const tbody = table.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    
+    // Toggle sort direction
+    const currentSort = table.dataset.sortDirection || 'asc';
+    const newSort = currentSort === 'asc' ? 'desc' : 'asc';
+    table.dataset.sortDirection = newSort;
+    
+    // Sort by severity (most critical first when desc)
+    rows.sort((a, b) => {
+        const severityA = a.querySelector('td:nth-child(2)').textContent.trim();
+        const severityB = b.querySelector('td:nth-child(2)').textContent.trim();
+        
+        const severityOrder = { 'BLOCKER': 5, 'CRITICAL': 4, 'MAJOR': 3, 'MINOR': 2, 'INFO': 1 };
+        const valueA = severityOrder[severityA] || 0;
+        const valueB = severityOrder[severityB] || 0;
+        
+        return newSort === 'desc' ? valueB - valueA : valueA - valueB;
+    });
+    
+    // Re-append sorted rows
+    rows.forEach(row => tbody.appendChild(row));
+    
+    // Update sort button icon
+    const sortBtn = document.querySelector('button[onclick="sortIssueTable()"]');
+    if (sortBtn) {
+        const icon = sortBtn.querySelector('i');
+        if (icon) {
+            icon.setAttribute('data-feather', newSort === 'desc' ? 'arrow-down' : 'arrow-up');
+            feather.replace();
+        }
+    }
+    
+    showNotification('info', `Issues sorted by severity (${newSort}ending)`);
+}
+
+// Clear all issue filters
+function clearIssueFilters() {
+    document.getElementById('issue-type-filter').value = '';
+    document.getElementById('issue-severity-filter').value = '';
+    document.getElementById('issue-search').value = '';
+    
+    // Re-filter to show all items
+    filterIssuesTable();
+    
+    showNotification('success', 'All filters cleared');
 }
 
 // SonarQube Connection Functions (deprecated - use dashboard configuration)
