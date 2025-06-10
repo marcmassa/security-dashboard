@@ -125,48 +125,191 @@ def _parse_sbom_xml(content: str) -> Dict[str, Any]:
     try:
         root = ET.fromstring(content)
         
-        # Handle namespaces
-        ns = {'bom': 'http://cyclonedx.org/schema/bom/1.4'}
+        # Handle multiple namespace versions
+        namespace_uris = [
+            'http://cyclonedx.org/schema/bom/1.6',
+            'http://cyclonedx.org/schema/bom/1.5', 
+            'http://cyclonedx.org/schema/bom/1.4',
+            'http://cyclonedx.org/schema/bom/1.3'
+        ]
+        
+        ns = None
         if root.tag.startswith('{'):
             # Extract namespace from root tag
             ns_uri = root.tag.split('}')[0][1:]
             ns = {'bom': ns_uri}
+        else:
+            # Try to detect namespace by testing component queries
+            for uri in namespace_uris:
+                test_ns = {'bom': uri}
+                if root.findall('.//bom:component', test_ns):
+                    ns = test_ns
+                    break
         
         # Get basic info
         bom_format = 'CycloneDX'
         spec_version = root.get('version', 'Unknown')
         
-        # Count components
-        components = root.findall('.//bom:component', ns) or root.findall('.//component')
+        # Extract metadata
+        metadata = {}
+        if ns:
+            timestamp_elem = root.find('.//bom:timestamp', ns)
+            if timestamp_elem is not None:
+                metadata['timestamp'] = timestamp_elem.text
+        
+        # Find components with multiple fallback strategies
+        components = []
+        if ns:
+            components = root.findall('.//bom:component', ns)
+        
+        # Fallback: search without namespace
+        if not components:
+            components = root.findall('.//component')
+        
+        # Further fallback: iterate through all elements
+        if not components:
+            for elem in root.iter():
+                if elem.tag.endswith('component'):
+                    components.append(elem)
+        
         component_summary = {
             'total': len(components),
             'by_type': {},
-            'licenses': set()
+            'licenses': set(),
+            'details': []
         }
         
-        for component in components:
-            comp_type = component.get('type', 'unknown')
+        # Process each component
+        for component in components[:100]:  # Limit for performance
+            comp_type = component.get('type', 'library')
             component_summary['by_type'][comp_type] = component_summary['by_type'].get(comp_type, 0) + 1
+            
+            # Extract component details
+            comp_details = {'type': comp_type}
+            
+            # Find name, version, group with namespace awareness
+            for field in ['name', 'version', 'group', 'author', 'description']:
+                elem = None
+                if ns:
+                    elem = component.find(f'bom:{field}', ns)
+                if elem is None:
+                    elem = component.find(field)
+                if elem is None:
+                    # Search in any namespace
+                    for child in component:
+                        if child.tag.endswith(field):
+                            elem = child
+                            break
+                
+                comp_details[field] = elem.text if elem is not None else 'Unknown'
+            
+            # Extract licenses
+            license_elements = []
+            if ns:
+                license_elements = component.findall('.//bom:license', ns)
+            if not license_elements:
+                license_elements = component.findall('.//license')
+            
+            for license_elem in license_elements:
+                license_name = None
+                
+                # Try to find license name or ID
+                for field in ['name', 'id']:
+                    name_elem = None
+                    if ns:
+                        name_elem = license_elem.find(f'bom:{field}', ns)
+                    if name_elem is None:
+                        name_elem = license_elem.find(field)
+                    
+                    if name_elem is not None and name_elem.text:
+                        license_name = name_elem.text
+                        break
+                
+                if license_name:
+                    component_summary['licenses'].add(license_name)
+            
+            # Extract hashes
+            hash_elements = []
+            if ns:
+                hash_elements = component.findall('.//bom:hash', ns)
+            if not hash_elements:
+                hash_elements = component.findall('.//hash')
+            
+            comp_details['hashes'] = []
+            for hash_elem in hash_elements:
+                alg = hash_elem.get('alg', 'unknown')
+                value = hash_elem.text if hash_elem.text else 'unknown'
+                comp_details['hashes'].append({'algorithm': alg, 'value': value})
+            
+            component_summary['details'].append(comp_details)
         
         component_summary['licenses'] = list(component_summary['licenses'])
         
-        # For XML, vulnerability parsing is more complex and varies by schema version
-        # For now, return basic structure
+        # Look for vulnerabilities
+        vulnerabilities = []
+        if ns:
+            vulnerabilities = root.findall('.//bom:vulnerability', ns)
+        if not vulnerabilities:
+            vulnerabilities = root.findall('.//vulnerability')
+        
+        # If still no vulnerabilities found, search in any namespace
+        if not vulnerabilities:
+            for elem in root.iter():
+                if elem.tag.endswith('vulnerability'):
+                    vulnerabilities.append(elem)
+        
+        # Process vulnerabilities
+        severity_counts = {
+            'critical': 0,
+            'high': 0,
+            'medium': 0,
+            'low': 0,
+            'info': 0,
+            'unknown': 0
+        }
+        
+        vuln_details = []
+        for vuln in vulnerabilities[:50]:  # Limit for performance
+            vuln_data = {
+                'id': vuln.get('id', 'Unknown'),
+                'source': vuln.get('source', 'Unknown')
+            }
+            
+            # Find severity in ratings
+            rating_elements = []
+            if ns:
+                rating_elements = vuln.findall('.//bom:rating', ns)
+            if not rating_elements:
+                rating_elements = vuln.findall('.//rating')
+            
+            for rating in rating_elements:
+                severity_elem = None
+                if ns:
+                    severity_elem = rating.find('bom:severity', ns)
+                if severity_elem is None:
+                    severity_elem = rating.find('severity')
+                
+                if severity_elem is not None and severity_elem.text:
+                    severity = severity_elem.text.lower()
+                    if severity in severity_counts:
+                        severity_counts[severity] += 1
+                        vuln_data['severity'] = severity
+                    else:
+                        severity_counts['unknown'] += 1
+                        vuln_data['severity'] = 'unknown'
+                    break
+            
+            vuln_details.append(vuln_data)
+        
         return {
             'bom_format': bom_format,
             'spec_version': spec_version,
-            'metadata': {},
+            'metadata': metadata,
             'components': component_summary,
             'vulnerabilities': {
-                'total': 0,
-                'by_severity': {
-                    'critical': 0,
-                    'high': 0,
-                    'medium': 0,
-                    'low': 0,
-                    'info': 0,
-                    'unknown': 0
-                }
+                'total': len(vulnerabilities),
+                'by_severity': severity_counts,
+                'details': vuln_details
             },
             'raw_data': content
         }
@@ -174,6 +317,9 @@ def _parse_sbom_xml(content: str) -> Dict[str, Any]:
     except ET.ParseError as e:
         logging.error(f"Invalid XML in SBOM report: {e}")
         raise ValueError("Invalid XML format in SBOM report")
+    except Exception as e:
+        logging.error(f"Error parsing XML SBOM report: {e}")
+        raise ValueError(f"Error parsing XML SBOM report: {e}")
 
 def parse_trivy_report(content: str) -> Dict[str, Any]:
     """Parse Trivy JSON report"""
