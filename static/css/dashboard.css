@@ -707,3 +707,240 @@ body {
   height: 16px;
   margin-right: 0.5rem;
 }
+
+/* ===== POP-UP AND MODAL FIXES ===== */
+
+/* Flash messages and notifications */
+.alert {
+  color: hsl(var(--foreground)) !important;
+  background-color: hsl(var(--card)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.alert-success {
+  background-color: hsl(var(--low) / 0.15) !important;
+  border-color: hsl(var(--low)) !important;
+  color: hsl(var(--low)) !important;
+}
+
+.alert-danger, .alert-error {
+  background-color: hsl(var(--critical) / 0.15) !important;
+  border-color: hsl(var(--critical)) !important;
+  color: hsl(var(--critical)) !important;
+}
+
+.alert-warning {
+  background-color: hsl(var(--medium) / 0.15) !important;
+  border-color: hsl(var(--medium)) !important;
+  color: hsl(var(--medium)) !important;
+}
+
+.alert-info {
+  background-color: hsl(var(--info) / 0.15) !important;
+  border-color: hsl(var(--info)) !important;
+  color: hsl(var(--info)) !important;
+}
+
+/* Modal and popup visibility */
+.modal {
+  color: hsl(var(--foreground)) !important;
+}
+
+.modal-content {
+  background-color: hsl(var(--card)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+.modal-header {
+  background-color: hsl(var(--secondary)) !important;
+  border-bottom: 1px solid hsl(var(--border)) !important;
+}
+
+.modal-title {
+  color: hsl(var(--foreground)) !important;
+}
+
+.modal-body {
+  color: hsl(var(--foreground)) !important;
+}
+
+.modal-footer {
+  background-color: hsl(var(--secondary) / 0.5) !important;
+  border-top: 1px solid hsl(var(--border)) !important;
+}
+
+/* Toast notifications */
+.toast {
+  background-color: hsl(var(--card)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+.toast-header {
+  background-color: hsl(var(--secondary)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+.toast-body {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* ===== ROLE-BASED ACCESS CONTROL FIXES ===== */
+
+/* Navigation user status indicator */
+.navbar-text {
+  color: hsl(var(--foreground)) !important;
+  font-weight: 500;
+}
+
+.navbar-text i {
+  color: hsl(var(--primary)) !important;
+}
+
+/* Dropdown menu fixes */
+.dropdown-menu {
+  background-color: hsl(var(--card)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.dropdown-item {
+  color: hsl(var(--foreground)) !important;
+  background-color: transparent !important;
+}
+
+.dropdown-item:hover, .dropdown-item:focus {
+  background-color: hsl(var(--secondary)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+.dropdown-divider {
+  border-color: hsl(var(--border)) !important;
+}
+
+/* Configuration form elements */
+.form-control {
+  background-color: hsl(var(--background)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+.form-control:focus {
+  background-color: hsl(var(--background)) !important;
+  border-color: hsl(var(--primary)) !important;
+  color: hsl(var(--foreground)) !important;
+  box-shadow: 0 0 0 0.2rem hsl(var(--primary) / 0.25);
+}
+
+.form-select {
+  background-color: hsl(var(--background)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  color: hsl(var(--foreground)) !important;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+}
+
+.form-select:focus {
+  background-color: hsl(var(--background)) !important;
+  border-color: hsl(var(--primary)) !important;
+  color: hsl(var(--foreground)) !important;
+  box-shadow: 0 0 0 0.2rem hsl(var(--primary) / 0.25);
+}
+
+.form-label {
+  color: hsl(var(--foreground)) !important;
+  font-weight: 500;
+}
+
+.form-text {
+  color: hsl(var(--secondary-foreground)) !important;
+}
+
+/* Card header and help text fixes */
+.card-header {
+  background-color: hsl(var(--secondary) / 0.5) !important;
+  border-bottom: 1px solid hsl(var(--border)) !important;
+}
+
+.card-header h5, .card-header h6 {
+  color: hsl(var(--foreground)) !important;
+  margin-bottom: 0;
+}
+
+/* Text and content visibility */
+.text-muted {
+  color: hsl(var(--secondary-foreground)) !important;
+}
+
+.small, small {
+  color: hsl(var(--secondary-foreground)) !important;
+}
+
+/* Button and interactive element fixes */
+.btn-outline-secondary {
+  color: hsl(var(--foreground)) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
+.btn-outline-secondary:hover {
+  background-color: hsl(var(--secondary)) !important;
+  color: hsl(var(--foreground)) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
+/* Status indicators and badges */
+.badge {
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.badge-primary {
+  background-color: hsl(var(--primary)) !important;
+  color: hsl(var(--primary-foreground)) !important;
+}
+
+.badge-secondary {
+  background-color: hsl(var(--secondary)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+/* ===== BOOTSTRAP OVERRIDE FIXES ===== */
+
+/* Override Bootstrap's default white backgrounds */
+[data-bs-theme="dark"] .bg-white {
+  background-color: hsl(var(--card)) !important;
+}
+
+[data-bs-theme="dark"] .text-dark {
+  color: hsl(var(--foreground)) !important;
+}
+
+[data-bs-theme="dark"] .text-white {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Force visibility for any remaining white background elements */
+.bg-white, .bg-light {
+  background-color: hsl(var(--card)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+.text-dark {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Breadcrumb fixes */
+.breadcrumb-item {
+  color: hsl(var(--secondary-foreground)) !important;
+}
+
+.breadcrumb-item.active {
+  color: hsl(var(--foreground)) !important;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+  color: hsl(var(--secondary-foreground)) !important;
+}

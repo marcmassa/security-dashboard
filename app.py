@@ -80,17 +80,26 @@ def home():
 @app.route('/create-project', methods=['GET', 'POST'])
 def create_project_route():
     """Create a new project"""
+    # Check admin permissions
+    if not is_admin():
+        flash('Access denied. Administrator privileges required.', 'error')
+        return redirect(url_for('home'))
+    
+    user_context = {
+        'is_admin': is_admin()
+    }
+    
     if request.method == 'POST':
         project_name = request.form.get('project_name', '').strip()
         if not project_name:
             flash('Project name is required.', 'error')
-            return render_template('create_project.html')
+            return render_template('create_project.html', user=user_context)
         
         project_id = create_project(project_name)
         flash(f'Project "{project_name}" created successfully.', 'success')
         return redirect(url_for('project_dashboard', project_id=project_id))
     
-    return render_template('create_project.html')
+    return render_template('create_project.html', user=user_context)
 
 @app.route('/project/<project_id>')
 def project_dashboard(project_id):
@@ -100,7 +109,11 @@ def project_dashboard(project_id):
         flash('Project not found.', 'error')
         return redirect(url_for('home'))
     
-    return render_template('project_dashboard.html', project=project.to_dict())
+    user_context = {
+        'is_admin': is_admin()
+    }
+    
+    return render_template('project_dashboard.html', project=project.to_dict(), user=user_context)
 
 @app.route('/project/<project_id>/upload', methods=['POST'])
 def upload_file(project_id):
@@ -188,9 +201,14 @@ def project_sonarqube_detail(project_id):
     project_data = project.to_dict()
     sonarqube_data = project_data['reports'].get('sonarqube')
     
+    user_context = {
+        'is_admin': is_admin()
+    }
+    
     return render_template('sonarqube_detail.html', 
                          data=sonarqube_data, 
-                         project=project)
+                         project=project,
+                         user=user_context)
 
 @app.route('/project/<project_id>/sbom')
 def project_sbom_detail(project_id):
@@ -202,9 +220,14 @@ def project_sbom_detail(project_id):
     project_data = project.to_dict()
     sbom_data = project_data['reports'].get('sbom')
     
+    user_context = {
+        'is_admin': is_admin()
+    }
+    
     return render_template('sbom_detail.html', 
                          data=sbom_data, 
-                         project=project)
+                         project=project,
+                         user=user_context)
 
 @app.route('/project/<project_id>/trivy')
 def project_trivy_detail(project_id):
@@ -216,9 +239,14 @@ def project_trivy_detail(project_id):
     project_data = project.to_dict()
     trivy_data = project_data['reports'].get('trivy')
     
+    user_context = {
+        'is_admin': is_admin()
+    }
+    
     return render_template('trivy_detail.html', 
                          data=trivy_data, 
-                         project=project)
+                         project=project,
+                         user=user_context)
 
 @app.route('/project/<project_id>/delete', methods=['POST'])
 def delete_project(project_id):
@@ -540,7 +568,13 @@ def configuration():
         'has_token': bool(session.get('sonar_token')),
         'refresh_interval': session.get('sonar_refresh_interval', 900)
     }
-    return render_template('configuration.html', sonarqube_config=sonarqube_config)
+    
+    # Pass user context to template
+    user_context = {
+        'is_admin': is_admin()
+    }
+    
+    return render_template('configuration.html', sonarqube_config=sonarqube_config, user=user_context)
 
 @app.route('/api/sso/test-connection', methods=['POST'])
 def test_sso_connection():
