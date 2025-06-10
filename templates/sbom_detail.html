@@ -3,6 +3,48 @@
 {% block title %}SBOM Report Details - Security Dashboard{% endblock %}
 
 {% block content %}
+<style>
+#component-details-table {
+    font-size: 0.875rem;
+}
+
+#component-details-table td {
+    padding: 0.5rem 0.75rem;
+    vertical-align: middle;
+}
+
+#component-details-table .text-truncate {
+    max-width: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#component-details-table .fw-bold {
+    font-weight: 600;
+}
+
+#component-details-table code {
+    background-color: var(--bs-gray-100);
+    color: var(--bs-gray-800);
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.25rem;
+    font-size: 0.8rem;
+}
+
+.table-responsive {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+    #component-details-table th,
+    #component-details-table td {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+    }
+}
+</style>
 <div class="detail-container">
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb">
@@ -175,42 +217,42 @@
         </div>
 
         <div class="table-responsive">
-            <table class="table table-striped table-hover" id="component-details-table">
+            <table class="table table-striped table-hover table-sm" id="component-details-table">
                 <thead class="table-dark">
                     <tr>
-                        <th onclick="sortComponentDetailsTable(0)">Name <i data-feather="arrow-up-down"></i></th>
-                        <th onclick="sortComponentDetailsTable(1)">Version <i data-feather="arrow-up-down"></i></th>
-                        <th onclick="sortComponentDetailsTable(2)">Group <i data-feather="arrow-up-down"></i></th>
-                        <th onclick="sortComponentDetailsTable(3)">Type <i data-feather="arrow-up-down"></i></th>
-                        <th onclick="sortComponentDetailsTable(4)">Author <i data-feather="arrow-up-down"></i></th>
+                        <th onclick="sortComponentDetailsTable(0)" style="cursor: pointer;">Name <i data-feather="chevron-up"></i></th>
+                        <th onclick="sortComponentDetailsTable(1)" style="cursor: pointer;">Version <i data-feather="chevron-up"></i></th>
+                        <th onclick="sortComponentDetailsTable(2)" style="cursor: pointer;">Group <i data-feather="chevron-up"></i></th>
+                        <th onclick="sortComponentDetailsTable(3)" style="cursor: pointer;">Type <i data-feather="chevron-up"></i></th>
+                        <th onclick="sortComponentDetailsTable(4)" style="cursor: pointer;">Author <i data-feather="chevron-up"></i></th>
                         <th>Hashes</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for component in data.components.details %}
                     <tr>
-                        <td>
-                            <strong>{{ component.name }}</strong>
+                        <td style="max-width: 250px;">
+                            <div class="fw-bold text-truncate">{{ component.name }}</div>
                             {% if component.description and component.description != 'Unknown' %}
-                            <br><small class="text-muted">{{ component.description[:100] }}{% if component.description|length > 100 %}...{% endif %}</small>
+                            <small class="text-muted text-truncate d-block">{{ component.description[:80] }}{% if component.description|length > 80 %}...{% endif %}</small>
                             {% endif %}
                         </td>
-                        <td><code>{{ component.version }}</code></td>
-                        <td>{{ component.group if component.group != 'Unknown' else '-' }}</td>
-                        <td><span class="badge bg-secondary">{{ component.type }}</span></td>
-                        <td>{{ component.author if component.author != 'Unknown' else '-' }}</td>
-                        <td>
+                        <td style="min-width: 100px;"><code class="small">{{ component.version }}</code></td>
+                        <td style="max-width: 200px;" class="text-truncate">{{ component.group if component.group != 'Unknown' else '-' }}</td>
+                        <td style="min-width: 80px;"><span class="badge bg-secondary small">{{ component.type }}</span></td>
+                        <td style="max-width: 150px;" class="text-truncate">{{ component.author if component.author != 'Unknown' else '-' }}</td>
+                        <td style="min-width: 100px;">
                             {% if component.hashes %}
                             <div class="dropdown">
                                 <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                    {{ component.hashes|length }} hash(es)
+                                    {{ component.hashes|length }}
                                 </button>
                                 <ul class="dropdown-menu">
                                     {% for hash in component.hashes %}
                                     <li class="dropdown-item-text">
                                         <small>
                                             <strong>{{ hash.algorithm }}:</strong><br>
-                                            <code class="text-break">{{ hash.value[:32] }}{% if hash.value|length > 32 %}...{% endif %}</code>
+                                            <code class="text-break small">{{ hash.value[:24] }}...</code>
                                         </small>
                                     </li>
                                     {% endfor %}
@@ -347,6 +389,43 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeVulnerabilityChart();
     initializeComponentChart();
 });
+
+// Function called from dashboard.js
+function createSBOMChart(vulnerabilities) {
+    const ctx = document.getElementById('sbom-chart');
+    if (!ctx) return;
+    
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Critical', 'High', 'Medium', 'Low'],
+            datasets: [{
+                data: [
+                    vulnerabilities.critical || 0,
+                    vulnerabilities.high || 0,
+                    vulnerabilities.medium || 0,
+                    vulnerabilities.low || 0
+                ],
+                backgroundColor: [
+                    'hsl(var(--critical))',
+                    'hsl(var(--high))',
+                    'hsl(var(--medium))',
+                    'hsl(var(--low))'
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+}
 
 function initializeVulnerabilityChart() {
     const ctx = document.getElementById('vulnerability-chart').getContext('2d');
