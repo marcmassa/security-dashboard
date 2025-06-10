@@ -399,6 +399,18 @@ body {
   .metric-label {
     font-size: 0.65rem;
   }
+  
+  /* Responsive button layout for mobile */
+  .d-flex.gap-2 {
+    flex-direction: column;
+    gap: 0.5rem !important;
+  }
+  
+  .d-flex.gap-2 .btn {
+    width: 100%;
+    justify-content: center;
+    min-height: 44px;
+  }
 }
 
 /* Detail page styles */
@@ -406,6 +418,27 @@ body {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 1rem;
+}
+
+/* Button group styling for consistent appearance */
+.d-flex.gap-2 .btn {
+  min-height: 38px;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 6px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.d-flex.gap-2 .btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.d-flex.gap-2 .btn i {
+  flex-shrink: 0;
 }
 
 .breadcrumb {
