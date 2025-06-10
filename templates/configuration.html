@@ -186,13 +186,13 @@
                         <div class="mb-3">
                             <label for="sonar-refresh-interval" class="form-label">Auto-refresh Interval</label>
                             <select class="form-select" id="sonar-refresh-interval">
-                                <option value="0">Manual only</option>
-                                <option value="300">5 minutes</option>
-                                <option value="900" selected>15 minutes</option>
-                                <option value="1800">30 minutes</option>
-                                <option value="3600">1 hour</option>
-                                <option value="7200">2 hours</option>
-                                <option value="14400">4 hours</option>
+                                <option value="0" {% if sonarqube_config.refresh_interval == 0 %}selected{% endif %}>Manual only</option>
+                                <option value="300" {% if sonarqube_config.refresh_interval == 300 %}selected{% endif %}>5 minutes</option>
+                                <option value="900" {% if sonarqube_config.refresh_interval == 900 or not sonarqube_config.refresh_interval %}selected{% endif %}>15 minutes</option>
+                                <option value="1800" {% if sonarqube_config.refresh_interval == 1800 %}selected{% endif %}>30 minutes</option>
+                                <option value="3600" {% if sonarqube_config.refresh_interval == 3600 %}selected{% endif %}>1 hour</option>
+                                <option value="7200" {% if sonarqube_config.refresh_interval == 7200 %}selected{% endif %}>2 hours</option>
+                                <option value="14400" {% if sonarqube_config.refresh_interval == 14400 %}selected{% endif %}>4 hours</option>
                             </select>
                             <div class="form-text">
                                 How often to automatically refresh SonarQube data from the server

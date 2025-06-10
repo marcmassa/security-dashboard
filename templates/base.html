@@ -69,6 +69,20 @@
                 </ul>
                 
                 <div class="navbar-nav">
+                    <!-- User Status Indicator -->
+                    <div class="nav-item me-2">
+                        <span class="navbar-text small">
+                            <i data-feather="{% if user and user.is_admin %}shield{% else %}user{% endif %}" class="me-1" style="width: 14px; height: 14px;"></i>
+                            {% if user and user.is_admin %}
+                                Administrator
+                            {% else %}
+                                User
+                            {% endif %}
+                        </span>
+                    </div>
+                    
+                    <!-- Configuration Dropdown (Admin Only) -->
+                    {% if user and user.is_admin %}
                     <div class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i data-feather="settings" class="me-1" style="width: 16px; height: 16px;"></i>
@@ -83,17 +97,26 @@
                                 <i data-feather="server" class="me-2" style="width: 16px; height: 16px;"></i>
                                 SonarQube Integration
                             </a></li>
+                            <li><a class="dropdown-item d-flex align-items-center" href="{{ url_for('configuration') }}#sso">
+                                <i data-feather="users" class="me-2" style="width: 16px; height: 16px;"></i>
+                                SSO/SAML Authentication
+                            </a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item d-flex align-items-center text-muted" href="#" onclick="return false;">
-                                <i data-feather="users" class="me-2" style="width: 16px; height: 16px;"></i>
-                                SSO/SAML <small>(Coming Soon)</small>
+                                <i data-feather="shield" class="me-2" style="width: 16px; height: 16px;"></i>
+                                Security Settings <small>(Coming Soon)</small>
                             </a></li>
                         </ul>
                     </div>
+                    {% endif %}
+                    
+                    <!-- New Project Button -->
+                    {% if user and user.is_admin %}
                     <a class="btn btn-outline-primary d-flex align-items-center ms-2" href="{{ url_for('create_project_route') }}">
                         <i data-feather="plus-circle" class="me-1" style="width: 16px; height: 16px;"></i>
                         New Project
                     </a>
+                    {% endif %}
                 </div>
             </div>
         </div>

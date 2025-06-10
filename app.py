@@ -61,9 +61,21 @@ def create_project(name: str) -> str:
 @app.route('/')
 def home():
     """Home page showing all projects"""
-    projects = Project.query.order_by(Project.created_at.desc()).all()
+    # Get projects based on user permissions
+    if is_admin():
+        projects = Project.query.order_by(Project.created_at.desc()).all()
+    else:
+        projects = get_user_projects()
+    
     projects_dict = {project.id: project.to_dict() for project in projects}
-    return render_template('home.html', projects=projects_dict)
+    
+    # Pass user context to template
+    user_context = {
+        'is_admin': is_admin(),
+        'total_projects': len(projects_dict)
+    }
+    
+    return render_template('home.html', projects=projects_dict, user=user_context)
 
 @app.route('/create-project', methods=['GET', 'POST'])
 def create_project_route():
