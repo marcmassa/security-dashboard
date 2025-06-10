@@ -101,6 +101,9 @@
             <p class="text-muted">{{ data.bom_format }} v{{ data.spec_version }}</p>
         </div>
         <div>
+            <button class="btn btn-outline-success me-2" onclick="triggerSBOMUpload()">
+                <i data-feather="upload"></i> Upload New SBOM
+            </button>
             <button class="btn btn-outline-primary me-2" onclick="exportToPDF()">
                 <i data-feather="download"></i> Export PDF
             </button>
@@ -416,6 +419,10 @@
     </div>
     {% endif %}
 </div>
+
+<!-- Hidden file input for SBOM upload -->
+<input type="file" id="sbom-file-input" accept=".json,.xml" style="display: none;" onchange="handleSBOMUpload(this)">
+
 {% endblock %}
 
 {% block scripts %}
@@ -677,6 +684,69 @@ function exportToJSON() {
     a.download = 'sbom-report.json';
     a.click();
     URL.revokeObjectURL(url);
+}
+
+function triggerSBOMUpload() {
+    document.getElementById('sbom-file-input').click();
+}
+
+function handleSBOMUpload(input) {
+    const file = input.files[0];
+    if (!file) return;
+    
+    // Validate file type
+    const validTypes = ['application/json', 'text/xml', 'application/xml'];
+    const validExtensions = ['.json', '.xml'];
+    const fileExtension = file.name.toLowerCase().substring(file.name.lastIndexOf('.'));
+    
+    if (!validTypes.includes(file.type) && !validExtensions.includes(fileExtension)) {
+        showNotification('error', 'Please select a valid SBOM file (.json or .xml)');
+        return;
+    }
+    
+    // Show loading state
+    const uploadBtn = document.querySelector('[onclick="triggerSBOMUpload()"]');
+    const originalText = uploadBtn.innerHTML;
+    uploadBtn.innerHTML = '<i data-feather="loader"></i> Uploading...';
+    uploadBtn.disabled = true;
+    
+    // Create form data
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('report_type', 'sbom');
+    
+    // Get project ID from current URL
+    const projectId = window.location.pathname.split('/')[2];
+    
+    // Upload file
+    fetch(`/project/${projectId}/upload`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('success', 'SBOM file uploaded successfully! Reloading page...');
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        } else {
+            showNotification('error', data.error || 'Failed to upload SBOM file');
+        }
+    })
+    .catch(error => {
+        console.error('Upload error:', error);
+        showNotification('error', 'Error uploading file. Please try again.');
+    })
+    .finally(() => {
+        // Restore button state
+        uploadBtn.innerHTML = originalText;
+        uploadBtn.disabled = false;
+        feather.replace();
+        
+        // Clear file input
+        input.value = '';
+    });
 }
 </script>
 {% endblock %}
