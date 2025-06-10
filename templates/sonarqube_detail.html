@@ -574,17 +574,22 @@
             </div>
         </div>
 
-        <div class="table-responsive">
-            <table class="table table-striped" id="issues-table">
-                <thead>
+        <div class="position-relative">
+            <div class="table-scroll-indicator text-muted small mb-2">
+                <i data-feather="arrow-left-right" style="width: 14px; height: 14px;"></i>
+                Scroll horizontally to see all columns
+            </div>
+            <div class="table-responsive" style="max-height: 600px; overflow-x: auto; overflow-y: auto; border: 2px solid hsl(var(--border));">
+                <table class="table table-striped table-hover mb-0" id="issues-table" style="min-width: 1200px;">
+                <thead class="table-dark sticky-top">
                     <tr>
-                        <th>Type</th>
-                        <th>Severity</th>
-                        <th>Component</th>
-                        <th>Line</th>
-                        <th>Message</th>
-                        <th>Status</th>
-                        <th>Created</th>
+                        <th style="min-width: 120px;">Type</th>
+                        <th style="min-width: 100px;">Severity</th>
+                        <th style="min-width: 300px;">Component</th>
+                        <th style="min-width: 60px;">Line</th>
+                        <th style="min-width: 400px;">Message</th>
+                        <th style="min-width: 80px;">Status</th>
+                        <th style="min-width: 100px;">Created</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -600,9 +605,9 @@
                                 {{ issue.severity }}
                             </span>
                         </td>
-                        <td>{{ issue.component.split(':')[-1] if issue.component else 'N/A' }}</td>
-                        <td>{{ issue.line or 'N/A' }}</td>
-                        <td>{{ issue.message[:100] }}{% if issue.message|length > 100 %}...{% endif %}</td>
+                        <td style="word-break: break-all; max-width: 300px;">{{ issue.component.split(':')[-1] if issue.component else 'N/A' }}</td>
+                        <td class="text-center">{{ issue.line or 'N/A' }}</td>
+                        <td style="word-wrap: break-word; white-space: normal; max-width: 400px;">{{ issue.message }}</td>
                         <td>
                             <span class="badge badge-{{ 'low' if issue.status == 'RESOLVED' else 'medium' }}">
                                 {{ issue.status }}
@@ -613,6 +618,7 @@
                     {% endfor %}
                 </tbody>
             </table>
+            </div>
         </div>
     </div>
     {% endif %}
@@ -767,6 +773,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if (issuesTable) {
         const totalRows = issuesTable.querySelectorAll('tbody tr').length;
         updateIssuesResultsCount(totalRows, totalRows);
+        
+        // Check if horizontal scroll is needed
+        checkTableScrollability();
     }
 });
 
@@ -1024,6 +1033,29 @@ function clearIssueFilters() {
     filterIssuesTable();
     
     showNotification('success', 'All filters cleared');
+}
+
+// Check if table needs horizontal scrolling and show/hide indicator
+function checkTableScrollability() {
+    const tableContainer = document.querySelector('.table-responsive');
+    const scrollIndicator = document.querySelector('.table-scroll-indicator');
+    
+    if (tableContainer && scrollIndicator) {
+        const needsScroll = tableContainer.scrollWidth > tableContainer.clientWidth;
+        scrollIndicator.style.display = needsScroll ? 'block' : 'none';
+        
+        // Add scroll event listeners for visual feedback
+        tableContainer.addEventListener('scroll', function() {
+            const scrollLeft = this.scrollLeft;
+            const maxScroll = this.scrollWidth - this.clientWidth;
+            
+            if (scrollLeft > 0 && scrollLeft < maxScroll) {
+                this.style.borderColor = 'hsl(var(--primary))';
+            } else {
+                this.style.borderColor = 'hsl(var(--border))';
+            }
+        });
+    }
 }
 
 // SonarQube Connection Functions (deprecated - use dashboard configuration)
