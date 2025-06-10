@@ -183,15 +183,31 @@
                         <hr class="my-4">
 
                         <h6 class="mb-3">Configuration Help</h6>
+                        <div class="mb-3">
+                            <label for="sonar-refresh-interval" class="form-label">Auto-refresh Interval</label>
+                            <select class="form-select" id="sonar-refresh-interval">
+                                <option value="0">Manual only</option>
+                                <option value="300">5 minutes</option>
+                                <option value="900" selected>15 minutes</option>
+                                <option value="1800">30 minutes</option>
+                                <option value="3600">1 hour</option>
+                                <option value="7200">2 hours</option>
+                                <option value="14400">4 hours</option>
+                            </select>
+                            <div class="form-text">
+                                How often to automatically refresh SonarQube data from the server
+                            </div>
+                        </div>
+
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="card bg-light">
+                                <div class="card border">
                                     <div class="card-body">
-                                        <h6 class="card-title">
+                                        <h6 class="card-title text-primary">
                                             <i data-feather="key" class="me-2"></i>
                                             Creating Authentication Tokens
                                         </h6>
-                                        <ol class="small mb-0">
+                                        <ol class="small mb-0 text-body">
                                             <li>Log into your SonarQube instance</li>
                                             <li>Go to <strong>User → My Account</strong></li>
                                             <li>Click <strong>Security</strong> tab</li>
@@ -202,13 +218,13 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="card bg-light">
+                                <div class="card border">
                                     <div class="card-body">
-                                        <h6 class="card-title">
+                                        <h6 class="card-title text-success">
                                             <i data-feather="shield" class="me-2"></i>
                                             Required Permissions
                                         </h6>
-                                        <ul class="small mb-0">
+                                        <ul class="small mb-0 text-body">
                                             <li><strong>Browse</strong> - View project metrics</li>
                                             <li><strong>Execute Analysis</strong> - Access detailed reports</li>
                                             <li><strong>Admin</strong> - Full project access (recommended)</li>
@@ -228,57 +244,232 @@
                         <h5 class="card-title mb-0">
                             <i data-feather="users" class="me-2"></i>
                             SSO/SAML Authentication
-                            <span class="badge bg-warning ms-2">Coming Soon</span>
                         </h5>
                     </div>
                     <div class="card-body">
-                        <div class="alert alert-warning">
-                            <i data-feather="clock" class="me-2"></i>
-                            <strong>Feature in Development</strong><br>
-                            SSO/SAML authentication integration is planned for the next release.
+                        <div class="alert alert-info">
+                            <i data-feather="info" class="me-2"></i>
+                            Configure Single Sign-On integration with your organization's identity provider.
                         </div>
 
-                        <h6>Planned Integrations:</h6>
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <div class="card text-center">
-                                    <div class="card-body">
-                                        <i data-feather="gitlab" class="mb-2" style="width: 48px; height: 48px;"></i>
-                                        <h6>GitLab SSO</h6>
-                                        <p class="small text-muted">OAuth 2.0 integration with GitLab</p>
+                        <!-- Provider Selection -->
+                        <div class="mb-4">
+                            <label class="form-label">Authentication Provider</label>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="sso-provider" id="gitlab-sso" value="gitlab">
+                                        <label class="form-check-label" for="gitlab-sso">
+                                            <i data-feather="gitlab" class="me-2"></i>
+                                            GitLab OAuth
+                                        </label>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <div class="card text-center">
-                                    <div class="card-body">
-                                        <i data-feather="key" class="mb-2" style="width: 48px; height: 48px;"></i>
-                                        <h6>Keycloak</h6>
-                                        <p class="small text-muted">SAML 2.0 and OpenID Connect</p>
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="sso-provider" id="keycloak-sso" value="keycloak">
+                                        <label class="form-check-label" for="keycloak-sso">
+                                            <i data-feather="key" class="me-2"></i>
+                                            Keycloak SAML
+                                        </label>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <div class="card text-center">
-                                    <div class="card-body">
-                                        <i data-feather="cloud" class="mb-2" style="width: 48px; height: 48px;"></i>
-                                        <h6>Azure AD</h6>
-                                        <p class="small text-muted">Microsoft Azure Active Directory</p>
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="sso-provider" id="azure-sso" value="azure">
+                                        <label class="form-check-label" for="azure-sso">
+                                            <i data-feather="cloud" class="me-2"></i>
+                                            Azure AD
+                                        </label>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
+                        <!-- GitLab Configuration -->
+                        <div id="gitlab-config" class="provider-config" style="display: none;">
+                            <h6 class="border-bottom pb-2 mb-3">GitLab OAuth Configuration</h6>
+                            <form id="gitlab-sso-form">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="gitlab-url" class="form-label">GitLab Instance URL</label>
+                                            <input type="url" class="form-control" id="gitlab-url" placeholder="https://gitlab.company.com" required>
+                                            <div class="form-text">Your GitLab server URL</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="gitlab-client-id" class="form-label">Application ID</label>
+                                            <input type="text" class="form-control" id="gitlab-client-id" required>
+                                            <div class="form-text">From GitLab Application settings</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="gitlab-client-secret" class="form-label">Application Secret</label>
+                                    <input type="password" class="form-control" id="gitlab-client-secret" required>
+                                    <div class="form-text">Keep this secure and never share publicly</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="gitlab-redirect-uri" class="form-label">Redirect URI</label>
+                                    <input type="url" class="form-control" id="gitlab-redirect-uri" 
+                                           value="https://your-dashboard.com/auth/gitlab/callback" readonly>
+                                    <div class="form-text">Configure this URL in your GitLab application</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="gitlab-admin-group" class="form-label">Administrator Group</label>
+                                    <input type="text" class="form-control" id="gitlab-admin-group" placeholder="security-admins">
+                                    <div class="form-text">GitLab group that grants admin access (optional)</div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Keycloak Configuration -->
+                        <div id="keycloak-config" class="provider-config" style="display: none;">
+                            <h6 class="border-bottom pb-2 mb-3">Keycloak SAML Configuration</h6>
+                            <form id="keycloak-sso-form">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="keycloak-url" class="form-label">Keycloak Server URL</label>
+                                            <input type="url" class="form-control" id="keycloak-url" placeholder="https://keycloak.company.com" required>
+                                            <div class="form-text">Your Keycloak server base URL</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="keycloak-realm" class="form-label">Realm</label>
+                                            <input type="text" class="form-control" id="keycloak-realm" placeholder="security-dashboard" required>
+                                            <div class="form-text">Keycloak realm name</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="keycloak-client-id" class="form-label">Client ID</label>
+                                            <input type="text" class="form-control" id="keycloak-client-id" required>
+                                            <div class="form-text">SAML client identifier</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="keycloak-entity-id" class="form-label">Entity ID</label>
+                                            <input type="text" class="form-control" id="keycloak-entity-id" placeholder="security-dashboard" required>
+                                            <div class="form-text">SAML SP entity identifier</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="keycloak-certificate" class="form-label">Signing Certificate</label>
+                                    <textarea class="form-control" id="keycloak-certificate" rows="4" 
+                                              placeholder="-----BEGIN CERTIFICATE-----
+...
+-----END CERTIFICATE-----"></textarea>
+                                    <div class="form-text">X.509 certificate for SAML assertion verification</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="keycloak-admin-role" class="form-label">Administrator Role</label>
+                                    <input type="text" class="form-control" id="keycloak-admin-role" placeholder="security-admin">
+                                    <div class="form-text">Keycloak role that grants admin access (optional)</div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Azure AD Configuration -->
+                        <div id="azure-config" class="provider-config" style="display: none;">
+                            <h6 class="border-bottom pb-2 mb-3">Azure Active Directory Configuration</h6>
+                            <form id="azure-sso-form">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="azure-tenant-id" class="form-label">Tenant ID</label>
+                                            <input type="text" class="form-control" id="azure-tenant-id" required>
+                                            <div class="form-text">Azure AD tenant identifier</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="azure-client-id" class="form-label">Application ID</label>
+                                            <input type="text" class="form-control" id="azure-client-id" required>
+                                            <div class="form-text">App registration client ID</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="azure-client-secret" class="form-label">Client Secret</label>
+                                    <input type="password" class="form-control" id="azure-client-secret" required>
+                                    <div class="form-text">Application secret from Azure portal</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="azure-redirect-uri" class="form-label">Redirect URI</label>
+                                    <input type="url" class="form-control" id="azure-redirect-uri" 
+                                           value="https://your-dashboard.com/auth/azure/callback" readonly>
+                                    <div class="form-text">Configure this URI in your Azure app registration</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="azure-admin-group" class="form-label">Administrator Group</label>
+                                    <input type="text" class="form-control" id="azure-admin-group" placeholder="Security Admins">
+                                    <div class="form-text">Azure AD group that grants admin access (optional)</div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Role-Based Access Control -->
                         <div class="mt-4">
-                            <h6>Features Overview:</h6>
-                            <ul>
-                                <li>Single Sign-On (SSO) with existing corporate identity providers</li>
-                                <li>Role-based access control (RBAC)</li>
-                                <li>Automatic user provisioning and deprovisioning</li>
-                                <li>Group-based project access management</li>
-                                <li>Audit logging for authentication events</li>
-                            </ul>
+                            <h6 class="border-bottom pb-2 mb-3">Role-Based Access Control</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card bg-light">
+                                        <div class="card-body">
+                                            <h6 class="card-title text-primary">
+                                                <i data-feather="shield" class="me-2"></i>
+                                                Administrator Access
+                                            </h6>
+                                            <ul class="small mb-0">
+                                                <li>View all projects across the organization</li>
+                                                <li>Manage system configuration and settings</li>
+                                                <li>Configure integrations and authentication</li>
+                                                <li>Manage user permissions and roles</li>
+                                                <li>Access audit logs and system metrics</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card bg-light">
+                                        <div class="card-body">
+                                            <h6 class="card-title text-info">
+                                                <i data-feather="user" class="me-2"></i>
+                                                User Access
+                                            </h6>
+                                            <ul class="small mb-0">
+                                                <li>View only assigned projects</li>
+                                                <li>Upload reports to authorized projects</li>
+                                                <li>Export data from accessible projects</li>
+                                                <li>Update personal profile settings</li>
+                                                <li>Access project-specific analytics</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+
+                        <!-- Test Connection and Save -->
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="button" class="btn btn-outline-primary" onclick="testSSOConnection()">
+                                <i data-feather="wifi" class="me-1"></i>
+                                Test SSO Connection
+                            </button>
+                            <button type="button" class="btn btn-primary" onclick="saveSSOConfiguration()">
+                                <i data-feather="save" class="me-1"></i>
+                                Save SSO Configuration
+                            </button>
+                        </div>
+
+                        <div id="sso-test-result" class="mt-3" style="display: none;"></div>
                     </div>
                 </div>
             </div>
@@ -470,6 +661,7 @@ document.getElementById('sonarqube-config-form').addEventListener('submit', asyn
     
     const url = document.getElementById('sonar-url').value;
     const token = document.getElementById('sonar-token').value;
+    const refreshInterval = document.getElementById('sonar-refresh-interval').value;
     
     try {
         const response = await fetch('/api/sonarqube/save-config', {
@@ -479,7 +671,8 @@ document.getElementById('sonarqube-config-form').addEventListener('submit', asyn
             },
             body: JSON.stringify({
                 sonar_url: url,
-                sonar_token: token
+                sonar_token: token,
+                refresh_interval: parseInt(refreshInterval)
             })
         });
         
@@ -495,6 +688,190 @@ document.getElementById('sonarqube-config-form').addEventListener('submit', asyn
         showToast('Error saving configuration: ' + error.message, 'error');
     }
 });
+
+// SSO Provider selection handling
+document.addEventListener('DOMContentLoaded', function() {
+    const providerRadios = document.querySelectorAll('input[name="sso-provider"]');
+    const providerConfigs = document.querySelectorAll('.provider-config');
+    
+    providerRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            // Hide all provider configs
+            providerConfigs.forEach(config => {
+                config.style.display = 'none';
+            });
+            
+            // Show selected provider config
+            if (this.checked) {
+                const configDiv = document.getElementById(this.value + '-config');
+                if (configDiv) {
+                    configDiv.style.display = 'block';
+                }
+            }
+        });
+    });
+});
+
+// Test SSO connection
+async function testSSOConnection() {
+    const selectedProvider = document.querySelector('input[name="sso-provider"]:checked');
+    const resultDiv = document.getElementById('sso-test-result');
+    
+    if (!selectedProvider) {
+        showToast('Please select an SSO provider first', 'warning');
+        return;
+    }
+    
+    const provider = selectedProvider.value;
+    let configData = {};
+    
+    // Gather configuration data based on provider
+    switch (provider) {
+        case 'gitlab':
+            configData = {
+                provider: 'gitlab',
+                url: document.getElementById('gitlab-url').value,
+                client_id: document.getElementById('gitlab-client-id').value,
+                client_secret: document.getElementById('gitlab-client-secret').value,
+                admin_group: document.getElementById('gitlab-admin-group').value
+            };
+            break;
+        case 'keycloak':
+            configData = {
+                provider: 'keycloak',
+                url: document.getElementById('keycloak-url').value,
+                realm: document.getElementById('keycloak-realm').value,
+                client_id: document.getElementById('keycloak-client-id').value,
+                entity_id: document.getElementById('keycloak-entity-id').value,
+                certificate: document.getElementById('keycloak-certificate').value,
+                admin_role: document.getElementById('keycloak-admin-role').value
+            };
+            break;
+        case 'azure':
+            configData = {
+                provider: 'azure',
+                tenant_id: document.getElementById('azure-tenant-id').value,
+                client_id: document.getElementById('azure-client-id').value,
+                client_secret: document.getElementById('azure-client-secret').value,
+                admin_group: document.getElementById('azure-admin-group').value
+            };
+            break;
+    }
+    
+    try {
+        const response = await fetch('/api/sso/test-connection', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(configData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            resultDiv.innerHTML = `
+                <div class="alert alert-success">
+                    <i data-feather="check-circle" class="me-2"></i>
+                    <strong>SSO Connection Successful!</strong><br>
+                    Provider: ${provider}<br>
+                    ${data.details || 'Configuration validated successfully'}
+                </div>
+            `;
+        } else {
+            resultDiv.innerHTML = `
+                <div class="alert alert-danger">
+                    <i data-feather="x-circle" class="me-2"></i>
+                    <strong>SSO Connection Failed</strong><br>
+                    ${data.message || data.error}
+                </div>
+            `;
+        }
+        
+        resultDiv.style.display = 'block';
+        feather.replace();
+        
+    } catch (error) {
+        resultDiv.innerHTML = `
+            <div class="alert alert-danger">
+                <i data-feather="x-circle" class="me-2"></i>
+                <strong>Connection Error</strong><br>
+                ${error.message}
+            </div>
+        `;
+        resultDiv.style.display = 'block';
+        feather.replace();
+    }
+}
+
+// Save SSO configuration
+async function saveSSOConfiguration() {
+    const selectedProvider = document.querySelector('input[name="sso-provider"]:checked');
+    
+    if (!selectedProvider) {
+        showToast('Please select an SSO provider first', 'warning');
+        return;
+    }
+    
+    const provider = selectedProvider.value;
+    let configData = {};
+    
+    // Gather configuration data based on provider
+    switch (provider) {
+        case 'gitlab':
+            configData = {
+                provider: 'gitlab',
+                url: document.getElementById('gitlab-url').value,
+                client_id: document.getElementById('gitlab-client-id').value,
+                client_secret: document.getElementById('gitlab-client-secret').value,
+                redirect_uri: document.getElementById('gitlab-redirect-uri').value,
+                admin_group: document.getElementById('gitlab-admin-group').value
+            };
+            break;
+        case 'keycloak':
+            configData = {
+                provider: 'keycloak',
+                url: document.getElementById('keycloak-url').value,
+                realm: document.getElementById('keycloak-realm').value,
+                client_id: document.getElementById('keycloak-client-id').value,
+                entity_id: document.getElementById('keycloak-entity-id').value,
+                certificate: document.getElementById('keycloak-certificate').value,
+                admin_role: document.getElementById('keycloak-admin-role').value
+            };
+            break;
+        case 'azure':
+            configData = {
+                provider: 'azure',
+                tenant_id: document.getElementById('azure-tenant-id').value,
+                client_id: document.getElementById('azure-client-id').value,
+                client_secret: document.getElementById('azure-client-secret').value,
+                redirect_uri: document.getElementById('azure-redirect-uri').value,
+                admin_group: document.getElementById('azure-admin-group').value
+            };
+            break;
+    }
+    
+    try {
+        const response = await fetch('/api/sso/save-config', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(configData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast('SSO configuration saved successfully', 'success');
+        } else {
+            showToast(data.error || 'Failed to save SSO configuration', 'error');
+        }
+        
+    } catch (error) {
+        showToast('Error saving SSO configuration: ' + error.message, 'error');
+    }
+}
 
 // Save all configuration
 function saveAllConfiguration() {

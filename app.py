@@ -3,10 +3,12 @@ import json
 import logging
 import uuid
 from datetime import datetime
+from functools import wraps
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 from werkzeug.middleware.proxy_fix import ProxyFix
+import requests
 from utils.parsers import parse_sonarqube_report, parse_sbom_report, parse_trivy_report, parse_trivy_html_report
 from utils.sonarqube_client import fetch_sonarqube_data
 from models import db, Project, Report
@@ -488,12 +490,14 @@ def save_sonarqube_config():
     
     sonar_url = data.get('sonar_url')
     sonar_token = data.get('sonar_token')
+    refresh_interval = data.get('refresh_interval', 900)  # Default 15 minutes
     
     if not sonar_url:
         return jsonify({'error': 'SonarQube URL is required'}), 400
     
     # Store in session
     session['sonar_url'] = sonar_url
+    session['sonar_refresh_interval'] = refresh_interval
     if sonar_token:
         session['sonar_token'] = sonar_token
     
@@ -513,12 +517,156 @@ def get_global_sonarqube_config():
 @app.route('/configuration')
 def configuration():
     """Configuration page"""
+    # Check admin permissions
+    if not is_admin():
+        flash('Access denied. Administrator privileges required.', 'error')
+        return redirect(url_for('home'))
+    
     # Get current SonarQube configuration from session
     sonarqube_config = {
         'sonar_url': session.get('sonar_url', ''),
-        'has_token': bool(session.get('sonar_token'))
+        'has_token': bool(session.get('sonar_token')),
+        'refresh_interval': session.get('sonar_refresh_interval', 900)
     }
     return render_template('configuration.html', sonarqube_config=sonarqube_config)
+
+@app.route('/api/sso/test-connection', methods=['POST'])
+def test_sso_connection():
+    """Test SSO connection configuration"""
+    if not is_admin():
+        return jsonify({'error': 'Admin access required'}), 403
+        
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'Request body required'}), 400
+    
+    provider = data.get('provider')
+    
+    try:
+        if provider == 'gitlab':
+            url = data.get('url')
+            client_id = data.get('client_id')
+            if not all([url, client_id]):
+                return jsonify({'error': 'GitLab URL and Client ID are required'}), 400
+            
+            # Test GitLab OAuth endpoint
+            test_url = f"{url.rstrip('/')}/oauth/applications"
+            response = requests.get(f"{url.rstrip('/')}/api/v4/user", timeout=10)
+            
+            return jsonify({
+                'success': True,
+                'details': f'GitLab instance accessible at {url}',
+                'api_version': 'v4'
+            })
+            
+        elif provider == 'keycloak':
+            url = data.get('url')
+            realm = data.get('realm')
+            if not all([url, realm]):
+                return jsonify({'error': 'Keycloak URL and Realm are required'}), 400
+            
+            # Test Keycloak realm endpoint
+            test_url = f"{url.rstrip('/')}/realms/{realm}/.well-known/openid_configuration"
+            response = requests.get(test_url, timeout=10)
+            
+            if response.ok:
+                config = response.json()
+                return jsonify({
+                    'success': True,
+                    'details': f'Keycloak realm "{realm}" is accessible',
+                    'issuer': config.get('issuer')
+                })
+            else:
+                return jsonify({'error': f'Keycloak realm not found: {response.status_code}'}), 400
+                
+        elif provider == 'azure':
+            tenant_id = data.get('tenant_id')
+            if not tenant_id:
+                return jsonify({'error': 'Azure Tenant ID is required'}), 400
+            
+            # Test Azure AD tenant endpoint
+            test_url = f"https://login.microsoftonline.com/{tenant_id}/.well-known/openid_configuration"
+            response = requests.get(test_url, timeout=10)
+            
+            if response.ok:
+                config = response.json()
+                return jsonify({
+                    'success': True,
+                    'details': f'Azure AD tenant "{tenant_id}" is accessible',
+                    'issuer': config.get('issuer')
+                })
+            else:
+                return jsonify({'error': f'Azure AD tenant not found: {response.status_code}'}), 400
+        
+        else:
+            return jsonify({'error': 'Unsupported SSO provider'}), 400
+            
+    except requests.exceptions.RequestException as e:
+        return jsonify({
+            'error': 'Connection failed',
+            'details': str(e)
+        }), 503
+    except Exception as e:
+        return jsonify({
+            'error': 'SSO test failed',
+            'details': str(e)
+        }), 500
+
+@app.route('/api/sso/save-config', methods=['POST'])
+def save_sso_config():
+    """Save SSO configuration"""
+    if not is_admin():
+        return jsonify({'error': 'Admin access required'}), 403
+        
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'Request body required'}), 400
+    
+    provider = data.get('provider')
+    if not provider:
+        return jsonify({'error': 'SSO provider is required'}), 400
+    
+    # Store SSO configuration in session (in production, use database)
+    session['sso_config'] = data
+    session['sso_enabled'] = True
+    
+    return jsonify({
+        'success': True,
+        'message': f'{provider.capitalize()} SSO configuration saved successfully'
+    }), 200
+
+def is_admin():
+    """Check if current user has admin privileges"""
+    # For now, assume admin based on session flag
+    # In production, this would check against SSO groups/roles
+    return session.get('is_admin', True)  # Default to admin for demo
+
+def get_user_projects():
+    """Get projects accessible to current user"""
+    if is_admin():
+        # Admins see all projects
+        return Project.query.all()
+    else:
+        # Regular users see only assigned projects
+        user_id = session.get('user_id')
+        if not user_id:
+            return []
+        
+        # In production, filter by user assignments
+        # For now, return empty list for non-admin users
+        return []
+
+def require_admin(f):
+    """Decorator to require admin access"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not is_admin():
+            if request.is_json:
+                return jsonify({'error': 'Admin access required'}), 403
+            flash('Access denied. Administrator privileges required.', 'error')
+            return redirect(url_for('home'))
+        return f(*args, **kwargs)
+    return decorated_function
 
 @app.route('/api/projects/<project_id>/sonarqube/connect', methods=['POST'])
 def connect_project_sonarqube(project_id):

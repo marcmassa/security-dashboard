@@ -14,4 +14,8 @@ dependencies = [
     "beautifulsoup4>=4.13.4",
     "requests>=2.32.3",
     "sqlalchemy>=2.0.41",
+    "flask-dance>=7.1.0",
+    "flask-login>=0.6.3",
+    "oauthlib>=3.2.2",
+    "pyjwt>=2.10.1",
 ]
