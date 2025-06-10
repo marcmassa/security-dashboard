@@ -201,7 +201,7 @@ def _parse_sbom_xml(content: str) -> Dict[str, Any]:
                             elem = child
                             break
                 
-                comp_details[field] = elem.text if elem is not None else 'Unknown'
+                comp_details[field] = str(elem.text) if elem is not None and elem.text else 'Unknown'
             
             # Extract licenses
             license_elements = []
@@ -235,11 +235,12 @@ def _parse_sbom_xml(content: str) -> Dict[str, Any]:
             if not hash_elements:
                 hash_elements = component.findall('.//hash')
             
-            comp_details['hashes'] = []
+            hash_list = []
             for hash_elem in hash_elements:
                 alg = hash_elem.get('alg', 'unknown')
                 value = hash_elem.text if hash_elem.text else 'unknown'
-                comp_details['hashes'].append({'algorithm': alg, 'value': value})
+                hash_list.append({'algorithm': alg, 'value': value})
+            comp_details['hashes'] = hash_list
             
             component_summary['details'].append(comp_details)
         
