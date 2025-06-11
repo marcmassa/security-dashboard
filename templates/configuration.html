@@ -40,6 +40,66 @@
         border-color: #3b82f6 !important;
         color: #ffffff !important;
     }
+    
+    /* Improve menu styling */
+    .config-nav-card {
+        border: none !important;
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important;
+        border-radius: 1rem !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    .list-group-item {
+        background-color: transparent !important;
+        border: none !important;
+        border-radius: 0.5rem !important;
+        margin: 0.25rem 0.5rem !important;
+        padding: 0.75rem 1rem !important;
+        color: #cbd5e1 !important;
+        transition: all 0.2s ease !important;
+        position: relative !important;
+    }
+    
+    .list-group-item:hover {
+        background-color: rgba(59, 130, 246, 0.1) !important;
+        color: #ffffff !important;
+        transform: translateX(4px) !important;
+    }
+    
+    .list-group-item.active {
+        background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%) !important;
+        color: #ffffff !important;
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3) !important;
+        transform: translateX(4px) !important;
+    }
+    
+    .list-group-item.active::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 3px;
+        height: 60%;
+        background-color: #ffffff;
+        border-radius: 0 2px 2px 0;
+    }
+    
+    .list-group-item .badge {
+        font-size: 0.7rem !important;
+        padding: 0.25rem 0.5rem !important;
+    }
+    
+    .config-nav-title {
+        color: #ffffff !important;
+        font-weight: 600 !important;
+        text-align: center !important;
+        padding: 1rem !important;
+        background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%) !important;
+        border-radius: 1rem 1rem 0 0 !important;
+        margin: 0 !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
 </style>
 
 <div class="main-container">
@@ -61,31 +121,35 @@
     <div class="row">
         <!-- Navigation Sidebar -->
         <div class="col-lg-3 col-md-4 mb-4">
-            <div class="card h-100">
-                <div class="card-body p-0">
+            <div class="config-nav-card h-100">
+                <div class="config-nav-title">
+                    <i data-feather="settings" class="me-2"></i>
+                    Settings Categories
+                </div>
+                <div class="p-2">
                     <div class="list-group list-group-flush">
                         <a class="list-group-item list-group-item-action active" href="#general" onclick="showSection('general')">
                             <i data-feather="sliders" class="me-2"></i>
-                            General Settings
+                            <span>General Settings</span>
                         </a>
                         <a class="list-group-item list-group-item-action" href="#sonarqube" onclick="showSection('sonarqube')">
                             <i data-feather="server" class="me-2"></i>
-                            SonarQube Integration
+                            <span>SonarQube Integration</span>
                         </a>
                         <a class="list-group-item list-group-item-action text-muted" href="#sso" onclick="showSection('sso')">
                             <i data-feather="users" class="me-2"></i>
-                            SSO/SAML Authentication
-                            <small class="text-muted d-block">Coming Soon</small>
+                            <span>SSO/SAML Authentication</span>
+                            <span class="badge bg-warning text-dark ms-auto">Soon</span>
                         </a>
                         <a class="list-group-item list-group-item-action text-muted" href="#notifications" onclick="showSection('notifications')">
                             <i data-feather="bell" class="me-2"></i>
-                            Notifications
-                            <small class="text-muted d-block">Coming Soon</small>
+                            <span>Notifications</span>
+                            <span class="badge bg-warning text-dark ms-auto">Soon</span>
                         </a>
                         <a class="list-group-item list-group-item-action text-muted" href="#security" onclick="showSection('security')">
                             <i data-feather="shield" class="me-2"></i>
-                            Security Settings
-                            <small class="text-muted d-block">Coming Soon</small>
+                            <span>Security Settings</span>
+                            <span class="badge bg-warning text-dark ms-auto">Soon</span>
                         </a>
                     </div>
                 </div>
