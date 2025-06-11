@@ -40,6 +40,12 @@
                             Dashboard
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center {% if request.endpoint == 'security_heatmap' %}active{% endif %}" href="{{ url_for('security_heatmap') }}">
+                            <i data-feather="activity" class="me-1" style="width: 16px; height: 16px;"></i>
+                            Security Heatmap
+                        </a>
+                    </li>
                     {% if project %}
                     <li class="nav-item">
                         <span class="navbar-text me-2">
