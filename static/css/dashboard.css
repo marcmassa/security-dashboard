@@ -402,7 +402,7 @@
   background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%) !important;
   color: #ffffff !important;
   padding: 1.5rem 0 !important;
-  margin: 0 0 1.5rem 0 !important;
+  margin: 0 0 1rem 0 !important;
   border-radius: 0 0 1rem 1rem !important;
   box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2) !important;
 }
@@ -906,11 +906,29 @@ body {
   }
 }
 
+/* Global body optimization */
+body {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Navigation spacing optimization */
+.navbar {
+  margin-bottom: 0 !important;
+}
+
+/* Main container optimization */
+.main-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem 2rem 1rem;
+}
+
 /* Detail page styles */
 .detail-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 0 1rem 2rem 1rem;
 }
 
 /* Button group styling for consistent appearance */
