@@ -8,18 +8,6 @@
     <div class="page-header">
         <div class="page-header-content">
             <div class="page-title-section">
-                <div class="breadcrumb-nav">
-                    <a href="{{ url_for('home') }}" class="breadcrumb-link">
-                        <i data-feather="home" class="me-1"></i>
-                        Dashboard
-                    </a>
-                    <i data-feather="chevron-right" class="breadcrumb-separator"></i>
-                    {% if project %}
-                    <a href="{{ url_for('project_dashboard', project_id=project.id) }}" class="breadcrumb-link">{{ project.name }}</a>
-                    <i data-feather="chevron-right" class="breadcrumb-separator"></i>
-                    {% endif %}
-                    <span class="breadcrumb-current">SBOM Analysis</span>
-                </div>
                 <h1 class="page-title">SBOM Report</h1>
                 <p class="page-subtitle">Software Bill of Materials analysis and component dependency tracking</p>
             </div>

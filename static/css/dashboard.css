@@ -401,8 +401,8 @@
 .page-header {
   background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%) !important;
   color: #ffffff !important;
-  padding: 2rem 0 !important;
-  margin: -1rem -1rem 2rem -1rem !important;
+  padding: 1.5rem 0 !important;
+  margin: 0 0 1.5rem 0 !important;
   border-radius: 0 0 1rem 1rem !important;
   box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2) !important;
 }
@@ -423,39 +423,7 @@
   min-width: 300px !important;
 }
 
-.breadcrumb-nav {
-  display: flex !important;
-  align-items: center !important;
-  margin-bottom: 0.75rem !important;
-  opacity: 0.9 !important;
-}
 
-.breadcrumb-link {
-  color: #ffffff !important;
-  text-decoration: none !important;
-  display: flex !important;
-  align-items: center !important;
-  transition: opacity 0.2s ease !important;
-  font-size: 0.9rem !important;
-}
-
-.breadcrumb-link:hover {
-  opacity: 0.8 !important;
-  color: #ffffff !important;
-}
-
-.breadcrumb-separator {
-  width: 16px !important;
-  height: 16px !important;
-  margin: 0 0.5rem !important;
-  opacity: 0.7 !important;
-}
-
-.breadcrumb-current {
-  color: #ffffff !important;
-  font-weight: 500 !important;
-  font-size: 0.9rem !important;
-}
 
 .page-title {
   font-size: 2.5rem !important;
