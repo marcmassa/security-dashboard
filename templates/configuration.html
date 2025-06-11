@@ -3,110 +3,13 @@
 {% block title %}Configuration - Security Dashboard{% endblock %}
 
 {% block content %}
-<style>
-    /* Force visibility of critical elements */
-    .dashboard-title, h1.dashboard-title {
-        color: #000000 !important;
-        font-weight: 700 !important;
-        font-size: 2.5rem !important;
-    }
-    
-    .dashboard-subtitle, p.dashboard-subtitle {
-        color: #94a3b8 !important;
-        font-size: 1.125rem !important;
-    }
-    
-    .navbar-text {
-        color: #ffffff !important;
-        font-weight: 500 !important;
-    }
-    
-    .navbar .navbar-text, .navbar .nav-link {
-        color: #ffffff !important;
-    }
-    
-    /* Keep Security Dashboard brand color as original */
-    .navbar .navbar-brand {
-        color: inherit;
-    }
-    
-    /* Ensure main container text is visible - but exclude navbar */
-    .main-container h1:not(.navbar h1), .main-container h2, .main-container h3, 
-    .main-container h4, .main-container h5, .main-container h6,
-    .main-container p:not(.card p), .main-container span:not(.card span) {
-        color: #f1f5f9 !important;
-    }
-    
-    /* Apply consistent header styling like home page */
-    .dashboard-header {
-        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%) !important;
-        border-radius: 1rem !important;
-        padding: 2rem !important;
-        margin-bottom: 2rem !important;
-        text-align: center !important;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
-    }
-    
-    .dashboard-header .dashboard-title {
-        color: #ffffff !important;
-        margin-bottom: 0.5rem !important;
-        font-weight: 700 !important;
-        font-size: 2.5rem !important;
-    }
-    
-    .dashboard-header .dashboard-subtitle {
-        color: #dbeafe !important;
-        margin-bottom: 0 !important;
-        font-size: 1.125rem !important;
-        opacity: 0.9 !important;
-    }
-    
-    /* Fix navigation menu styling */
-    .list-group-item {
-        background-color: #374151 !important;
-        border: 1px solid #4b5563 !important;
-        color: #f9fafb !important;
-        border-radius: 0.5rem !important;
-        margin-bottom: 0.25rem !important;
-        padding: 0.75rem 1rem !important;
-        transition: all 0.2s ease !important;
-    }
-    
-    .list-group-item:hover {
-        background-color: #4b5563 !important;
-        color: #ffffff !important;
-        transform: translateX(4px) !important;
-    }
-    
-    .list-group-item.active {
-        background-color: #3b82f6 !important;
-        border-color: #3b82f6 !important;
-        color: #ffffff !important;
-    }
-    
-    .list-group-flush .list-group-item {
-        border-left: 0 !important;
-        border-right: 0 !important;
-    }
-    
-    .list-group-flush .list-group-item:first-child {
-        border-top: 0 !important;
-        border-top-left-radius: 0.5rem !important;
-        border-top-right-radius: 0.5rem !important;
-    }
-    
-    .list-group-flush .list-group-item:last-child {
-        border-bottom: 0 !important;
-        border-bottom-left-radius: 0.5rem !important;
-        border-bottom-right-radius: 0.5rem !important;
-    }
-</style>
-
 <div class="main-container">
     <!-- Page Header -->
-    <div class="dashboard-header mb-4">
+    <div class="dashboard-header">
         <h1 class="dashboard-title">Configuration</h1>
-        <p class="dashboard-subtitle">Manage system settings and integrations</p>
+        <p class="dashboard-subtitle">
+            Manage system settings and integrations
+        </p>
     </div>
     
     <div class="d-flex justify-content-end mb-4">
@@ -119,14 +22,9 @@
     <div class="row">
         <!-- Navigation Sidebar -->
         <div class="col-lg-3 col-md-4 mb-4">
-            <div class="summary-card h-100">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">
-                        <i data-feather="list" class="me-2"></i>
-                        Settings Categories
-                    </h5>
-                </div>
-                <div class="list-group list-group-flush">
+            <div class="card h-100">
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
                     <a class="list-group-item list-group-item-action active" href="#general" onclick="showSection('general')">
                         <i data-feather="sliders" class="me-2"></i>
                         General Settings
@@ -150,6 +48,7 @@
                         Security Settings
                         <small class="text-muted d-block">Coming Soon</small>
                     </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -158,7 +57,7 @@
         <div class="col-lg-9 col-md-8">
             <!-- General Settings Section -->
             <div id="general-section" class="config-section">
-                <div class="summary-card mb-4">
+                <div class="card mb-4">
                     <div class="card-header">
                         <h5 class="card-title mb-0">
                             <i data-feather="sliders" class="me-2"></i>
@@ -215,7 +114,7 @@
 
             <!-- SonarQube Integration Section -->
             <div id="sonarqube-section" class="config-section" style="display: none;">
-                <div class="summary-card mb-4">
+                <div class="card mb-4">
                     <div class="card-header">
                         <h5 class="card-title mb-0">
                             <i data-feather="server" class="me-2"></i>
@@ -333,7 +232,7 @@
 
             <!-- SSO/SAML Section -->
             <div id="sso-section" class="config-section" style="display: none;">
-                <div class="summary-card mb-4">
+                <div class="card mb-4">
                     <div class="card-header">
                         <h5 class="card-title mb-0">
                             <i data-feather="users" class="me-2"></i>
