@@ -40,6 +40,60 @@
   --muted-text: 210 11% 70%; /* Muted but visible text */
 }
 
+/* Configuration Dropdown Styling */
+.config-dropdown {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 1rem !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+  padding: 0.5rem !important;
+  min-width: 250px !important;
+}
+
+.config-dropdown .dropdown-header {
+  background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%) !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  text-align: center !important;
+  padding: 0.75rem 1rem !important;
+  border-radius: 0.75rem !important;
+  margin-bottom: 0.5rem !important;
+  border-bottom: none !important;
+}
+
+.config-dropdown-item {
+  background-color: transparent !important;
+  border: none !important;
+  border-radius: 0.5rem !important;
+  margin: 0.25rem 0 !important;
+  padding: 0.75rem 1rem !important;
+  color: #475569 !important;
+  transition: all 0.2s ease !important;
+  position: relative !important;
+}
+
+.config-dropdown-item:hover {
+  background-color: rgba(59, 130, 246, 0.1) !important;
+  color: #1e293b !important;
+  transform: translateX(4px) !important;
+}
+
+.config-dropdown-item:focus {
+  background-color: rgba(59, 130, 246, 0.1) !important;
+  color: #1e293b !important;
+  box-shadow: none !important;
+}
+
+.config-dropdown-item .badge {
+  font-size: 0.7rem !important;
+  padding: 0.25rem 0.5rem !important;
+}
+
+.config-dropdown .dropdown-divider {
+  border-color: #e2e8f0 !important;
+  margin: 0.5rem 0 !important;
+}
+
 * {
   box-sizing: border-box;
 }

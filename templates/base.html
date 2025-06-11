@@ -88,23 +88,28 @@
                             <i data-feather="settings" class="me-1" style="width: 16px; height: 16px;"></i>
                             Configuration
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item d-flex align-items-center" href="{{ url_for('configuration') }}">
-                                <i data-feather="sliders" class="me-2" style="width: 16px; height: 16px;"></i>
-                                General Settings
+                        <ul class="dropdown-menu dropdown-menu-end config-dropdown">
+                            <li class="dropdown-header">
+                                <i data-feather="settings" class="me-2"></i>
+                                Settings Categories
+                            </li>
+                            <li><a class="dropdown-item config-dropdown-item" href="{{ url_for('configuration') }}">
+                                <i data-feather="sliders" class="me-2"></i>
+                                <span>General Settings</span>
                             </a></li>
-                            <li><a class="dropdown-item d-flex align-items-center" href="{{ url_for('configuration') }}#sonarqube">
-                                <i data-feather="server" class="me-2" style="width: 16px; height: 16px;"></i>
-                                SonarQube Integration
+                            <li><a class="dropdown-item config-dropdown-item" href="{{ url_for('configuration') }}#sonarqube">
+                                <i data-feather="server" class="me-2"></i>
+                                <span>SonarQube Integration</span>
                             </a></li>
-                            <li><a class="dropdown-item d-flex align-items-center" href="{{ url_for('configuration') }}#sso">
-                                <i data-feather="users" class="me-2" style="width: 16px; height: 16px;"></i>
-                                SSO/SAML Authentication
+                            <li><a class="dropdown-item config-dropdown-item" href="{{ url_for('configuration') }}#sso">
+                                <i data-feather="users" class="me-2"></i>
+                                <span>SSO/SAML Authentication</span>
                             </a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item d-flex align-items-center text-muted" href="#" onclick="return false;">
-                                <i data-feather="shield" class="me-2" style="width: 16px; height: 16px;"></i>
-                                Security Settings <small>(Coming Soon)</small>
+                            <li><a class="dropdown-item config-dropdown-item text-muted" href="#" onclick="return false;">
+                                <i data-feather="shield" class="me-2"></i>
+                                <span>Security Settings</span>
+                                <span class="badge bg-warning text-dark ms-auto">Soon</span>
                             </a></li>
                         </ul>
                     </div>
