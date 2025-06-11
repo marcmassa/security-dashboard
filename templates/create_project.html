@@ -3,88 +3,182 @@
 {% block title %}Create New Project - Security Dashboard{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title mb-0">
-                        <i data-feather="plus-circle" class="me-2"></i>
-                        Create New Project
-                    </h4>
+<div class="container-fluid create-project-page">
+    <div class="row">
+        <!-- Left Sidebar -->
+        <div class="col-md-4 col-lg-3">
+            <div class="create-project-sidebar">
+                <div class="sidebar-header">
+                    <i data-feather="plus-circle" class="me-2"></i>
+                    <span>Project Setup</span>
                 </div>
-                <div class="card-body">
-                    <form method="POST" action="{{ url_for('create_project_route') }}">
-                        <div class="mb-3">
-                            <label for="project_name" class="form-label">Project Name</label>
-                            <input type="text" 
-                                   class="form-control" 
-                                   id="project_name" 
-                                   name="project_name" 
-                                   required 
-                                   placeholder="Enter project name"
-                                   autocomplete="off">
-                            <div class="form-text">
-                                Choose a unique, descriptive name for your security analysis project.
+                
+                <nav class="sidebar-nav">
+                    <div class="list-group list-group-flush">
+                        <a class="list-group-item list-group-item-action active" href="#basic-info" onclick="showSection('basic-info')">
+                            <i data-feather="edit-3" class="me-2"></i>
+                            <span>Basic Information</span>
+                        </a>
+                        <a class="list-group-item list-group-item-action" href="#project-guide" onclick="showSection('project-guide')">
+                            <i data-feather="info" class="me-2"></i>
+                            <span>Setup Guide</span>
+                        </a>
+                        <a class="list-group-item list-group-item-action" href="#report-types" onclick="showSection('report-types')">
+                            <i data-feather="file-text" class="me-2"></i>
+                            <span>Report Types</span>
+                        </a>
+                    </div>
+                </nav>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-md-8 col-lg-9">
+            <div class="create-project-content">
+                <!-- Basic Information Section -->
+                <div id="basic-info" class="content-section active">
+                    <div class="section-header">
+                        <h2 class="section-title">Create New Project</h2>
+                        <p class="section-description">Set up a new security analysis project to start monitoring your application's security posture.</p>
+                    </div>
+                    
+                    <div class="form-container">
+                        <form method="POST" action="{{ url_for('create_project_route') }}" class="project-form">
+                            <div class="form-group">
+                                <label for="project_name" class="form-label">Project Name</label>
+                                <input type="text" 
+                                       class="form-control project-input" 
+                                       id="project_name" 
+                                       name="project_name" 
+                                       required 
+                                       placeholder="Enter a descriptive project name"
+                                       autocomplete="off">
+                                <div class="form-help">
+                                    <i data-feather="info" class="me-1"></i>
+                                    Choose a unique name that clearly identifies your project or application.
+                                </div>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <a href="{{ url_for('home') }}" class="btn btn-secondary">
+                                    <i data-feather="arrow-left" class="me-1"></i>
+                                    Cancel
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i data-feather="plus" class="me-1"></i>
+                                    Create Project
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Project Guide Section -->
+                <div id="project-guide" class="content-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Project Setup Guide</h2>
+                        <p class="section-description">Learn what you can do after creating your project.</p>
+                    </div>
+                    
+                    <div class="guide-container">
+                        <div class="guide-items">
+                            <div class="guide-item">
+                                <div class="guide-icon">
+                                    <i data-feather="upload"></i>
+                                </div>
+                                <div class="guide-content">
+                                    <h5>Upload Security Reports</h5>
+                                    <p>Upload reports from SonarQube, SBOM generators, and Trivy scanners to get comprehensive security insights.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="guide-item">
+                                <div class="guide-icon">
+                                    <i data-feather="server"></i>
+                                </div>
+                                <div class="guide-content">
+                                    <h5>Connect to SonarQube</h5>
+                                    <p>Link your project to a SonarQube server for real-time code quality and security analysis.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="guide-item">
+                                <div class="guide-icon">
+                                    <i data-feather="bar-chart-2"></i>
+                                </div>
+                                <div class="guide-content">
+                                    <h5>View Analytics Dashboard</h5>
+                                    <p>Access detailed security metrics, vulnerability trends, and actionable insights through interactive dashboards.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="guide-item">
+                                <div class="guide-icon">
+                                    <i data-feather="settings"></i>
+                                </div>
+                                <div class="guide-content">
+                                    <h5>Configure Integrations</h5>
+                                    <p>Set up CI/CD pipeline integrations and automated security scanning workflows.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Report Types Section -->
+                <div id="report-types" class="content-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Supported Report Types</h2>
+                        <p class="section-description">Overview of security report formats supported by the platform.</p>
+                    </div>
+                    
+                    <div class="report-types-container">
+                        <div class="report-type-card">
+                            <div class="report-type-header sonarqube">
+                                <i data-feather="server" class="me-2"></i>
+                                <span>SonarQube</span>
+                            </div>
+                            <div class="report-type-body">
+                                <p><strong>Code Quality & Security Issues</strong></p>
+                                <ul>
+                                    <li>Security vulnerabilities</li>
+                                    <li>Code smells and bugs</li>
+                                    <li>Technical debt analysis</li>
+                                    <li>Coverage metrics</li>
+                                </ul>
                             </div>
                         </div>
                         
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <a href="{{ url_for('home') }}" class="btn btn-outline-secondary me-md-2">
-                                <i data-feather="arrow-left" class="me-1"></i>
-                                Cancel
-                            </a>
-                            <button type="submit" class="btn btn-primary">
-                                <i data-feather="plus" class="me-1"></i>
-                                Create Project
-                            </button>
+                        <div class="report-type-card">
+                            <div class="report-type-header sbom">
+                                <i data-feather="package" class="me-2"></i>
+                                <span>SBOM</span>
+                            </div>
+                            <div class="report-type-body">
+                                <p><strong>Software Bill of Materials</strong></p>
+                                <ul>
+                                    <li>CycloneDX format support</li>
+                                    <li>Dependency tracking</li>
+                                    <li>License compliance</li>
+                                    <li>Component risk assessment</li>
+                                </ul>
+                            </div>
                         </div>
-                    </form>
-                </div>
-            </div>
-            
-            <div class="card mt-4">
-                <div class="card-header">
-                    <h6 class="card-title mb-0">
-                        <i data-feather="help-circle" class="me-2"></i>
-                        Project Setup Guide
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h6>After creating your project, you can:</h6>
-                            <ul class="list-unstyled">
-                                <li class="mb-2">
-                                    <i data-feather="upload" class="me-2 text-primary" style="width: 16px; height: 16px;"></i>
-                                    Upload security reports (SonarQube, SBOM, Trivy)
-                                </li>
-                                <li class="mb-2">
-                                    <i data-feather="server" class="me-2 text-primary" style="width: 16px; height: 16px;"></i>
-                                    Connect to SonarQube server for live data
-                                </li>
-                                <li class="mb-2">
-                                    <i data-feather="bar-chart-2" class="me-2 text-primary" style="width: 16px; height: 16px;"></i>
-                                    View comprehensive security analytics
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="col-md-6">
-                            <h6>Supported Report Types:</h6>
-                            <ul class="list-unstyled">
-                                <li class="mb-2">
-                                    <span class="badge bg-info me-2">SonarQube</span>
-                                    Code quality & security issues
-                                </li>
-                                <li class="mb-2">
-                                    <span class="badge bg-success me-2">SBOM</span>
-                                    Software Bill of Materials (CycloneDX)
-                                </li>
-                                <li class="mb-2">
-                                    <span class="badge bg-warning me-2">Trivy</span>
-                                    Container vulnerability scanning
-                                </li>
-                            </ul>
+                        
+                        <div class="report-type-card">
+                            <div class="report-type-header trivy">
+                                <i data-feather="shield" class="me-2"></i>
+                                <span>Trivy</span>
+                            </div>
+                            <div class="report-type-body">
+                                <p><strong>Container Security Scanning</strong></p>
+                                <ul>
+                                    <li>Container vulnerabilities</li>
+                                    <li>OS package scanning</li>
+                                    <li>Misconfiguration detection</li>
+                                    <li>Secret detection</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -94,14 +188,107 @@
 </div>
 
 <script>
-// Auto-focus on project name input
-document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('project_name').focus();
+// Section management and page functionality
+function showSection(sectionId) {
+    // Hide all sections
+    const sections = document.querySelectorAll('.content-section');
+    sections.forEach(section => {
+        section.classList.remove('active');
+    });
     
+    // Remove active class from all sidebar links
+    const sidebarLinks = document.querySelectorAll('.list-group-item');
+    sidebarLinks.forEach(link => {
+        link.classList.remove('active');
+    });
+    
+    // Show selected section
+    const targetSection = document.getElementById(sectionId);
+    if (targetSection) {
+        targetSection.classList.add('active');
+    }
+    
+    // Add active class to clicked sidebar link
+    const clickedLink = document.querySelector(`[onclick="showSection('${sectionId}')"]`);
+    if (clickedLink) {
+        clickedLink.classList.add('active');
+    }
+    
+    // Auto-focus on project name input when basic-info section is active
+    if (sectionId === 'basic-info') {
+        setTimeout(() => {
+            const projectNameInput = document.getElementById('project_name');
+            if (projectNameInput) {
+                projectNameInput.focus();
+            }
+        }, 100);
+    }
+}
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', function() {
     // Initialize feather icons
     if (typeof feather !== 'undefined') {
         feather.replace();
     }
+    
+    // Auto-focus on project name input
+    const projectNameInput = document.getElementById('project_name');
+    if (projectNameInput) {
+        projectNameInput.focus();
+    }
+    
+    // Form validation enhancement
+    const form = document.querySelector('.project-form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const projectName = document.getElementById('project_name').value.trim();
+            if (!projectName) {
+                e.preventDefault();
+                showNotification('error', 'Please enter a project name');
+                return false;
+            }
+            
+            // Show loading state
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i data-feather="loader" class="me-1"></i>Creating...';
+                feather.replace();
+            }
+        });
+    }
 });
+
+// Notification function (if not already available)
+function showNotification(type, message) {
+    // Create notification if it doesn't exist
+    let notification = document.querySelector('.notification-container');
+    if (!notification) {
+        notification = document.createElement('div');
+        notification.className = 'notification-container position-fixed top-0 end-0 p-3';
+        notification.style.zIndex = '1055';
+        document.body.appendChild(notification);
+    }
+    
+    const alertClass = type === 'error' ? 'alert-danger' : 'alert-success';
+    const alertHtml = `
+        <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    `;
+    
+    notification.innerHTML = alertHtml;
+    
+    // Auto-hide after 3 seconds
+    setTimeout(() => {
+        const alert = notification.querySelector('.alert');
+        if (alert) {
+            alert.classList.remove('show');
+            setTimeout(() => alert.remove(), 150);
+        }
+    }, 3000);
+}
 </script>
 {% endblock %}
