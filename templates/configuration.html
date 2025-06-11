@@ -3,29 +3,24 @@
 {% block title %}Configuration - Security Dashboard{% endblock %}
 
 {% block content %}
-<div class="container-fluid py-4">
-    <div class="row">
-        <!-- Page Header -->
-        <div class="col-12 mb-4">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h1 class="h2 mb-1">Configuration</h1>
-                    <p class="text-muted mb-0">Manage system settings and integrations</p>
-                </div>
-                <div>
-                    <button class="btn btn-success" onclick="saveAllConfiguration()">
-                        <i data-feather="save" class="me-1"></i>
-                        Save All Changes
-                    </button>
-                </div>
-            </div>
-        </div>
+<div class="main-container">
+    <!-- Page Header -->
+    <div class="dashboard-header mb-4">
+        <h1 class="dashboard-title">Configuration</h1>
+        <p class="dashboard-subtitle">Manage system settings and integrations</p>
+    </div>
+    
+    <div class="d-flex justify-content-end mb-4">
+        <button class="btn btn-primary" onclick="saveAllConfiguration()">
+            <i data-feather="save" class="me-1"></i>
+            Save All Changes
+        </button>
     </div>
 
     <div class="row">
         <!-- Navigation Sidebar -->
         <div class="col-lg-3 col-md-4 mb-4">
-            <div class="card h-100">
+            <div class="summary-card h-100">
                 <div class="card-header">
                     <h5 class="card-title mb-0">
                         <i data-feather="list" class="me-2"></i>
@@ -64,7 +59,7 @@
         <div class="col-lg-9 col-md-8">
             <!-- General Settings Section -->
             <div id="general-section" class="config-section">
-                <div class="card mb-4">
+                <div class="summary-card mb-4">
                     <div class="card-header">
                         <h5 class="card-title mb-0">
                             <i data-feather="sliders" class="me-2"></i>
@@ -121,7 +116,7 @@
 
             <!-- SonarQube Integration Section -->
             <div id="sonarqube-section" class="config-section" style="display: none;">
-                <div class="card mb-4">
+                <div class="summary-card mb-4">
                     <div class="card-header">
                         <h5 class="card-title mb-0">
                             <i data-feather="server" class="me-2"></i>
@@ -239,7 +234,7 @@
 
             <!-- SSO/SAML Section -->
             <div id="sso-section" class="config-section" style="display: none;">
-                <div class="card mb-4">
+                <div class="summary-card mb-4">
                     <div class="card-header">
                         <h5 class="card-title mb-0">
                             <i data-feather="users" class="me-2"></i>
@@ -942,11 +937,27 @@ document.addEventListener('DOMContentLoaded', function() {
             card.style.setProperty('overflow', 'hidden', 'important');
         });
         
-        // Force headings to be white
-        const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6, .card-title, .form-label');
-        headings.forEach(heading => {
+        // Force headings with proper hierarchy
+        const mainHeadings = document.querySelectorAll('h1, h2');
+        mainHeadings.forEach(heading => {
             heading.style.setProperty('color', '#ffffff', 'important');
-            heading.style.setProperty('font-weight', '600', 'important');
+            heading.style.setProperty('font-weight', '700', 'important');
+        });
+        
+        const cardTitles = document.querySelectorAll('.card-title');
+        cardTitles.forEach(title => {
+            if (title.closest('.card-header')) {
+                title.style.setProperty('color', '#ffffff', 'important');
+            } else {
+                title.style.setProperty('color', '#f1f5f9', 'important');
+            }
+            title.style.setProperty('font-weight', '600', 'important');
+        });
+        
+        const formLabels = document.querySelectorAll('.form-label');
+        formLabels.forEach(label => {
+            label.style.setProperty('color', '#f1f5f9', 'important');
+            label.style.setProperty('font-weight', '500', 'important');
         });
         
         // Force muted text to be visible
@@ -958,11 +969,51 @@ document.addEventListener('DOMContentLoaded', function() {
         // Force form controls styling
         const formControls = document.querySelectorAll('.form-control, .form-select');
         formControls.forEach(control => {
-            control.style.setProperty('background-color', '#1e293b', 'important');
-            control.style.setProperty('color', '#ffffff', 'important');
+            control.style.setProperty('background-color', '#0f172a', 'important');
+            control.style.setProperty('color', '#f1f5f9', 'important');
             control.style.setProperty('border', '1px solid #334155', 'important');
             control.style.setProperty('border-radius', '8px', 'important');
         });
+        
+        // Force card bodies to have proper background
+        const cardBodies = document.querySelectorAll('.card-body');
+        cardBodies.forEach(body => {
+            body.style.setProperty('background-color', '#1e293b', 'important');
+            body.style.setProperty('color', '#f1f5f9', 'important');
+        });
+        
+        // Force main content areas
+        const contentSections = document.querySelectorAll('.config-section');
+        contentSections.forEach(section => {
+            section.style.setProperty('background-color', 'transparent', 'important');
+        });
+        
+        // Force buttons to have proper styling
+        const buttons = document.querySelectorAll('.btn-outline-primary, .btn-outline-secondary');
+        buttons.forEach(button => {
+            button.style.setProperty('color', '#f1f5f9', 'important');
+            button.style.setProperty('border-color', '#3b82f6', 'important');
+            button.style.setProperty('background-color', 'transparent', 'important');
+        });
+        
+        const primaryButtons = document.querySelectorAll('.btn-primary, .btn-success');
+        primaryButtons.forEach(button => {
+            button.style.setProperty('background-color', '#22c55e', 'important');
+            button.style.setProperty('border-color', '#22c55e', 'important');
+            button.style.setProperty('color', '#000000', 'important');
+        });
+        
+        // Fix page title and subtitle
+        const pageTitle = document.querySelector('h1.h2');
+        if (pageTitle) {
+            pageTitle.style.setProperty('color', '#ffffff', 'important');
+            pageTitle.style.setProperty('font-weight', '700', 'important');
+        }
+        
+        const pageSubtitle = document.querySelector('p.text-muted');
+        if (pageSubtitle) {
+            pageSubtitle.style.setProperty('color', '#94a3b8', 'important');
+        }
     }
     
     forceConfigurationStyling();
