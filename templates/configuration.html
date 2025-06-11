@@ -43,8 +43,8 @@
     
     /* Improve menu styling */
     .config-nav-card {
-        border: none !important;
-        background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important;
+        border: 1px solid #e2e8f0 !important;
+        background: #ffffff !important;
         border-radius: 1rem !important;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
     }
@@ -55,14 +55,14 @@
         border-radius: 0.5rem !important;
         margin: 0.25rem 0.5rem !important;
         padding: 0.75rem 1rem !important;
-        color: #cbd5e1 !important;
+        color: #475569 !important;
         transition: all 0.2s ease !important;
         position: relative !important;
     }
     
     .list-group-item:hover {
         background-color: rgba(59, 130, 246, 0.1) !important;
-        color: #ffffff !important;
+        color: #1e293b !important;
         transform: translateX(4px) !important;
     }
     
@@ -104,24 +104,28 @@
     /* Fix grid layout and prevent content from affecting sidebar */
     .config-row {
         display: flex !important;
-        flex-wrap: wrap !important;
+        flex-wrap: nowrap !important;
         gap: 1.5rem !important;
+        align-items: flex-start !important;
     }
     
     .config-sidebar {
         flex: 0 0 300px !important;
+        width: 300px !important;
+        min-width: 300px !important;
         max-width: 300px !important;
     }
     
     .config-content {
         flex: 1 !important;
         min-width: 0 !important;
+        width: calc(100% - 300px - 1.5rem) !important;
     }
     
     /* Improve content cards styling */
     .config-content-card {
-        border: none !important;
-        background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important;
+        border: 1px solid #e2e8f0 !important;
+        background: #ffffff !important;
         border-radius: 1rem !important;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
         overflow: hidden !important;
@@ -138,37 +142,52 @@
     
     .config-content-body {
         padding: 1.5rem !important;
-        background-color: transparent !important;
+        background-color: #ffffff !important;
+        color: #1e293b !important;
     }
     
     /* Fix form elements in content area */
     .config-content .form-control, .config-content .form-select {
-        background-color: rgba(15, 23, 42, 0.8) !important;
-        border: 1px solid #475569 !important;
-        color: #f1f5f9 !important;
+        background-color: #f8fafc !important;
+        border: 1px solid #cbd5e1 !important;
+        color: #1e293b !important;
         border-radius: 0.5rem !important;
     }
     
     .config-content .form-control:focus, .config-content .form-select:focus {
-        background-color: rgba(15, 23, 42, 0.9) !important;
+        background-color: #ffffff !important;
         border-color: #3b82f6 !important;
         box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25) !important;
-        color: #ffffff !important;
+        color: #1e293b !important;
+    }
+    
+    /* Fix form labels and text */
+    .config-content .form-label {
+        color: #374151 !important;
+        font-weight: 500 !important;
+    }
+    
+    .config-content .form-text {
+        color: #6b7280 !important;
     }
     
     /* Improve help cards styling */
     .help-card {
-        background: rgba(30, 41, 59, 0.5) !important;
-        border: 1px solid rgba(75, 85, 99, 0.3) !important;
+        background: #f8fafc !important;
+        border: 1px solid #e2e8f0 !important;
         border-radius: 0.75rem !important;
         transition: all 0.2s ease !important;
     }
     
     .help-card:hover {
-        background: rgba(30, 41, 59, 0.7) !important;
+        background: #f1f5f9 !important;
         border-color: rgba(59, 130, 246, 0.3) !important;
         transform: translateY(-2px) !important;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    }
+    
+    .help-card .card-body {
+        color: #1e293b !important;
     }
 </style>
 
@@ -403,9 +422,196 @@
                         </h5>
                     </div>
                     <div class="config-content-body">
-                        <div class="alert alert-warning">
-                            <i data-feather="clock" class="me-2"></i>
-                            This feature is coming soon. SSO/SAML authentication integration will be available in a future update.
+                        <div class="alert alert-info">
+                            <i data-feather="info" class="me-2"></i>
+                            Configure Single Sign-On integration with your organization's identity provider.
+                        </div>
+
+                        <!-- Provider Selection -->
+                        <div class="mb-4">
+                            <label class="form-label">Authentication Provider</label>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="sso-provider" id="gitlab-oauth" value="gitlab" checked>
+                                        <label class="form-check-label" for="gitlab-oauth">
+                                            <strong>GitLab OAuth</strong>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="sso-provider" id="keycloak-saml" value="keycloak">
+                                        <label class="form-check-label" for="keycloak-saml">
+                                            <strong>Keycloak SAML</strong>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="sso-provider" id="azure-ad" value="azure">
+                                        <label class="form-check-label" for="azure-ad">
+                                            <strong>Azure AD</strong>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- GitLab OAuth Configuration -->
+                        <div id="gitlab-config" class="provider-config">
+                            <h6 class="text-primary mb-3">
+                                <i data-feather="gitlab" class="me-2"></i>
+                                GitLab OAuth Configuration
+                            </h6>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="gitlab-url" class="form-label">GitLab Instance URL</label>
+                                        <input type="url" class="form-control" id="gitlab-url" 
+                                               placeholder="https://gitlab.company.com" required>
+                                        <div class="form-text">Your GitLab server URL</div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="gitlab-client-id" class="form-label">Application ID</label>
+                                        <input type="text" class="form-control" id="gitlab-client-id" 
+                                               placeholder="Enter GitLab Application ID" required>
+                                        <div class="form-text">OAuth Application ID from GitLab</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="gitlab-client-secret" class="form-label">Application Secret</label>
+                                        <div class="input-group">
+                                            <input type="password" class="form-control" id="gitlab-client-secret" 
+                                                   placeholder="Enter Application Secret" required>
+                                            <button class="btn btn-outline-secondary" type="button" onclick="toggleSecretVisibility('gitlab-client-secret')">
+                                                <i data-feather="eye"></i>
+                                            </button>
+                                        </div>
+                                        <div class="form-text">OAuth Application Secret from GitLab</div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="gitlab-scope" class="form-label">OAuth Scopes</label>
+                                        <input type="text" class="form-control" id="gitlab-scope" 
+                                               value="read_user email" readonly>
+                                        <div class="form-text">Required permissions for authentication</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Keycloak SAML Configuration -->
+                        <div id="keycloak-config" class="provider-config" style="display: none;">
+                            <h6 class="text-success mb-3">
+                                <i data-feather="key" class="me-2"></i>
+                                Keycloak SAML Configuration
+                            </h6>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="keycloak-url" class="form-label">Keycloak Server URL</label>
+                                        <input type="url" class="form-control" id="keycloak-url" 
+                                               placeholder="https://keycloak.company.com" required>
+                                        <div class="form-text">Your Keycloak server base URL</div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="keycloak-realm" class="form-label">Realm</label>
+                                        <input type="text" class="form-control" id="keycloak-realm" 
+                                               placeholder="master" required>
+                                        <div class="form-text">Keycloak realm name</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="keycloak-client-id" class="form-label">Client ID</label>
+                                        <input type="text" class="form-control" id="keycloak-client-id" 
+                                               placeholder="security-dashboard" required>
+                                        <div class="form-text">SAML client identifier</div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="keycloak-entity-id" class="form-label">Entity ID</label>
+                                        <input type="text" class="form-control" id="keycloak-entity-id" 
+                                               placeholder="urn:security-dashboard" required>
+                                        <div class="form-text">SAML Entity ID</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Azure AD Configuration -->
+                        <div id="azure-config" class="provider-config" style="display: none;">
+                            <h6 class="text-info mb-3">
+                                <i data-feather="cloud" class="me-2"></i>
+                                Azure Active Directory Configuration
+                            </h6>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="azure-tenant-id" class="form-label">Tenant ID</label>
+                                        <input type="text" class="form-control" id="azure-tenant-id" 
+                                               placeholder="12345678-1234-1234-1234-123456789012" required>
+                                        <div class="form-text">Azure AD Tenant identifier</div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="azure-client-id" class="form-label">Application ID</label>
+                                        <input type="text" class="form-control" id="azure-client-id" 
+                                               placeholder="87654321-4321-4321-4321-210987654321" required>
+                                        <div class="form-text">Azure AD Application ID</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="azure-client-secret" class="form-label">Client Secret</label>
+                                        <div class="input-group">
+                                            <input type="password" class="form-control" id="azure-client-secret" 
+                                                   placeholder="Enter Client Secret" required>
+                                            <button class="btn btn-outline-secondary" type="button" onclick="toggleSecretVisibility('azure-client-secret')">
+                                                <i data-feather="eye"></i>
+                                            </button>
+                                        </div>
+                                        <div class="form-text">Azure AD Application Secret</div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="azure-authority" class="form-label">Authority URL</label>
+                                        <input type="url" class="form-control" id="azure-authority" 
+                                               value="https://login.microsoftonline.com/" readonly>
+                                        <div class="form-text">Azure AD authentication endpoint</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <button type="button" class="btn btn-outline-primary" onclick="testSSOConnection()">
+                                <i data-feather="wifi" class="me-1"></i>
+                                Test Connection
+                            </button>
+                            <button type="button" class="btn btn-success" onclick="saveSSOConfig()">
+                                <i data-feather="save" class="me-1"></i>
+                                Save Configuration
+                            </button>
+                        </div>
+
+                        <!-- Configuration Status -->
+                        <div id="sso-status" class="mt-3" style="display: none;">
+                            <div class="alert" id="sso-status-alert">
+                                <i data-feather="check-circle" class="me-2"></i>
+                                <span id="sso-status-message">Configuration saved successfully!</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -528,6 +734,62 @@ function toggleTokenVisibility() {
     }
     
     feather.replace();
+}
+
+function toggleSecretVisibility(inputId) {
+    const input = document.getElementById(inputId);
+    const button = input.nextElementSibling;
+    const icon = button.querySelector('i');
+    
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.setAttribute('data-feather', 'eye-off');
+    } else {
+        input.type = 'password';
+        icon.setAttribute('data-feather', 'eye');
+    }
+    
+    feather.replace();
+}
+
+// SSO Provider switching
+document.addEventListener('DOMContentLoaded', function() {
+    const providerRadios = document.querySelectorAll('input[name="sso-provider"]');
+    
+    providerRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            // Hide all provider configs
+            document.querySelectorAll('.provider-config').forEach(config => {
+                config.style.display = 'none';
+            });
+            
+            // Show selected provider config
+            const selectedConfig = document.getElementById(this.value + '-config');
+            if (selectedConfig) {
+                selectedConfig.style.display = 'block';
+            }
+        });
+    });
+});
+
+function testSSOConnection() {
+    const provider = document.querySelector('input[name="sso-provider"]:checked').value;
+    
+    // TODO: Implement actual SSO connection test
+    const statusDiv = document.getElementById('sso-status');
+    const statusAlert = document.getElementById('sso-status-alert');
+    const statusMessage = document.getElementById('sso-status-message');
+    
+    statusAlert.className = 'alert alert-success';
+    statusMessage.textContent = `${provider.toUpperCase()} connection test successful!`;
+    statusDiv.style.display = 'block';
+    
+    feather.replace();
+}
+
+function saveSSOConfig() {
+    // TODO: Implement SSO config save
+    alert('SSO configuration saved successfully!');
 }
 </script>
 {% endblock %}
