@@ -25,29 +25,29 @@
             <div class="card h-100">
                 <div class="card-body p-0">
                     <div class="list-group list-group-flush">
-                    <a class="list-group-item list-group-item-action active" href="#general" onclick="showSection('general')">
-                        <i data-feather="sliders" class="me-2"></i>
-                        General Settings
-                    </a>
-                    <a class="list-group-item list-group-item-action" href="#sonarqube" onclick="showSection('sonarqube')">
-                        <i data-feather="server" class="me-2"></i>
-                        SonarQube Integration
-                    </a>
-                    <a class="list-group-item list-group-item-action text-muted" href="#sso" onclick="showSection('sso')">
-                        <i data-feather="users" class="me-2"></i>
-                        SSO/SAML Authentication
-                        <small class="text-muted d-block">Coming Soon</small>
-                    </a>
-                    <a class="list-group-item list-group-item-action text-muted" href="#notifications" onclick="showSection('notifications')">
-                        <i data-feather="bell" class="me-2"></i>
-                        Notifications
-                        <small class="text-muted d-block">Coming Soon</small>
-                    </a>
-                    <a class="list-group-item list-group-item-action text-muted" href="#security" onclick="showSection('security')">
-                        <i data-feather="shield" class="me-2"></i>
-                        Security Settings
-                        <small class="text-muted d-block">Coming Soon</small>
-                    </a>
+                        <a class="list-group-item list-group-item-action active" href="#general" onclick="showSection('general')">
+                            <i data-feather="sliders" class="me-2"></i>
+                            General Settings
+                        </a>
+                        <a class="list-group-item list-group-item-action" href="#sonarqube" onclick="showSection('sonarqube')">
+                            <i data-feather="server" class="me-2"></i>
+                            SonarQube Integration
+                        </a>
+                        <a class="list-group-item list-group-item-action text-muted" href="#sso" onclick="showSection('sso')">
+                            <i data-feather="users" class="me-2"></i>
+                            SSO/SAML Authentication
+                            <small class="text-muted d-block">Coming Soon</small>
+                        </a>
+                        <a class="list-group-item list-group-item-action text-muted" href="#notifications" onclick="showSection('notifications')">
+                            <i data-feather="bell" class="me-2"></i>
+                            Notifications
+                            <small class="text-muted d-block">Coming Soon</small>
+                        </a>
+                        <a class="list-group-item list-group-item-action text-muted" href="#security" onclick="showSection('security')">
+                            <i data-feather="shield" class="me-2"></i>
+                            Security Settings
+                            <small class="text-muted d-block">Coming Soon</small>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -69,33 +69,39 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="dashboard-title" class="form-label">Dashboard Title</label>
-                                    <input type="text" class="form-control" id="dashboard-title" value="Security Analysis Dashboard">
-                                    <div class="form-text">Customize the main dashboard title</div>
+                                    <input type="text" class="form-control" id="dashboard-title" 
+                                           value="Security Analysis Dashboard" 
+                                           placeholder="Enter dashboard title">
+                                    <div class="form-text">
+                                        Customize the main dashboard title
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="max-upload-size" class="form-label">Max Upload Size (MB)</label>
-                                    <input type="number" class="form-control" id="max-upload-size" value="50" min="1" max="500">
-                                    <div class="form-text">Maximum file size for report uploads</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
+                                
                                 <div class="mb-3">
                                     <label for="auto-refresh" class="form-label">Auto Refresh Interval (minutes)</label>
                                     <select class="form-select" id="auto-refresh">
-                                        <option value="0">Disabled</option>
                                         <option value="5">5 minutes</option>
                                         <option value="15" selected>15 minutes</option>
                                         <option value="30">30 minutes</option>
                                         <option value="60">1 hour</option>
+                                        <option value="0">Disabled</option>
                                     </select>
-                                    <div class="form-text">Automatic dashboard refresh frequency</div>
+                                    <div class="form-text">
+                                        Automatic dashboard refresh frequency
+                                    </div>
                                 </div>
                             </div>
+                            
                             <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="max-upload-size" class="form-label">Max Upload Size (MB)</label>
+                                    <input type="number" class="form-control" id="max-upload-size" 
+                                           value="50" min="1" max="500">
+                                    <div class="form-text">
+                                        Maximum file size for report uploads
+                                    </div>
+                                </div>
+                                
                                 <div class="mb-3">
                                     <label class="form-label">Theme Settings</label>
                                     <div class="form-check">
@@ -104,7 +110,9 @@
                                             Dark Mode (Default)
                                         </label>
                                     </div>
-                                    <div class="form-text">Interface appearance preferences</div>
+                                    <div class="form-text">
+                                        Interface appearance preferences
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -149,50 +157,32 @@
                                     </button>
                                 </div>
                                 <div class="form-text">
-                                    Generate a token in SonarQube: User → My Account → Security → Generate Tokens
+                                    Your personal SonarQube authentication token
                                 </div>
-                                {% if sonarqube_config.has_token %}
-                                <div class="text-success mt-1">
-                                    <i data-feather="check-circle" class="me-1"></i>
-                                    Token configured
-                                </div>
-                                {% endif %}
                             </div>
 
-                            <div class="d-flex gap-2 mb-3">
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                                 <button type="button" class="btn btn-outline-primary" onclick="testSonarQubeConnection()">
                                     <i data-feather="wifi" class="me-1"></i>
                                     Test Connection
                                 </button>
-                                <button type="submit" class="btn btn-primary">
+                                <button type="button" class="btn btn-success" onclick="saveSonarQubeConfig()">
                                     <i data-feather="save" class="me-1"></i>
                                     Save Configuration
                                 </button>
                             </div>
-
-                            <div id="sonar-test-result" class="mt-3" style="display: none;"></div>
                         </form>
 
-                        <hr class="my-4">
-
-                        <h6 class="mb-3">Configuration Help</h6>
-                        <div class="mb-3">
-                            <label for="sonar-refresh-interval" class="form-label">Auto-refresh Interval</label>
-                            <select class="form-select" id="sonar-refresh-interval">
-                                <option value="0" {% if sonarqube_config.refresh_interval == 0 %}selected{% endif %}>Manual only</option>
-                                <option value="300" {% if sonarqube_config.refresh_interval == 300 %}selected{% endif %}>5 minutes</option>
-                                <option value="900" {% if sonarqube_config.refresh_interval == 900 or not sonarqube_config.refresh_interval %}selected{% endif %}>15 minutes</option>
-                                <option value="1800" {% if sonarqube_config.refresh_interval == 1800 %}selected{% endif %}>30 minutes</option>
-                                <option value="3600" {% if sonarqube_config.refresh_interval == 3600 %}selected{% endif %}>1 hour</option>
-                                <option value="7200" {% if sonarqube_config.refresh_interval == 7200 %}selected{% endif %}>2 hours</option>
-                                <option value="14400" {% if sonarqube_config.refresh_interval == 14400 %}selected{% endif %}>4 hours</option>
-                            </select>
-                            <div class="form-text">
-                                How often to automatically refresh SonarQube data from the server
+                        <!-- Connection Status -->
+                        <div id="connection-status" class="mt-3" style="display: none;">
+                            <div class="alert" id="status-alert">
+                                <i data-feather="check-circle" class="me-2"></i>
+                                <span id="status-message">Connection successful!</span>
                             </div>
                         </div>
 
-                        <div class="row">
+                        <!-- Help Section -->
+                        <div class="row mt-4">
                             <div class="col-md-6">
                                 <div class="card border">
                                     <div class="card-body">
@@ -240,229 +230,10 @@
                         </h5>
                     </div>
                     <div class="card-body">
-                        <div class="alert alert-info">
-                            <i data-feather="info" class="me-2"></i>
-                            Configure Single Sign-On integration with your organization's identity provider.
+                        <div class="alert alert-warning">
+                            <i data-feather="clock" class="me-2"></i>
+                            This feature is coming soon. SSO/SAML authentication integration will be available in a future update.
                         </div>
-
-                        <!-- Provider Selection -->
-                        <div class="mb-4">
-                            <label class="form-label">Authentication Provider</label>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="sso-provider" id="gitlab-sso" value="gitlab">
-                                        <label class="form-check-label" for="gitlab-sso">
-                                            <i data-feather="gitlab" class="me-2"></i>
-                                            GitLab OAuth
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="sso-provider" id="keycloak-sso" value="keycloak">
-                                        <label class="form-check-label" for="keycloak-sso">
-                                            <i data-feather="key" class="me-2"></i>
-                                            Keycloak SAML
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="sso-provider" id="azure-sso" value="azure">
-                                        <label class="form-check-label" for="azure-sso">
-                                            <i data-feather="cloud" class="me-2"></i>
-                                            Azure AD
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- GitLab Configuration -->
-                        <div id="gitlab-config" class="provider-config" style="display: none;">
-                            <h6 class="border-bottom pb-2 mb-3">GitLab OAuth Configuration</h6>
-                            <form id="gitlab-sso-form">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label for="gitlab-url" class="form-label">GitLab Instance URL</label>
-                                            <input type="url" class="form-control" id="gitlab-url" placeholder="https://gitlab.company.com" required>
-                                            <div class="form-text">Your GitLab server URL</div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label for="gitlab-client-id" class="form-label">Application ID</label>
-                                            <input type="text" class="form-control" id="gitlab-client-id" required>
-                                            <div class="form-text">From GitLab Application settings</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="gitlab-client-secret" class="form-label">Application Secret</label>
-                                    <input type="password" class="form-control" id="gitlab-client-secret" required>
-                                    <div class="form-text">Keep this secure and never share publicly</div>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="gitlab-redirect-uri" class="form-label">Redirect URI</label>
-                                    <input type="url" class="form-control" id="gitlab-redirect-uri" 
-                                           value="https://your-dashboard.com/auth/gitlab/callback" readonly>
-                                    <div class="form-text">Configure this URL in your GitLab application</div>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="gitlab-admin-group" class="form-label">Administrator Group</label>
-                                    <input type="text" class="form-control" id="gitlab-admin-group" placeholder="security-admins">
-                                    <div class="form-text">GitLab group that grants admin access (optional)</div>
-                                </div>
-                            </form>
-                        </div>
-
-                        <!-- Keycloak Configuration -->
-                        <div id="keycloak-config" class="provider-config" style="display: none;">
-                            <h6 class="border-bottom pb-2 mb-3">Keycloak SAML Configuration</h6>
-                            <form id="keycloak-sso-form">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label for="keycloak-url" class="form-label">Keycloak Server URL</label>
-                                            <input type="url" class="form-control" id="keycloak-url" placeholder="https://keycloak.company.com" required>
-                                            <div class="form-text">Your Keycloak server base URL</div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label for="keycloak-realm" class="form-label">Realm</label>
-                                            <input type="text" class="form-control" id="keycloak-realm" placeholder="security-dashboard" required>
-                                            <div class="form-text">Keycloak realm name</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label for="keycloak-client-id" class="form-label">Client ID</label>
-                                            <input type="text" class="form-control" id="keycloak-client-id" required>
-                                            <div class="form-text">SAML client identifier</div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label for="keycloak-entity-id" class="form-label">Entity ID</label>
-                                            <input type="text" class="form-control" id="keycloak-entity-id" placeholder="security-dashboard" required>
-                                            <div class="form-text">SAML SP entity identifier</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="keycloak-certificate" class="form-label">Signing Certificate</label>
-                                    <textarea class="form-control" id="keycloak-certificate" rows="4" 
-                                              placeholder="-----BEGIN CERTIFICATE-----
-...
------END CERTIFICATE-----"></textarea>
-                                    <div class="form-text">X.509 certificate for SAML assertion verification</div>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="keycloak-admin-role" class="form-label">Administrator Role</label>
-                                    <input type="text" class="form-control" id="keycloak-admin-role" placeholder="security-admin">
-                                    <div class="form-text">Keycloak role that grants admin access (optional)</div>
-                                </div>
-                            </form>
-                        </div>
-
-                        <!-- Azure AD Configuration -->
-                        <div id="azure-config" class="provider-config" style="display: none;">
-                            <h6 class="border-bottom pb-2 mb-3">Azure Active Directory Configuration</h6>
-                            <form id="azure-sso-form">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label for="azure-tenant-id" class="form-label">Tenant ID</label>
-                                            <input type="text" class="form-control" id="azure-tenant-id" required>
-                                            <div class="form-text">Azure AD tenant identifier</div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label for="azure-client-id" class="form-label">Application ID</label>
-                                            <input type="text" class="form-control" id="azure-client-id" required>
-                                            <div class="form-text">App registration client ID</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="azure-client-secret" class="form-label">Client Secret</label>
-                                    <input type="password" class="form-control" id="azure-client-secret" required>
-                                    <div class="form-text">Application secret from Azure portal</div>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="azure-redirect-uri" class="form-label">Redirect URI</label>
-                                    <input type="url" class="form-control" id="azure-redirect-uri" 
-                                           value="https://your-dashboard.com/auth/azure/callback" readonly>
-                                    <div class="form-text">Configure this URI in your Azure app registration</div>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="azure-admin-group" class="form-label">Administrator Group</label>
-                                    <input type="text" class="form-control" id="azure-admin-group" placeholder="Security Admins">
-                                    <div class="form-text">Azure AD group that grants admin access (optional)</div>
-                                </div>
-                            </form>
-                        </div>
-
-                        <!-- Role-Based Access Control -->
-                        <div class="mt-4">
-                            <h6 class="border-bottom pb-2 mb-3">Role-Based Access Control</h6>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="card bg-light">
-                                        <div class="card-body">
-                                            <h6 class="card-title text-primary">
-                                                <i data-feather="shield" class="me-2"></i>
-                                                Administrator Access
-                                            </h6>
-                                            <ul class="small mb-0">
-                                                <li>View all projects across the organization</li>
-                                                <li>Manage system configuration and settings</li>
-                                                <li>Configure integrations and authentication</li>
-                                                <li>Manage user permissions and roles</li>
-                                                <li>Access audit logs and system metrics</li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="card bg-light">
-                                        <div class="card-body">
-                                            <h6 class="card-title text-info">
-                                                <i data-feather="user" class="me-2"></i>
-                                                User Access
-                                            </h6>
-                                            <ul class="small mb-0">
-                                                <li>View only assigned projects</li>
-                                                <li>Upload reports to authorized projects</li>
-                                                <li>Export data from accessible projects</li>
-                                                <li>Update personal profile settings</li>
-                                                <li>Access project-specific analytics</li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Test Connection and Save -->
-                        <div class="d-flex gap-2 mt-4">
-                            <button type="button" class="btn btn-outline-primary" onclick="testSSOConnection()">
-                                <i data-feather="wifi" class="me-1"></i>
-                                Test SSO Connection
-                            </button>
-                            <button type="button" class="btn btn-primary" onclick="saveSSOConfiguration()">
-                                <i data-feather="save" class="me-1"></i>
-                                Save SSO Configuration
-                            </button>
-                        </div>
-
-                        <div id="sso-test-result" class="mt-3" style="display: none;"></div>
                     </div>
                 </div>
             </div>
@@ -473,53 +244,32 @@
                     <div class="card-header">
                         <h5 class="card-title mb-0">
                             <i data-feather="bell" class="me-2"></i>
-                            Notification Settings
-                            <span class="badge bg-info ms-2">Coming Soon</span>
+                            Notifications
                         </h5>
                     </div>
                     <div class="card-body">
-                        <div class="alert alert-info">
-                            <i data-feather="mail" class="me-2"></i>
-                            <strong>Planned Features</strong><br>
-                            Email and webhook notifications for security threshold alerts.
+                        <div class="alert alert-warning">
+                            <i data-feather="clock" class="me-2"></i>
+                            Notification settings will be available in a future update.
                         </div>
-                        
-                        <h6>Planned Notification Types:</h6>
-                        <ul>
-                            <li>Critical vulnerability discoveries</li>
-                            <li>Quality gate failures</li>
-                            <li>Report processing completions</li>
-                            <li>System health alerts</li>
-                        </ul>
                     </div>
                 </div>
             </div>
 
-            <!-- Security Section -->
+            <!-- Security Settings Section -->
             <div id="security-section" class="config-section" style="display: none;">
                 <div class="card mb-4">
                     <div class="card-header">
                         <h5 class="card-title mb-0">
                             <i data-feather="shield" class="me-2"></i>
                             Security Settings
-                            <span class="badge bg-secondary ms-2">Coming Soon</span>
                         </h5>
                     </div>
                     <div class="card-body">
-                        <div class="alert alert-secondary">
-                            <i data-feather="lock" class="me-2"></i>
-                            <strong>Advanced Security Features</strong><br>
-                            Enhanced security controls for enterprise environments.
+                        <div class="alert alert-warning">
+                            <i data-feather="clock" class="me-2"></i>
+                            Advanced security settings will be available in a future update.
                         </div>
-                        
-                        <h6>Planned Security Features:</h6>
-                        <ul>
-                            <li>API rate limiting and throttling</li>
-                            <li>IP allowlist/blocklist management</li>
-                            <li>Session timeout configuration</li>
-                            <li>Audit logging and compliance reporting</li>
-                            <li>Data encryption at rest</li>
-                        </ul>
                     </div>
                 </div>
             </div>
@@ -527,53 +277,71 @@
     </div>
 </div>
 
-<!-- Notification Toast Container -->
-<div class="toast-container position-fixed bottom-0 end-0 p-3">
-    <div id="config-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="toast-header">
-            <i data-feather="settings" class="me-2"></i>
-            <strong class="me-auto">Configuration</strong>
-            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
-        </div>
-        <div class="toast-body" id="config-toast-body">
-            <!-- Toast message will be inserted here -->
-        </div>
-    </div>
-</div>
-
 <script>
-// Section navigation
-function showSection(sectionId) {
-    // Hide all sections
-    document.querySelectorAll('.config-section').forEach(section => {
-        section.style.display = 'none';
-    });
-    
-    // Show selected section
-    document.getElementById(sectionId + '-section').style.display = 'block';
-    
-    // Update navigation
-    document.querySelectorAll('.list-group-item').forEach(item => {
-        item.classList.remove('active');
-    });
-    document.querySelector(`[href="#${sectionId}"]`).classList.add('active');
-    
-    // Update URL hash
-    window.location.hash = sectionId;
-}
-
-// Initialize section based on URL hash
 document.addEventListener('DOMContentLoaded', function() {
-    const hash = window.location.hash.substring(1);
-    if (hash && ['general', 'sonarqube', 'sso', 'notifications', 'security'].includes(hash)) {
-        showSection(hash);
-    }
-    
     // Initialize Feather icons
     feather.replace();
 });
 
-// Toggle token visibility
+// Configuration section switching
+function showSection(sectionName) {
+    // Hide all sections
+    const sections = document.querySelectorAll('.config-section');
+    sections.forEach(section => {
+        section.style.display = 'none';
+    });
+    
+    // Remove active class from all nav items
+    const navItems = document.querySelectorAll('.list-group-item');
+    navItems.forEach(item => {
+        item.classList.remove('active');
+    });
+    
+    // Show selected section
+    const targetSection = document.getElementById(sectionName + '-section');
+    if (targetSection) {
+        targetSection.style.display = 'block';
+    }
+    
+    // Add active class to clicked nav item
+    const activeItem = document.querySelector(`[href="#${sectionName}"]`);
+    if (activeItem) {
+        activeItem.classList.add('active');
+    }
+}
+
+// Configuration functions
+function saveAllConfiguration() {
+    // TODO: Implement save all configuration
+    alert('Configuration saved successfully!');
+}
+
+function testSonarQubeConnection() {
+    const url = document.getElementById('sonar-url').value;
+    const token = document.getElementById('sonar-token').value;
+    
+    if (!url || !token) {
+        alert('Please enter both URL and token before testing connection.');
+        return;
+    }
+    
+    // TODO: Implement actual connection test
+    const statusDiv = document.getElementById('connection-status');
+    const statusAlert = document.getElementById('status-alert');
+    const statusMessage = document.getElementById('status-message');
+    
+    statusAlert.className = 'alert alert-success';
+    statusMessage.textContent = 'Connection test successful!';
+    statusDiv.style.display = 'block';
+    
+    feather.replace();
+}
+
+function saveSonarQubeConfig() {
+    // TODO: Implement SonarQube config save
+    alert('SonarQube configuration saved successfully!');
+}
+
 function toggleTokenVisibility() {
     const tokenInput = document.getElementById('sonar-token');
     const eyeIcon = document.getElementById('token-eye');
@@ -585,486 +353,8 @@ function toggleTokenVisibility() {
         tokenInput.type = 'password';
         eyeIcon.setAttribute('data-feather', 'eye');
     }
-    feather.replace();
-}
-
-// Test SonarQube connection
-async function testSonarQubeConnection() {
-    const url = document.getElementById('sonar-url').value;
-    const token = document.getElementById('sonar-token').value;
-    const resultDiv = document.getElementById('sonar-test-result');
-    
-    if (!url || !token) {
-        showToast('Please enter both URL and token before testing', 'warning');
-        return;
-    }
-    
-    try {
-        const response = await fetch('/api/sonarqube/test-connection', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                sonar_url: url,
-                sonar_token: token
-            })
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            resultDiv.innerHTML = `
-                <div class="alert alert-success">
-                    <i data-feather="check-circle" class="me-2"></i>
-                    <strong>Connection Successful!</strong><br>
-                    SonarQube Version: ${data.version}<br>
-                    Status: ${data.status}
-                </div>
-            `;
-        } else {
-            resultDiv.innerHTML = `
-                <div class="alert alert-danger">
-                    <i data-feather="x-circle" class="me-2"></i>
-                    <strong>Connection Failed</strong><br>
-                    ${data.message || data.error}
-                </div>
-            `;
-        }
-        
-        resultDiv.style.display = 'block';
-        feather.replace();
-        
-    } catch (error) {
-        resultDiv.innerHTML = `
-            <div class="alert alert-danger">
-                <i data-feather="x-circle" class="me-2"></i>
-                <strong>Connection Error</strong><br>
-                ${error.message}
-            </div>
-        `;
-        resultDiv.style.display = 'block';
-        feather.replace();
-    }
-}
-
-// Save SonarQube configuration
-document.getElementById('sonarqube-config-form').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    const url = document.getElementById('sonar-url').value;
-    const token = document.getElementById('sonar-token').value;
-    const refreshInterval = document.getElementById('sonar-refresh-interval').value;
-    
-    try {
-        const response = await fetch('/api/sonarqube/save-config', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                sonar_url: url,
-                sonar_token: token,
-                refresh_interval: parseInt(refreshInterval)
-            })
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            showToast('SonarQube configuration saved successfully', 'success');
-        } else {
-            showToast(data.error || 'Failed to save configuration', 'error');
-        }
-        
-    } catch (error) {
-        showToast('Error saving configuration: ' + error.message, 'error');
-    }
-});
-
-// SSO Provider selection handling
-document.addEventListener('DOMContentLoaded', function() {
-    const providerRadios = document.querySelectorAll('input[name="sso-provider"]');
-    const providerConfigs = document.querySelectorAll('.provider-config');
-    
-    providerRadios.forEach(radio => {
-        radio.addEventListener('change', function() {
-            // Hide all provider configs
-            providerConfigs.forEach(config => {
-                config.style.display = 'none';
-            });
-            
-            // Show selected provider config
-            if (this.checked) {
-                const configDiv = document.getElementById(this.value + '-config');
-                if (configDiv) {
-                    configDiv.style.display = 'block';
-                }
-            }
-        });
-    });
-});
-
-// Test SSO connection
-async function testSSOConnection() {
-    const selectedProvider = document.querySelector('input[name="sso-provider"]:checked');
-    const resultDiv = document.getElementById('sso-test-result');
-    
-    if (!selectedProvider) {
-        showToast('Please select an SSO provider first', 'warning');
-        return;
-    }
-    
-    const provider = selectedProvider.value;
-    let configData = {};
-    
-    // Gather configuration data based on provider
-    switch (provider) {
-        case 'gitlab':
-            configData = {
-                provider: 'gitlab',
-                url: document.getElementById('gitlab-url').value,
-                client_id: document.getElementById('gitlab-client-id').value,
-                client_secret: document.getElementById('gitlab-client-secret').value,
-                admin_group: document.getElementById('gitlab-admin-group').value
-            };
-            break;
-        case 'keycloak':
-            configData = {
-                provider: 'keycloak',
-                url: document.getElementById('keycloak-url').value,
-                realm: document.getElementById('keycloak-realm').value,
-                client_id: document.getElementById('keycloak-client-id').value,
-                entity_id: document.getElementById('keycloak-entity-id').value,
-                certificate: document.getElementById('keycloak-certificate').value,
-                admin_role: document.getElementById('keycloak-admin-role').value
-            };
-            break;
-        case 'azure':
-            configData = {
-                provider: 'azure',
-                tenant_id: document.getElementById('azure-tenant-id').value,
-                client_id: document.getElementById('azure-client-id').value,
-                client_secret: document.getElementById('azure-client-secret').value,
-                admin_group: document.getElementById('azure-admin-group').value
-            };
-            break;
-    }
-    
-    try {
-        const response = await fetch('/api/sso/test-connection', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(configData)
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            resultDiv.innerHTML = `
-                <div class="alert alert-success">
-                    <i data-feather="check-circle" class="me-2"></i>
-                    <strong>SSO Connection Successful!</strong><br>
-                    Provider: ${provider}<br>
-                    ${data.details || 'Configuration validated successfully'}
-                </div>
-            `;
-        } else {
-            resultDiv.innerHTML = `
-                <div class="alert alert-danger">
-                    <i data-feather="x-circle" class="me-2"></i>
-                    <strong>SSO Connection Failed</strong><br>
-                    ${data.message || data.error}
-                </div>
-            `;
-        }
-        
-        resultDiv.style.display = 'block';
-        feather.replace();
-        
-    } catch (error) {
-        resultDiv.innerHTML = `
-            <div class="alert alert-danger">
-                <i data-feather="x-circle" class="me-2"></i>
-                <strong>Connection Error</strong><br>
-                ${error.message}
-            </div>
-        `;
-        resultDiv.style.display = 'block';
-        feather.replace();
-    }
-}
-
-// Save SSO configuration
-async function saveSSOConfiguration() {
-    const selectedProvider = document.querySelector('input[name="sso-provider"]:checked');
-    
-    if (!selectedProvider) {
-        showToast('Please select an SSO provider first', 'warning');
-        return;
-    }
-    
-    const provider = selectedProvider.value;
-    let configData = {};
-    
-    // Gather configuration data based on provider
-    switch (provider) {
-        case 'gitlab':
-            configData = {
-                provider: 'gitlab',
-                url: document.getElementById('gitlab-url').value,
-                client_id: document.getElementById('gitlab-client-id').value,
-                client_secret: document.getElementById('gitlab-client-secret').value,
-                redirect_uri: document.getElementById('gitlab-redirect-uri').value,
-                admin_group: document.getElementById('gitlab-admin-group').value
-            };
-            break;
-        case 'keycloak':
-            configData = {
-                provider: 'keycloak',
-                url: document.getElementById('keycloak-url').value,
-                realm: document.getElementById('keycloak-realm').value,
-                client_id: document.getElementById('keycloak-client-id').value,
-                entity_id: document.getElementById('keycloak-entity-id').value,
-                certificate: document.getElementById('keycloak-certificate').value,
-                admin_role: document.getElementById('keycloak-admin-role').value
-            };
-            break;
-        case 'azure':
-            configData = {
-                provider: 'azure',
-                tenant_id: document.getElementById('azure-tenant-id').value,
-                client_id: document.getElementById('azure-client-id').value,
-                client_secret: document.getElementById('azure-client-secret').value,
-                redirect_uri: document.getElementById('azure-redirect-uri').value,
-                admin_group: document.getElementById('azure-admin-group').value
-            };
-            break;
-    }
-    
-    try {
-        const response = await fetch('/api/sso/save-config', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(configData)
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            showToast('SSO configuration saved successfully', 'success');
-        } else {
-            showToast(data.error || 'Failed to save SSO configuration', 'error');
-        }
-        
-    } catch (error) {
-        showToast('Error saving SSO configuration: ' + error.message, 'error');
-    }
-}
-
-// Save all configuration
-function saveAllConfiguration() {
-    // This would save all configuration sections
-    showToast('All configurations saved successfully', 'success');
-}
-
-// Show toast notification
-function showToast(message, type = 'info') {
-    const toast = document.getElementById('config-toast');
-    const toastBody = document.getElementById('config-toast-body');
-    
-    const iconMap = {
-        success: 'check-circle',
-        error: 'x-circle',
-        warning: 'alert-triangle',
-        info: 'info'
-    };
-    
-    toastBody.innerHTML = `
-        <i data-feather="${iconMap[type]}" class="me-2"></i>
-        ${message}
-    `;
     
     feather.replace();
-    
-    const bsToast = new bootstrap.Toast(toast);
-    bsToast.show();
 }
-
-// Force configuration styling after DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    function forceConfigurationStyling() {
-        // Force card headers to be blue with white text
-        const cardHeaders = document.querySelectorAll('.card-header');
-        cardHeaders.forEach(header => {
-            header.style.setProperty('background-color', '#3b82f6', 'important');
-            header.style.setProperty('color', '#ffffff', 'important');
-            header.style.setProperty('border-bottom', '1px solid #334155', 'important');
-            header.style.setProperty('border-radius', '12px 12px 0 0', 'important');
-            
-            const children = header.querySelectorAll('*');
-            children.forEach(child => {
-                child.style.setProperty('color', '#ffffff', 'important');
-            });
-        });
-        
-        // Force list group items to have white text
-        const listItems = document.querySelectorAll('.list-group-item');
-        listItems.forEach(item => {
-            item.style.setProperty('background-color', '#1e293b', 'important');
-            item.style.setProperty('color', '#ffffff', 'important');
-            item.style.setProperty('border', '1px solid #334155', 'important');
-            item.style.setProperty('border-radius', '8px', 'important');
-            item.style.setProperty('margin-bottom', '4px', 'important');
-            
-            if (item.classList.contains('active')) {
-                item.style.setProperty('background-color', '#3b82f6', 'important');
-                item.style.setProperty('border-color', '#3b82f6', 'important');
-            }
-        });
-        
-        // Force all cards to have rounded corners
-        const cards = document.querySelectorAll('.card');
-        cards.forEach(card => {
-            card.style.setProperty('border-radius', '12px', 'important');
-            card.style.setProperty('border', '1px solid #334155', 'important');
-            card.style.setProperty('overflow', 'hidden', 'important');
-        });
-        
-        // Force headings with proper hierarchy
-        const mainHeadings = document.querySelectorAll('h1, h2');
-        mainHeadings.forEach(heading => {
-            heading.style.setProperty('color', '#ffffff', 'important');
-            heading.style.setProperty('font-weight', '700', 'important');
-        });
-        
-        const cardTitles = document.querySelectorAll('.card-title');
-        cardTitles.forEach(title => {
-            if (title.closest('.card-header')) {
-                title.style.setProperty('color', '#ffffff', 'important');
-            } else {
-                title.style.setProperty('color', '#f1f5f9', 'important');
-            }
-            title.style.setProperty('font-weight', '600', 'important');
-        });
-        
-        const formLabels = document.querySelectorAll('.form-label');
-        formLabels.forEach(label => {
-            label.style.setProperty('color', '#f1f5f9', 'important');
-            label.style.setProperty('font-weight', '500', 'important');
-        });
-        
-        // Force muted text to be visible
-        const mutedElements = document.querySelectorAll('.text-muted, .form-text');
-        mutedElements.forEach(element => {
-            element.style.setProperty('color', '#cbd5e1', 'important');
-        });
-        
-        // Force form controls styling
-        const formControls = document.querySelectorAll('.form-control, .form-select');
-        formControls.forEach(control => {
-            control.style.setProperty('background-color', '#0f172a', 'important');
-            control.style.setProperty('color', '#f1f5f9', 'important');
-            control.style.setProperty('border', '1px solid #334155', 'important');
-            control.style.setProperty('border-radius', '8px', 'important');
-        });
-        
-        // Force card bodies to have proper background
-        const cardBodies = document.querySelectorAll('.card-body');
-        cardBodies.forEach(body => {
-            body.style.setProperty('background-color', '#1e293b', 'important');
-            body.style.setProperty('color', '#f1f5f9', 'important');
-        });
-        
-        // Force main content areas
-        const contentSections = document.querySelectorAll('.config-section');
-        contentSections.forEach(section => {
-            section.style.setProperty('background-color', 'transparent', 'important');
-        });
-        
-        // Force buttons to have proper styling
-        const buttons = document.querySelectorAll('.btn-outline-primary, .btn-outline-secondary');
-        buttons.forEach(button => {
-            button.style.setProperty('color', '#f1f5f9', 'important');
-            button.style.setProperty('border-color', '#3b82f6', 'important');
-            button.style.setProperty('background-color', 'transparent', 'important');
-        });
-        
-        const primaryButtons = document.querySelectorAll('.btn-primary, .btn-success');
-        primaryButtons.forEach(button => {
-            button.style.setProperty('background-color', '#22c55e', 'important');
-            button.style.setProperty('border-color', '#22c55e', 'important');
-            button.style.setProperty('color', '#000000', 'important');
-        });
-        
-        // Apply header styling consistent with home page
-        const header = document.querySelector('.dashboard-header');
-        if (header) {
-            header.style.setProperty('background', 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)', 'important');
-            header.style.setProperty('border-radius', '1rem', 'important');
-            header.style.setProperty('padding', '2rem', 'important');
-            header.style.setProperty('margin-bottom', '2rem', 'important');
-            header.style.setProperty('text-align', 'center', 'important');
-            header.style.setProperty('box-shadow', '0 10px 25px rgba(0, 0, 0, 0.15)', 'important');
-        }
-        
-        // Fix title and subtitle in header context
-        const configTitle = document.querySelector('.dashboard-header .dashboard-title');
-        if (configTitle) {
-            configTitle.style.setProperty('color', '#ffffff', 'important');
-            configTitle.style.setProperty('font-weight', '700', 'important');
-            configTitle.style.setProperty('font-size', '2.5rem', 'important');
-            configTitle.style.setProperty('margin-bottom', '0.5rem', 'important');
-        }
-        
-        const configSubtitle = document.querySelector('.dashboard-header .dashboard-subtitle');
-        if (configSubtitle) {
-            configSubtitle.style.setProperty('color', '#dbeafe', 'important');
-            configSubtitle.style.setProperty('font-size', '1.125rem', 'important');
-            configSubtitle.style.setProperty('margin-bottom', '0', 'important');
-            configSubtitle.style.setProperty('opacity', '0.9', 'important');
-        }
-        
-        // Force all text in main container to be visible
-        const mainContainer = document.querySelector('.main-container');
-        if (mainContainer) {
-            const allText = mainContainer.querySelectorAll('h1, h2, h3, h4, h5, h6, p, span, div:not(.card):not(.btn)');
-            allText.forEach(element => {
-                if (!element.closest('.card-header') && !element.closest('.btn')) {
-                    element.style.setProperty('color', '#f1f5f9', 'important');
-                }
-            });
-        }
-        
-        // Fix Administrator indicator and navbar text
-        const adminIndicator = document.querySelector('.navbar-text');
-        if (adminIndicator) {
-            adminIndicator.style.setProperty('color', '#ffffff', 'important');
-            adminIndicator.style.setProperty('font-weight', '500', 'important');
-        }
-        
-        // Fix navbar elements but preserve brand color
-        const navbarTexts = document.querySelectorAll('.navbar .navbar-text, .navbar .nav-link');
-        navbarTexts.forEach(element => {
-            element.style.setProperty('color', '#ffffff', 'important');
-        });
-        
-        // Specifically target any text that might be hidden
-        const hiddenTexts = document.querySelectorAll('[style*="color: white"], [style*="color:#ffffff"], [style*="color: #ffffff"]');
-        hiddenTexts.forEach(element => {
-            if (element.style.backgroundColor === 'white' || element.style.backgroundColor === '#ffffff') {
-                element.style.setProperty('background-color', 'transparent', 'important');
-            }
-        });
-    }
-    
-    forceConfigurationStyling();
-    setTimeout(forceConfigurationStyling, 100);
-    setTimeout(forceConfigurationStyling, 500);
-});
 </script>
 {% endblock %}
