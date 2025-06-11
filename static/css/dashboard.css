@@ -1500,33 +1500,59 @@ body {
 }
 
 /* Card header and help text fixes */
-[data-bs-theme="dark"] .card-header {
-  background-color: hsl(217 91% 60%) !important; /* Blue background instead of grey */
-  border-bottom: 1px solid hsl(var(--border)) !important;
-  border-radius: 12px 12px 0 0 !important; /* Rounded top corners */
+/* Dark theme - clean project card headers */
+[data-bs-theme="dark"] .project-card .card-header {
+  background-color: transparent !important;
+  border-bottom: none !important;
+  border: none !important;
+  padding: 1.25rem 1.25rem 0.75rem 1.25rem !important;
 }
 
-[data-bs-theme="dark"] .card-header h5, 
-[data-bs-theme="dark"] .card-header h6,
-[data-bs-theme="dark"] .card-header .card-title {
-  color: hsl(0 0% 100%) !important; /* White text on blue background */
+[data-bs-theme="dark"] .project-card .card-header h3,
+[data-bs-theme="dark"] .project-card .card-header .card-title {
+  color: hsl(var(--foreground)) !important;
+  margin-bottom: 0 !important;
+  font-weight: 600 !important;
+  font-size: 1.1rem !important;
+}
+
+[data-bs-theme="dark"] .project-card .card-header i {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Keep other card headers styled for non-project cards */
+[data-bs-theme="dark"] .card-header:not(.project-card .card-header) {
+  background-color: hsl(217 91% 60%) !important;
+  border-bottom: 1px solid hsl(var(--border)) !important;
+  border-radius: 12px 12px 0 0 !important;
+}
+
+[data-bs-theme="dark"] .card-header:not(.project-card .card-header) h5, 
+[data-bs-theme="dark"] .card-header:not(.project-card .card-header) h6,
+[data-bs-theme="dark"] .card-header:not(.project-card .card-header) .card-title {
+  color: hsl(0 0% 100%) !important;
   margin-bottom: 0;
   font-weight: 600;
 }
 
-[data-bs-theme="dark"] .card-header i {
-  color: hsl(0 0% 100%) !important; /* White icons in headers */
+[data-bs-theme="dark"] .card-header:not(.project-card .card-header) i {
+  color: hsl(0 0% 100%) !important;
 }
 
-/* Light theme card headers */
-.card-header {
-  background-color: hsl(var(--secondary) / 0.5) !important;
-  border-bottom: 1px solid hsl(var(--border)) !important;
+/* Clean project card headers - no borders or backgrounds */
+.project-card .card-header {
+  background-color: transparent !important;
+  border-bottom: none !important;
+  border: none !important;
+  padding: 1.25rem 1.25rem 0.75rem 1.25rem !important;
 }
 
-.card-header h5, .card-header h6 {
+.project-card .card-header h3, 
+.project-card .card-header .card-title {
   color: hsl(var(--foreground)) !important;
-  margin-bottom: 0;
+  margin-bottom: 0 !important;
+  font-weight: 600 !important;
+  font-size: 1.1rem !important;
 }
 
 /* Text and content visibility */
@@ -1536,6 +1562,46 @@ body {
 
 .small, small {
   color: hsl(var(--secondary-foreground)) !important;
+}
+
+/* Project cards - clean minimal design */
+.project-card {
+  border: 1px solid hsl(var(--border)) !important;
+  background: hsl(var(--card)) !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+}
+
+.project-card:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.15) !important;
+  border-color: rgba(59, 130, 246, 0.3) !important;
+}
+
+/* Remove all unnecessary dividers and lines */
+.project-card .card-body {
+  padding: 0 1.25rem 1.25rem 1.25rem !important;
+  border: none !important;
+}
+
+.project-card hr {
+  display: none !important;
+}
+
+.project-card .border-bottom,
+.project-card .border-top,
+.project-card .border {
+  border: none !important;
+}
+
+/* Clean card content spacing */
+.project-card .mb-3 {
+  margin-bottom: 0.75rem !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
 }
 
 /* Button and interactive element fixes */
