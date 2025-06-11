@@ -792,6 +792,438 @@ def connect_project_sonarqube(project_id):
                 'message': 'Unable to connect to SonarQube. Check your configuration.'
             }), 500
 
+# Security Heatmap Routes
+@app.route('/security-heatmap')
+def security_heatmap():
+    """Security Risk Heatmap page"""
+    return render_template('security_heatmap.html')
+
+@app.route('/api/security-heatmap/data')
+def get_heatmap_data():
+    """Get security heatmap data from real project data"""
+    try:
+        projects = Project.query.all()
+        heatmap_data = {
+            'projects': [],
+            'statistics': {
+                'critical': 0,
+                'high': 0,
+                'medium': 0,
+                'low': 0,
+                'trendScore': 0,
+                'criticalChange': 0,
+                'highChange': 0,
+                'mediumChange': 0,
+                'trendDirection': 'Stable'
+            }
+        }
+        
+        total_critical = 0
+        total_high = 0
+        total_medium = 0
+        total_low = 0
+        
+        for project in projects:
+            # Get all reports for this project
+            sonarqube_report = project.get_report('sonarqube')
+            sbom_report = project.get_report('sbom')
+            trivy_report = project.get_report('trivy')
+            
+            # Calculate risk scores for each category
+            risks = {
+                'vulnerabilities': calculate_vulnerability_risk(trivy_report, sbom_report),
+                'code_quality': calculate_code_quality_risk(sonarqube_report),
+                'dependencies': calculate_dependency_risk(sbom_report),
+                'containers': calculate_container_risk(trivy_report)
+            }
+            
+            # Calculate severity counts
+            counts = calculate_severity_counts(sonarqube_report, sbom_report, trivy_report)
+            
+            # Determine trend based on recent changes
+            trend = calculate_risk_trend(project)
+            
+            project_data = {
+                'name': project.name,
+                'id': project.id,
+                'risks': risks,
+                'counts': counts,
+                'trend': trend,
+                'lastUpdated': project.updated_at.isoformat() if project.updated_at else None
+            }
+            
+            heatmap_data['projects'].append(project_data)
+            
+            # Aggregate statistics
+            total_critical += counts.get('critical', 0)
+            total_high += counts.get('high', 0)
+            total_medium += counts.get('medium', 0)
+            total_low += counts.get('low', 0)
+        
+        # Update global statistics
+        heatmap_data['statistics']['critical'] = total_critical
+        heatmap_data['statistics']['high'] = total_high
+        heatmap_data['statistics']['medium'] = total_medium
+        heatmap_data['statistics']['low'] = total_low
+        heatmap_data['statistics']['trendScore'] = calculate_overall_trend_score(heatmap_data['projects'])
+        
+        return jsonify({'success': True, 'data': heatmap_data})
+        
+    except Exception as e:
+        print(f"Error generating heatmap data: {e}")
+        return jsonify({'success': False, 'message': str(e)})
+
+@app.route('/api/security-heatmap/timeline')
+def get_heatmap_timeline():
+    """Get timeline data for risk visualization"""
+    try:
+        from datetime import datetime, timedelta
+        
+        end_time = datetime.now()
+        start_time = end_time - timedelta(hours=24)
+        
+        # Generate hourly data points
+        timeline_data = {
+            'labels': [],
+            'critical': [],
+            'high': [],
+            'medium': []
+        }
+        
+        current_time = start_time
+        while current_time <= end_time:
+            timeline_data['labels'].append(current_time.strftime('%H:%M'))
+            
+            # Calculate actual risk counts at this time
+            projects = Project.query.all()
+            critical_count = 0
+            high_count = 0
+            medium_count = 0
+            
+            for project in projects:
+                # Get current severity counts
+                sonarqube_report = project.get_report('sonarqube')
+                sbom_report = project.get_report('sbom')
+                trivy_report = project.get_report('trivy')
+                
+                counts = calculate_severity_counts(sonarqube_report, sbom_report, trivy_report)
+                critical_count += counts.get('critical', 0)
+                high_count += counts.get('high', 0)
+                medium_count += counts.get('medium', 0)
+            
+            timeline_data['critical'].append(critical_count)
+            timeline_data['high'].append(high_count)
+            timeline_data['medium'].append(medium_count)
+            
+            current_time += timedelta(hours=1)
+        
+        return jsonify({'success': True, 'data': timeline_data})
+        
+    except Exception as e:
+        print(f"Error generating timeline data: {e}")
+        return jsonify({'success': False, 'message': str(e)})
+
+@app.route('/api/security-heatmap/details/<project_id>/<category>')
+def get_risk_details(project_id, category):
+    """Get detailed risk information for a specific project and category"""
+    try:
+        project = Project.query.get_or_404(project_id)
+        
+        details = {
+            'project': project.name,
+            'category': category,
+            'issues': [],
+            'recommendations': []
+        }
+        
+        if category == 'vulnerabilities':
+            trivy_report = project.get_report('trivy')
+            if trivy_report:
+                trivy_data = json.loads(trivy_report.data)
+                details['issues'] = extract_vulnerability_details(trivy_data)
+                details['recommendations'] = get_vulnerability_recommendations(trivy_data)
+        
+        elif category == 'code_quality':
+            sonarqube_report = project.get_report('sonarqube')
+            if sonarqube_report:
+                sonar_data = json.loads(sonarqube_report.data)
+                details['issues'] = extract_code_quality_details(sonar_data)
+                details['recommendations'] = get_code_quality_recommendations(sonar_data)
+        
+        elif category == 'dependencies':
+            sbom_report = project.get_report('sbom')
+            if sbom_report:
+                sbom_data = json.loads(sbom_report.data)
+                details['issues'] = extract_dependency_details(sbom_data)
+                details['recommendations'] = get_dependency_recommendations(sbom_data)
+        
+        elif category == 'containers':
+            trivy_report = project.get_report('trivy')
+            if trivy_report:
+                trivy_data = json.loads(trivy_report.data)
+                details['issues'] = extract_container_details(trivy_data)
+                details['recommendations'] = get_container_recommendations(trivy_data)
+        
+        return jsonify({'success': True, 'data': details})
+        
+    except Exception as e:
+        print(f"Error getting risk details: {e}")
+        return jsonify({'success': False, 'message': str(e)})
+
+# Helper functions for risk calculations
+def calculate_vulnerability_risk(trivy_report, sbom_report):
+    """Calculate vulnerability risk score (0-10)"""
+    if not trivy_report:
+        return 0
+    
+    try:
+        trivy_data = json.loads(trivy_report.data)
+        vulnerabilities = trivy_data.get('vulnerabilities', [])
+        
+        if not vulnerabilities:
+            return 0
+        
+        # Count by severity
+        critical = sum(1 for v in vulnerabilities if v.get('severity') == 'CRITICAL')
+        high = sum(1 for v in vulnerabilities if v.get('severity') == 'HIGH')
+        medium = sum(1 for v in vulnerabilities if v.get('severity') == 'MEDIUM')
+        
+        # Calculate weighted score
+        score = min(10, (critical * 3 + high * 2 + medium * 1) / 10)
+        return round(score, 1)
+    except:
+        return 0
+
+def calculate_code_quality_risk(sonarqube_report):
+    """Calculate code quality risk score (0-10)"""
+    if not sonarqube_report:
+        return 0
+    
+    try:
+        sonar_data = json.loads(sonarqube_report.data)
+        
+        # Extract key metrics
+        bugs = sonar_data.get('bugs', 0)
+        code_smells = sonar_data.get('code_smells', 0)
+        coverage = sonar_data.get('coverage', 100)
+        
+        # Calculate risk based on metrics
+        bug_score = min(5, bugs / 20)  # 20+ bugs = 5 points
+        smell_score = min(3, code_smells / 100)  # 100+ smells = 3 points
+        coverage_score = max(0, (80 - coverage) / 20)  # Below 80% coverage adds risk
+        
+        total_score = bug_score + smell_score + coverage_score
+        return round(min(10, total_score), 1)
+    except:
+        return 0
+
+def calculate_dependency_risk(sbom_report):
+    """Calculate dependency risk score (0-10)"""
+    if not sbom_report:
+        return 0
+    
+    try:
+        sbom_data = json.loads(sbom_report.data)
+        components = sbom_data.get('components', [])
+        
+        if not components:
+            return 0
+        
+        # Count outdated/vulnerable dependencies
+        vulnerable_count = 0
+        total_count = len(components)
+        
+        for component in components:
+            # Check for known vulnerabilities or outdated versions
+            if component.get('vulnerabilities') or component.get('outdated'):
+                vulnerable_count += 1
+        
+        # Calculate risk percentage
+        risk_percentage = (vulnerable_count / total_count) * 10 if total_count > 0 else 0
+        return round(min(10, risk_percentage), 1)
+    except:
+        return 0
+
+def calculate_container_risk(trivy_report):
+    """Calculate container security risk score (0-10)"""
+    if not trivy_report:
+        return 0
+    
+    try:
+        trivy_data = json.loads(trivy_report.data)
+        
+        # Look for container-specific issues
+        misconfigurations = trivy_data.get('misconfigurations', [])
+        secrets = trivy_data.get('secrets', [])
+        vulnerabilities = trivy_data.get('vulnerabilities', [])
+        
+        # Calculate risk from different sources
+        config_risk = min(4, len(misconfigurations) / 5)  # Misconfigurations
+        secret_risk = min(3, len(secrets))  # Exposed secrets
+        vuln_risk = min(3, len([v for v in vulnerabilities if v.get('severity') in ['CRITICAL', 'HIGH']]) / 10)
+        
+        total_risk = config_risk + secret_risk + vuln_risk
+        return round(min(10, total_risk), 1)
+    except:
+        return 0
+
+def calculate_severity_counts(sonarqube_report, sbom_report, trivy_report):
+    """Calculate total severity counts across all reports"""
+    counts = {'critical': 0, 'high': 0, 'medium': 0, 'low': 0}
+    
+    # Count from SonarQube
+    if sonarqube_report:
+        try:
+            sonar_data = json.loads(sonarqube_report.data)
+            bugs = sonar_data.get('bugs', 0)
+            vulnerabilities = sonar_data.get('vulnerabilities', 0)
+            
+            # Map to severity levels based on SonarQube categorization
+            counts['high'] += vulnerabilities
+            counts['medium'] += bugs
+        except:
+            pass
+    
+    # Count from Trivy
+    if trivy_report:
+        try:
+            trivy_data = json.loads(trivy_report.data)
+            vulnerabilities = trivy_data.get('vulnerabilities', [])
+            
+            for vuln in vulnerabilities:
+                severity = vuln.get('severity', '').lower()
+                if severity == 'critical':
+                    counts['critical'] += 1
+                elif severity == 'high':
+                    counts['high'] += 1
+                elif severity == 'medium':
+                    counts['medium'] += 1
+                elif severity == 'low':
+                    counts['low'] += 1
+        except:
+            pass
+    
+    return counts
+
+def calculate_risk_trend(project):
+    """Calculate risk trend for a project"""
+    # For now, return neutral trend
+    # In a real implementation, this would analyze historical data
+    return 'stable'
+
+def calculate_overall_trend_score(projects):
+    """Calculate overall trend score across all projects"""
+    if not projects:
+        return 0
+    
+    total_risk = 0
+    for project in projects:
+        risks = project.get('risks', {})
+        project_risk = sum(risks.values()) / len(risks) if risks else 0
+        total_risk += project_risk
+    
+    return round(total_risk / len(projects), 1)
+
+def extract_vulnerability_details(trivy_data):
+    """Extract detailed vulnerability information"""
+    vulnerabilities = trivy_data.get('vulnerabilities', [])
+    return [
+        {
+            'id': v.get('vulnerability_id', 'Unknown'),
+            'severity': v.get('severity', 'Unknown'),
+            'title': v.get('title', 'No title'),
+            'description': v.get('description', 'No description')[:200],
+            'package': v.get('package_name', 'Unknown')
+        }
+        for v in vulnerabilities[:10]  # Limit to first 10
+    ]
+
+def get_vulnerability_recommendations(trivy_data):
+    """Get vulnerability remediation recommendations"""
+    return [
+        "Update vulnerable packages to latest versions",
+        "Apply security patches from vendors",
+        "Review and update container base images",
+        "Implement automated vulnerability scanning"
+    ]
+
+def extract_code_quality_details(sonar_data):
+    """Extract code quality issue details"""
+    issues = sonar_data.get('issues', [])
+    return [
+        {
+            'rule': issue.get('rule', 'Unknown'),
+            'severity': issue.get('severity', 'Unknown'),
+            'message': issue.get('message', 'No message'),
+            'component': issue.get('component', 'Unknown')
+        }
+        for issue in issues[:10]  # Limit to first 10
+    ]
+
+def get_code_quality_recommendations(sonar_data):
+    """Get code quality improvement recommendations"""
+    return [
+        "Address critical bugs and vulnerabilities first",
+        "Improve test coverage to at least 80%",
+        "Reduce code complexity and duplication",
+        "Follow established coding standards"
+    ]
+
+def extract_dependency_details(sbom_data):
+    """Extract dependency risk details"""
+    components = sbom_data.get('components', [])
+    return [
+        {
+            'name': comp.get('name', 'Unknown'),
+            'version': comp.get('version', 'Unknown'),
+            'type': comp.get('type', 'Unknown'),
+            'vulnerabilities': len(comp.get('vulnerabilities', []))
+        }
+        for comp in components[:10]  # Limit to first 10
+    ]
+
+def get_dependency_recommendations(sbom_data):
+    """Get dependency security recommendations"""
+    return [
+        "Update outdated dependencies regularly",
+        "Monitor for new vulnerability disclosures",
+        "Use dependency scanning tools in CI/CD",
+        "Maintain an accurate software bill of materials"
+    ]
+
+def extract_container_details(trivy_data):
+    """Extract container security details"""
+    misconfigs = trivy_data.get('misconfigurations', [])
+    secrets = trivy_data.get('secrets', [])
+    
+    details = []
+    for config in misconfigs[:5]:
+        details.append({
+            'type': 'Misconfiguration',
+            'rule': config.get('rule', 'Unknown'),
+            'severity': config.get('severity', 'Unknown'),
+            'message': config.get('message', 'No message')
+        })
+    
+    for secret in secrets[:5]:
+        details.append({
+            'type': 'Secret',
+            'rule': secret.get('rule', 'Unknown'),
+            'severity': 'HIGH',
+            'message': f"Exposed secret: {secret.get('type', 'Unknown')}"
+        })
+    
+    return details
+
+def get_container_recommendations(trivy_data):
+    """Get container security recommendations"""
+    return [
+        "Use minimal base images with fewer vulnerabilities",
+        "Scan images before deployment",
+        "Implement proper secret management",
+        "Follow container security best practices"
+    ]
+
 @app.errorhandler(404)
 def not_found_error(error):
     return render_template('404.html'), 404
