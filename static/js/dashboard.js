@@ -1,11 +1,11 @@
-// Dashboard module to avoid global variable conflicts
-const DashboardModule = (function() {
-    // Private state
-    let uploadedReports = {
+// Global state
+window.dashboardState = window.dashboardState || {
+    uploadedReports: {
         sonarqube: false,
         sbom: false,
         trivy: false
-    };
+    }
+};
 
 // Initialize dashboard
 document.addEventListener('DOMContentLoaded', function() {
@@ -35,7 +35,7 @@ function setupFileUploads() {
         
         // Handle card click
         card.addEventListener('click', () => {
-            if (!uploadedReports[reportType]) {
+            if (!window.dashboardState.uploadedReports[reportType]) {
                 fileInput.click();
             }
         });
@@ -76,20 +76,26 @@ async function uploadFile(file, reportType, card, projectId) {
         
         if (result.success) {
             // Mark as uploaded
-            uploadedReports[reportType] = true;
+            window.dashboardState.uploadedReports[reportType] = true;
             updateUploadCard(card, true, file.name);
             
             // Show success message
-            showNotification('success', result.message);
+            if (window.notificationManager) {
+                window.notificationManager.success(result.message);
+            }
             
             // Refresh summary data
             await loadSummaryData(projectId);
         } else {
-            showNotification('error', result.error || 'Upload failed');
+            if (window.notificationManager) {
+                window.notificationManager.error(result.error || 'Upload failed');
+            }
         }
     } catch (error) {
         console.error('Upload error:', error);
-        showNotification('error', 'Upload failed. Please try again.');
+        if (window.notificationManager) {
+            window.notificationManager.error('Upload failed. Please try again.');
+        }
     } finally {
         showUploadLoading(card, false);
     }
@@ -407,28 +413,17 @@ function createTrivyChart(vulnerabilities) {
     });
 }
 
-// Show notification
+// Use notification manager if available
 function showNotification(type, message) {
-    const alertClass = type === 'success' ? 'alert-success' : 
-                      type === 'warning' ? 'alert-warning' : 'alert-danger';
-    
-    const alert = document.createElement('div');
-    alert.className = `alert ${alertClass}`;
-    alert.innerHTML = `
-        <span>${message}</span>
-        <button type="button" class="btn-close" style="float: right;" onclick="this.parentElement.remove()">×</button>
-    `;
-    
-    // Insert at top of main container
-    const mainContainer = document.querySelector('.main-container');
-    mainContainer.insertBefore(alert, mainContainer.firstChild);
-    
-    // Auto remove after 5 seconds
-    setTimeout(() => {
-        if (alert.parentElement) {
-            alert.remove();
+    if (window.notificationManager) {
+        if (type === 'success') {
+            window.notificationManager.success(message);
+        } else if (type === 'warning') {
+            window.notificationManager.warning(message);
+        } else {
+            window.notificationManager.error(message);
         }
-    }, 5000);
+    }
 }
 
 // Detail page functions
