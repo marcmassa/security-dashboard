@@ -3,6 +3,36 @@
 {% block title %}Configuration - Security Dashboard{% endblock %}
 
 {% block content %}
+<style>
+    /* Force visibility of critical elements */
+    .dashboard-title, h1.dashboard-title {
+        color: #ffffff !important;
+        font-weight: 700 !important;
+        font-size: 2.5rem !important;
+    }
+    
+    .dashboard-subtitle, p.dashboard-subtitle {
+        color: #94a3b8 !important;
+        font-size: 1.125rem !important;
+    }
+    
+    .navbar-text {
+        color: #ffffff !important;
+        font-weight: 500 !important;
+    }
+    
+    .navbar .navbar-text, .navbar .nav-link, .navbar .navbar-brand {
+        color: #ffffff !important;
+    }
+    
+    /* Ensure main container text is visible */
+    .main-container h1, .main-container h2, .main-container h3, 
+    .main-container h4, .main-container h5, .main-container h6,
+    .main-container p:not(.card p), .main-container span:not(.card span) {
+        color: #f1f5f9 !important;
+    }
+</style>
+
 <div class="main-container">
     <!-- Page Header -->
     <div class="dashboard-header mb-4">
@@ -1003,17 +1033,51 @@ document.addEventListener('DOMContentLoaded', function() {
             button.style.setProperty('color', '#000000', 'important');
         });
         
-        // Fix page title and subtitle
-        const pageTitle = document.querySelector('h1.h2');
-        if (pageTitle) {
-            pageTitle.style.setProperty('color', '#ffffff', 'important');
-            pageTitle.style.setProperty('font-weight', '700', 'important');
+        // Fix page title and subtitle with multiple selectors
+        const pageTitles = document.querySelectorAll('h1, .dashboard-title, h1.dashboard-title');
+        pageTitles.forEach(title => {
+            title.style.setProperty('color', '#ffffff', 'important');
+            title.style.setProperty('font-weight', '700', 'important');
+            title.style.setProperty('font-size', '2.5rem', 'important');
+        });
+        
+        const pageSubtitles = document.querySelectorAll('p.text-muted, .dashboard-subtitle, p.dashboard-subtitle');
+        pageSubtitles.forEach(subtitle => {
+            subtitle.style.setProperty('color', '#94a3b8', 'important');
+            subtitle.style.setProperty('font-size', '1.125rem', 'important');
+        });
+        
+        // Force all text in main container to be visible
+        const mainContainer = document.querySelector('.main-container');
+        if (mainContainer) {
+            const allText = mainContainer.querySelectorAll('h1, h2, h3, h4, h5, h6, p, span, div:not(.card):not(.btn)');
+            allText.forEach(element => {
+                if (!element.closest('.card-header') && !element.closest('.btn')) {
+                    element.style.setProperty('color', '#f1f5f9', 'important');
+                }
+            });
         }
         
-        const pageSubtitle = document.querySelector('p.text-muted');
-        if (pageSubtitle) {
-            pageSubtitle.style.setProperty('color', '#94a3b8', 'important');
+        // Fix Administrator indicator and navbar text
+        const adminIndicator = document.querySelector('.navbar-text');
+        if (adminIndicator) {
+            adminIndicator.style.setProperty('color', '#ffffff', 'important');
+            adminIndicator.style.setProperty('font-weight', '500', 'important');
         }
+        
+        // Fix all navbar elements
+        const navbarElements = document.querySelectorAll('.navbar .navbar-text, .navbar .nav-link, .navbar .navbar-brand');
+        navbarElements.forEach(element => {
+            element.style.setProperty('color', '#ffffff', 'important');
+        });
+        
+        // Specifically target any text that might be hidden
+        const hiddenTexts = document.querySelectorAll('[style*="color: white"], [style*="color:#ffffff"], [style*="color: #ffffff"]');
+        hiddenTexts.forEach(element => {
+            if (element.style.backgroundColor === 'white' || element.style.backgroundColor === '#ffffff') {
+                element.style.setProperty('background-color', 'transparent', 'important');
+            }
+        });
     }
     
     forceConfigurationStyling();
