@@ -922,13 +922,13 @@ body {
 }
 
 .modern-navbar .navbar-brand {
-  color: #ffffff !important;
+  color: #60a5fa !important;
   font-size: 1.5rem !important;
   font-weight: 700 !important;
 }
 
 .modern-navbar .navbar-brand:hover {
-  color: #dbeafe !important;
+  color: #3b82f6 !important;
 }
 
 .modern-navbar .nav-link {
