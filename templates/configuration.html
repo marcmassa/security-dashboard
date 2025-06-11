@@ -3,6 +3,45 @@
 {% block title %}Configuration - Security Dashboard{% endblock %}
 
 {% block content %}
+<style>
+    /* Fix active menu item color to blue */
+    .list-group-item.active {
+        background-color: #3b82f6 !important;
+        border-color: #3b82f6 !important;
+        color: #ffffff !important;
+    }
+    
+    /* Fix card header to blue instead of gray */
+    .card-header {
+        background-color: #3b82f6 !important;
+        border-bottom: 1px solid #1e40af !important;
+        color: #ffffff !important;
+    }
+    
+    /* Make form text white instead of gray */
+    .form-text {
+        color: #ffffff !important;
+    }
+    
+    /* Fix muted text to white */
+    .text-muted {
+        color: #ffffff !important;
+    }
+    
+    /* Fix card title in header */
+    .card-header .card-title {
+        color: #ffffff !important;
+        font-weight: 600 !important;
+    }
+    
+    /* Fix alert info text */
+    .alert-info {
+        background-color: #1e40af !important;
+        border-color: #3b82f6 !important;
+        color: #ffffff !important;
+    }
+</style>
+
 <div class="main-container">
     <!-- Page Header -->
     <div class="dashboard-header">
