@@ -1,353 +1,275 @@
-# Security Analysis Dashboard
+# Security Dashboard v1.0.0
 
-Comprehensive security analysis dashboard that aggregates and visualizes security reports from multiple sources, providing real-time insights and actionable intelligence for development teams.
+A comprehensive security analysis platform that aggregates and visualizes security reports from multiple sources, providing real-time insights and actionable intelligence for development teams.
 
-## Features
+## ✨ Features
 
-### Core Functionality
-- **Multi-Source Integration**: SonarQube, SBOM (CycloneDX), and Trivy security reports
-- **Interactive Dashboards**: Real-time visualization with Chart.js and responsive design
-- **Project Management**: Organize security reports by project with comprehensive tracking
-- **Advanced Report Analysis**: Detailed breakdown with filtering, sorting, and search
-- **File Upload Interface**: Dedicated upload buttons for each report type with validation
+### Core Capabilities
+- **Multi-Source Security Analysis**: Integrates SonarQube, SBOM (CycloneDX), and Trivy reports
+- **Interactive Security Risk Heatmap**: Real-time threat visualization with multiple view modes
+- **Progressive Information Display**: Shows data as reports are uploaded
+- **Comprehensive Dashboards**: Summary views and detailed analysis for each report type
+- **Real-time Monitoring**: Live updates and security threat notifications
+- **Export Capabilities**: PDF and JSON export options with detailed reporting
 
-### Enhanced Report Processing
-- **SonarQube Integration**: 
-  - Direct API connectivity to SonarQube servers
-  - JSON report parsing with issue categorization
-  - Interactive tables with filtering by severity, type, and component
-  - Code quality metrics and technical debt visualization
-  
-- **SBOM Analysis**:
-  - CycloneDX JSON and XML format support
-  - Component dependency analysis with detailed metadata
-  - License detection and compliance tracking
-  - Enhanced XML parsing with multi-namespace support
-  
-- **Trivy Container Scanning**:
-  - JSON report processing for container vulnerabilities
-  - CVSS scoring integration and CVE linking
-  - Package-level vulnerability tracking
-  - Resizable table interface with sticky headers
+### Security Features
+- **Vulnerability Assessment**: Multi-source vulnerability aggregation and analysis
+- **Code Quality Metrics**: SonarQube integration with trend analysis
+- **Dependency Analysis**: SBOM parsing with outdated package detection
+- **Container Security**: Trivy integration for container vulnerability scanning
+- **Risk Scoring**: Intelligent risk calculation across four security categories
+- **Threat Intelligence**: AI-powered insights and recommendations
 
-### User Interface Enhancements
-- **Professional Design**: Bootstrap-based dark theme with compact layouts
-- **Interactive Tables**: Real-time filtering, sorting, and search across all views
-- **Responsive Layout**: Mobile-optimized with space-efficient design
-- **Export Capabilities**: PDF and JSON export for compliance reporting
-- **Upload Management**: Individual upload functionality for each report type
+### Enterprise Features
+- **Role-based Access Control**: Admin and user permission levels
+- **SSO/SAML Integration**: Enterprise authentication support
+- **CI/CD Integration**: Jenkins integration scripts and webhook support
+- **Kubernetes Deployment**: Production-ready containerized deployment
+- **API-First Design**: RESTful APIs for external integrations
 
-## Technology Stack
+## 🛠 Technology Stack
 
-- **Backend**: Flask (Python) with SQLAlchemy ORM
-- **Database**: PostgreSQL with optimized schema and indexing
-- **Frontend**: JavaScript ES6, Bootstrap 5, Chart.js, Feather Icons
-- **File Processing**: Multi-format parsers (JSON, XML, HTML)
-- **Containerization**: Docker with optimized builds
-- **Orchestration**: Kubernetes with health checks and auto-scaling
-- **CI/CD**: Jenkins integration with webhook support
+- **Backend**: Flask (Python 3.11+)
+- **Frontend**: Bootstrap 5 + Modern JavaScript
+- **Database**: PostgreSQL with optimized queries
+- **Visualization**: Chart.js, Canvas-based interactive charts
+- **Deployment**: Kubernetes (GKE) with Docker
+- **Authentication**: Flask-Login with SSO/SAML support
+- **Security**: JWT tokens, secure session management
 
-## Installation & Setup
+## 🚀 Quick Start
 
 ### Prerequisites
 - Python 3.11+
-- PostgreSQL 12+
-- Docker (optional)
+- PostgreSQL database
+- SonarQube server (optional but recommended)
 
-### Local Development
-
+### Installation
 ```bash
-# Clone repository
+# Clone the repository
 git clone <repository-url>
 cd security-dashboard
 
 # Install dependencies
 pip install -r requirements.txt
 
-# Set environment variables
-export DATABASE_URL="postgresql://user:password@localhost/security_dashboard"
+# Set up environment variables
+export DATABASE_URL="postgresql://user:pass@localhost/securitydb"
 export SESSION_SECRET="your-secure-secret-key"
 
-# Run application
+# Initialize database
+python -c "from app import app, db; app.app_context().push(); db.create_all()"
+
+# Run the application
 python main.py
-# Access at http://localhost:5000
 ```
 
-### Docker Deployment
+### First Time Setup
+1. Access the application at `http://localhost:5000`
+2. Navigate to Configuration (Admin access required)
+3. Configure SonarQube integration if available
+4. Create your first project
+5. Upload security reports to start analysis
 
+## 📊 Security Risk Heatmap
+
+The interactive security heatmap provides comprehensive threat visualization:
+
+### View Modes
+- **Grid View**: Matrix display of risk scores across projects and categories
+- **Tree Map**: Hierarchical visualization showing risk distribution
+- **Bubble Chart**: Interactive bubbles sized by risk severity
+
+### Risk Categories
+- **Vulnerabilities**: CVE analysis from Trivy and SBOM data
+- **Code Quality**: SonarQube metrics including bugs and code smells
+- **Dependencies**: Outdated packages and vulnerable dependencies
+- **Containers**: Container-specific security issues and misconfigurations
+
+### Real-time Features
+- Automatic data refresh (configurable intervals)
+- Live threat monitoring and notifications
+- Timeline visualization showing 24-hour risk trends
+- Interactive drill-down for detailed risk analysis
+
+## ⚙️ Configuration
+
+### SonarQube Integration
+1. Navigate to **Configuration → SonarQube Integration**
+2. Enter your SonarQube server URL and authentication token
+3. Test connection and save configuration
+4. Projects can now fetch data directly from SonarQube
+
+### Project Management
+1. Create projects through the **New Project** button
+2. Upload reports individually or via CI/CD integration
+3. View real-time analysis as reports are processed
+4. Access the Security Heatmap for cross-project risk visualization
+
+## 🔄 CI/CD Integration
+
+### Jenkins Pipeline Integration
 ```bash
-# Using Docker Compose
+python scripts/jenkins-integration.py \
+  --dashboard-url "https://security-dashboard.company.com" \
+  --project "MyProject" \
+  --sonarqube-report "reports/sonar-report.json" \
+  --sbom-report "reports/sbom.json" \
+  --trivy-report "reports/trivy-report.json" \
+  --jenkins-build "${BUILD_NUMBER}" \
+  --jenkins-url "${BUILD_URL}"
+```
+
+### Webhook Notifications
+Configure external systems to receive security updates:
+```bash
+curl -X POST "https://security-dashboard.company.com/api/projects/{id}/webhook" \
+  -H "Content-Type: application/json" \
+  -d '{"event": "scan_complete", "severity": "high", "details": "..."}'
+```
+
+## 🐳 Deployment
+
+### Production Deployment (Kubernetes)
+```bash
+# Deploy to Kubernetes cluster
+kubectl apply -f k8s/
+
+# Check deployment status
+kubectl get pods -l app=security-dashboard
+
+# Access via LoadBalancer
+kubectl get services security-dashboard-service
+```
+
+### Development Deployment (Docker)
+```bash
+# Build container
+docker build -t security-dashboard:1.0.0 .
+
+# Run with database
 docker-compose up -d
 
 # Access at http://localhost:5000
 ```
 
-### Kubernetes Deployment
-
-```bash
-# Apply manifests
-kubectl apply -f k8s/
-
-# Check services
-kubectl get services
-```
-
-## Usage Guide
-
-### Project Management
-
-1. **Create Project**: Click "Create New Project" on homepage
-2. **Upload Reports**: Use dedicated upload buttons for each report type
-3. **View Analysis**: Navigate through interactive dashboards and detailed views
-4. **Export Data**: Generate PDF or JSON reports for compliance
-
-### Report Analysis Features
-
-#### SonarQube Reports
-- **Upload Format**: JSON from SonarQube API or export
-- **Analysis Capabilities**: Code quality metrics, security hotspots, technical debt
-- **Interactive Features**: 
-  - Sortable issue tables with severity filtering
-  - Component-based categorization
-  - Rule-based issue classification
-  - Direct server API integration
-
-#### SBOM (Software Bill of Materials)
-- **Upload Format**: CycloneDX JSON/XML
-- **Analysis Capabilities**: Component inventory, license compliance, dependency mapping
-- **Interactive Features**: 
-  - Component details table with metadata
-  - License analysis and compliance tracking
-  - Component search and type filtering
-  - Enhanced XML namespace handling
-
-#### Trivy Container Scans
-- **Upload Format**: JSON from Trivy CLI
-- **Analysis Capabilities**: Container vulnerabilities, package-level issues, CVSS scoring
-- **Interactive Features**: 
-  - Resizable vulnerability tables
-  - CVE linking to NIST database
-  - Package search and severity filtering
-  - Sticky headers for large datasets
-
-### Advanced Functionality
-
-#### Interactive Data Tables
-- **Real-time Filtering**: Search across all columns
-- **Multi-level Sorting**: Click headers for ascending/descending sort
-- **Responsive Design**: Horizontal scrolling for wide tables
-- **Resizable Interface**: Drag table borders to adjust height (Trivy)
-
-#### Data Export Options
-- **PDF Reports**: Print-optimized layouts for executive reporting
-- **JSON Export**: Structured data for programmatic access
-- **Compliance Ready**: Formatted outputs for audit requirements
-
-## API Integration
-
-### SonarQube Server Integration
-Configure direct connectivity to SonarQube servers:
-
-```bash
-export SONARQUBE_URL="https://sonar.company.com"
-export SONARQUBE_TOKEN="your-authentication-token"
-```
-
-### REST API Endpoints
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/projects` | POST | Create new project |
-| `/project/{id}/upload` | POST | Upload security reports |
-| `/project/{id}/summary` | GET | Get project metrics |
-| `/project/{id}/webhook` | POST | External integration webhook |
-| `/api/health` | GET | Health check for monitoring |
-
-### Jenkins CI/CD Integration
-
-```bash
-python scripts/jenkins-integration.py \
-  --dashboard-url "https://dashboard.company.com" \
-  --project-name "microservice-auth" \
-  --sonarqube-report "reports/sonar-analysis.json" \
-  --sbom-report "reports/cyclonedx-sbom.xml" \
-  --trivy-report "reports/trivy-container-scan.json" \
-  --build-number "${BUILD_NUMBER}"
-```
-
-## Architecture
-
-### Application Structure
-```
-security-dashboard/
-├── app.py                    # Flask application with route handlers
-├── main.py                   # Application entry point
-├── models.py                 # SQLAlchemy database models
-├── reprocess_sbom.py         # Data migration utilities
-├── templates/                # Jinja2 templates with enhanced UI
-│   ├── base.html            # Bootstrap-based responsive layout
-│   ├── home.html            # Project overview dashboard
-│   ├── project_dashboard.html # Project summary with metrics
-│   ├── sonarqube_detail.html # SonarQube analysis interface
-│   ├── sbom_detail.html     # SBOM component analysis
-│   └── trivy_detail.html    # Trivy vulnerability interface
-├── static/                   # Frontend assets and styling
-│   ├── css/dashboard.css    # Custom themes and responsive design
-│   └── js/dashboard.js      # Interactive functionality and charts
-├── utils/                    # Core processing modules
-│   ├── parsers.py           # Multi-format report parsers
-│   └── sonarqube_client.py  # SonarQube API integration
-├── scripts/                  # Automation and CI/CD integration
-│   └── jenkins-integration.py # Pipeline automation script
-├── k8s/                     # Kubernetes deployment manifests
-└── uploads/                 # Temporary file storage
-```
-
-### Database Schema
-- **projects**: Project metadata with SonarQube integration keys
-- **reports**: Polymorphic report storage with JSON data fields
-- **Optimized Indexing**: Query optimization for large datasets
-
-### Security Implementation
-- **Input Validation**: Comprehensive file type and content verification
-- **SQL Injection Prevention**: Parameterized queries throughout application
-- **Session Security**: Secure cookie configuration and CSRF protection
-- **API Authentication**: Token-based access control for external integrations
-- **Data Sanitization**: XSS prevention in all user inputs
-
-## Configuration
-
 ### Environment Variables
 ```bash
-# Required Configuration
-DATABASE_URL=postgresql://user:pass@host:5432/security_dashboard
-SESSION_SECRET=your-cryptographically-secure-random-key
-
-# Optional SonarQube Integration
-SONARQUBE_URL=https://sonar.company.com
-SONARQUBE_TOKEN=your-sonarqube-authentication-token
-
-# Application Settings
-LOG_LEVEL=INFO
-MAX_UPLOAD_SIZE=50MB
+DATABASE_URL=postgresql://user:pass@localhost/securitydb
+SESSION_SECRET=your-256-bit-secret-key
+SONAR_URL=https://sonarqube.company.com
 FLASK_ENV=production
+GUNICORN_WORKERS=4
 ```
 
-### Feature Configuration
-- **SonarQube API Integration**: Enable direct server connectivity
-- **Webhook Support**: External system notifications and callbacks
-- **Debug Mode**: Enhanced logging and error details for development
+## 📈 API Documentation
 
-## Development
-
-### Adding New Report Types
-
-1. **Parser Implementation**: Add parsing logic in `utils/parsers.py`
-2. **Database Extension**: Extend report schema if required
-3. **Upload Handler**: Add route processing in `app.py`
-4. **UI Template**: Create dedicated detail view template
-5. **Dashboard Integration**: Add summary cards and visualization
-
-### Code Quality Standards
-- **Python**: PEP 8 compliance with type hints
-- **JavaScript**: ES6+ with consistent formatting
-- **Templates**: Semantic HTML with accessibility considerations
-- **CSS**: BEM methodology with responsive design principles
-
-### Testing Framework
+### Core Endpoints
 ```bash
-# Unit tests for report parsers
-python -m pytest tests/test_parsers.py -v
+# Project Management
+POST   /projects                    # Create new project
+GET    /projects/{id}              # Get project details
+DELETE /projects/{id}              # Delete project
 
-# Integration tests for API endpoints
-python -m pytest tests/test_api.py -v
+# Report Upload
+POST   /projects/{id}/upload       # Upload security reports
+GET    /projects/{id}/summary      # Get aggregated summary
 
-# Frontend functionality tests
-npm run test
+# Detailed Analysis
+GET    /projects/{id}/sonarqube    # SonarQube analysis
+GET    /projects/{id}/sbom         # SBOM dependency analysis  
+GET    /projects/{id}/trivy        # Trivy security scan
+
+# Security Heatmap
+GET    /api/security-heatmap/data  # Heatmap visualization data
+GET    /api/security-heatmap/timeline # Historical risk data
+GET    /api/security-heatmap/details/{project}/{category} # Detailed risk info
+
+# External Integration
+POST   /api/projects/find-or-create # Jenkins integration
+POST   /api/projects/{id}/webhook   # Webhook notifications
+GET    /api/projects/{id}/status    # Project status for CI/CD
 ```
 
-## Performance & Monitoring
+### Authentication
+All API endpoints support both session-based and token-based authentication.
 
-### Optimization Features
-- **Database Indexing**: Optimized queries for large report datasets
-- **Streaming Parsers**: Memory-efficient processing for large files
-- **Frontend Optimization**: Lazy loading and pagination for large tables
-- **Session Caching**: Repeated query optimization
+## 🔒 Security & Compliance
 
-### Health Monitoring
-- **Kubernetes Probes**: Readiness and liveness endpoint monitoring
-- **Database Health**: Connection pool and query performance tracking
-- **File Processing**: Upload size limits and processing time monitoring
-- **Error Tracking**: Structured logging with categorized error handling
+### Data Security
+- All sensitive data encrypted at rest and in transit
+- Secure session management with httpOnly cookies
+- CSRF protection on all state-changing operations
+- SQL injection prevention through parameterized queries
 
-## Deployment
+### Access Control
+- Role-based permissions (Admin/User)
+- Project-level access restrictions
+- Audit logging for security events
+- SSO/SAML integration for enterprise environments
 
-### Production Requirements
-- **Database**: PostgreSQL 12+ with connection pooling
-- **Storage**: Persistent volumes for uploaded report files
-- **Memory**: 2GB+ recommended for large report processing
-- **Security**: TLS termination and security headers configuration
+### Compliance Features
+- Vulnerability tracking and remediation workflows
+- Compliance reporting with historical trends
+- Risk assessment scoring and prioritization
+- Integration with ticketing systems for issue tracking
 
-### Scaling Strategies
-- **Horizontal Scaling**: Multiple application instances with load balancing
-- **Database Optimization**: Read replicas for analytics and reporting queries
-- **File Storage**: Object storage integration for uploaded reports
-- **Caching Layer**: Redis integration for session and query caching
+## 🧪 Testing & Quality
 
-## Troubleshooting
+### Report Format Support
+- **SonarQube**: JSON format from SonarQube API or exported reports
+- **SBOM**: CycloneDX format (JSON/XML) with component vulnerability data
+- **Trivy**: JSON format including vulnerabilities, secrets, and misconfigurations
 
-### Common Issues
-- **Upload Failures**: Verify file format compliance and size limits
-- **SonarQube Connection**: Check server URL and token configuration
-- **Database Connectivity**: Validate connection string and permissions
-- **Chart Rendering**: Ensure JavaScript libraries load correctly
+### Validation
+All uploaded reports are validated for:
+- Correct JSON/XML format
+- Required fields and data structure
+- Security scan completeness
+- Timestamp and versioning information
 
-### Debug Configuration
+## 🤝 Contributing
+
+### Development Setup
 ```bash
-export FLASK_ENV=development
-export LOG_LEVEL=DEBUG
-python main.py
+# Install development dependencies
+pip install -r requirements-dev.txt
+
+# Run tests
+pytest tests/
+
+# Code formatting
+black app.py models.py
+flake8 --max-line-length=88
+
+# Pre-commit hooks
+pre-commit install
 ```
 
-### Log Analysis
-- **Application Logs**: Structured JSON logging for analysis
-- **Database Queries**: Query performance monitoring
-- **Upload Processing**: File validation and parsing error tracking
+### Pull Request Process
+1. Fork the repository and create a feature branch
+2. Implement changes with comprehensive tests
+3. Ensure all security checks pass
+4. Update documentation as needed
+5. Submit pull request with detailed description
 
-## Recent Updates (Current Release)
+## 📄 License
 
-### Enhanced SBOM Processing
-- Improved XML parser with multi-namespace support
-- Component details table with comprehensive metadata
-- License analysis and compliance tracking
-- Enhanced component search and filtering
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-### Trivy Interface Improvements
-- Resizable table containers with sticky headers
-- Enhanced CVE linking and CVSS score display
-- Improved package name styling and severity badges
-- Better mobile responsiveness and compact design
+## 🆘 Support
 
-### User Interface Enhancements
-- Upload buttons for each report type with validation
-- Improved table layouts with space-efficient design
-- Enhanced color contrast and typography
-- Responsive design optimizations
+### Getting Help
+- **Issues**: Create detailed bug reports and feature requests
+- **Discussions**: Community support and questions
+- **Security**: Report vulnerabilities through responsible disclosure
+- **Enterprise**: Contact team for enterprise support and customization
 
-## Contributing
+### Version History
+- **v1.0.0** (Current): Initial production release with security heatmap
+- **v0.9.x**: Beta releases with core functionality
+- **v0.8.x**: Alpha releases with basic report processing
 
-1. **Development Setup**: Follow local development installation guide
-2. **Code Standards**: Maintain consistency with existing patterns
-3. **Testing Requirements**: Include comprehensive tests for new features
-4. **Documentation**: Update relevant documentation sections
-5. **Pull Requests**: Provide detailed descriptions and testing evidence
+---
 
-## License
-
-MIT License - see LICENSE file for comprehensive terms
-
-## Support
-
-- **Issue Tracking**: GitHub repository issue tracker
-- **Documentation**: Comprehensive in-code documentation and examples
-- **Community**: Developer community support and contributions
+**Security Dashboard v1.0.0** - Comprehensive security analysis platform for modern development teams.
