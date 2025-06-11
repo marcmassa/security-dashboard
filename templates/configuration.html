@@ -100,6 +100,76 @@
         margin: 0 !important;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
     }
+    
+    /* Fix grid layout and prevent content from affecting sidebar */
+    .config-row {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 1.5rem !important;
+    }
+    
+    .config-sidebar {
+        flex: 0 0 300px !important;
+        max-width: 300px !important;
+    }
+    
+    .config-content {
+        flex: 1 !important;
+        min-width: 0 !important;
+    }
+    
+    /* Improve content cards styling */
+    .config-content-card {
+        border: none !important;
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important;
+        border-radius: 1rem !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+        overflow: hidden !important;
+    }
+    
+    .config-content-header {
+        background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%) !important;
+        color: #ffffff !important;
+        font-weight: 600 !important;
+        padding: 1rem 1.5rem !important;
+        margin: 0 !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    .config-content-body {
+        padding: 1.5rem !important;
+        background-color: transparent !important;
+    }
+    
+    /* Fix form elements in content area */
+    .config-content .form-control, .config-content .form-select {
+        background-color: rgba(15, 23, 42, 0.8) !important;
+        border: 1px solid #475569 !important;
+        color: #f1f5f9 !important;
+        border-radius: 0.5rem !important;
+    }
+    
+    .config-content .form-control:focus, .config-content .form-select:focus {
+        background-color: rgba(15, 23, 42, 0.9) !important;
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25) !important;
+        color: #ffffff !important;
+    }
+    
+    /* Improve help cards styling */
+    .help-card {
+        background: rgba(30, 41, 59, 0.5) !important;
+        border: 1px solid rgba(75, 85, 99, 0.3) !important;
+        border-radius: 0.75rem !important;
+        transition: all 0.2s ease !important;
+    }
+    
+    .help-card:hover {
+        background: rgba(30, 41, 59, 0.7) !important;
+        border-color: rgba(59, 130, 246, 0.3) !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    }
 </style>
 
 <div class="main-container">
@@ -118,9 +188,9 @@
         </button>
     </div>
 
-    <div class="row">
+    <div class="config-row">
         <!-- Navigation Sidebar -->
-        <div class="col-lg-3 col-md-4 mb-4">
+        <div class="config-sidebar">
             <div class="config-nav-card h-100">
                 <div class="config-nav-title">
                     <i data-feather="settings" class="me-2"></i>
@@ -157,17 +227,17 @@
         </div>
 
         <!-- Main Content -->
-        <div class="col-lg-9 col-md-8">
+        <div class="config-content">
             <!-- General Settings Section -->
             <div id="general-section" class="config-section">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">
+                <div class="config-content-card mb-4">
+                    <div class="config-content-header">
+                        <h5 class="mb-0">
                             <i data-feather="sliders" class="me-2"></i>
                             General Settings
                         </h5>
                     </div>
-                    <div class="card-body">
+                    <div class="config-content-body">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
@@ -225,14 +295,14 @@
 
             <!-- SonarQube Integration Section -->
             <div id="sonarqube-section" class="config-section" style="display: none;">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">
+                <div class="config-content-card mb-4">
+                    <div class="config-content-header">
+                        <h5 class="mb-0">
                             <i data-feather="server" class="me-2"></i>
                             SonarQube Server Integration
                         </h5>
                     </div>
-                    <div class="card-body">
+                    <div class="config-content-body">
                         <div class="alert alert-info">
                             <i data-feather="info" class="me-2"></i>
                             Configure your SonarQube server connection to enable direct API integration and real-time data fetching.
@@ -287,13 +357,13 @@
                         <!-- Help Section -->
                         <div class="row mt-4">
                             <div class="col-md-6">
-                                <div class="card border">
+                                <div class="help-card">
                                     <div class="card-body">
                                         <h6 class="card-title text-primary">
                                             <i data-feather="key" class="me-2"></i>
                                             Creating Authentication Tokens
                                         </h6>
-                                        <ol class="small mb-0 text-body">
+                                        <ol class="small mb-0">
                                             <li>Log into your SonarQube instance</li>
                                             <li>Go to <strong>User → My Account</strong></li>
                                             <li>Click <strong>Security</strong> tab</li>
@@ -304,13 +374,13 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="card border">
+                                <div class="help-card">
                                     <div class="card-body">
                                         <h6 class="card-title text-success">
                                             <i data-feather="shield" class="me-2"></i>
                                             Required Permissions
                                         </h6>
-                                        <ul class="small mb-0 text-body">
+                                        <ul class="small mb-0">
                                             <li><strong>Browse</strong> - View project metrics</li>
                                             <li><strong>Execute Analysis</strong> - Access detailed reports</li>
                                             <li><strong>Admin</strong> - Full project access (recommended)</li>
@@ -325,14 +395,14 @@
 
             <!-- SSO/SAML Section -->
             <div id="sso-section" class="config-section" style="display: none;">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">
+                <div class="config-content-card mb-4">
+                    <div class="config-content-header">
+                        <h5 class="mb-0">
                             <i data-feather="users" class="me-2"></i>
                             SSO/SAML Authentication
                         </h5>
                     </div>
-                    <div class="card-body">
+                    <div class="config-content-body">
                         <div class="alert alert-warning">
                             <i data-feather="clock" class="me-2"></i>
                             This feature is coming soon. SSO/SAML authentication integration will be available in a future update.
@@ -343,14 +413,14 @@
 
             <!-- Notifications Section -->
             <div id="notifications-section" class="config-section" style="display: none;">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">
+                <div class="config-content-card mb-4">
+                    <div class="config-content-header">
+                        <h5 class="mb-0">
                             <i data-feather="bell" class="me-2"></i>
                             Notifications
                         </h5>
                     </div>
-                    <div class="card-body">
+                    <div class="config-content-body">
                         <div class="alert alert-warning">
                             <i data-feather="clock" class="me-2"></i>
                             Notification settings will be available in a future update.
@@ -361,14 +431,14 @@
 
             <!-- Security Settings Section -->
             <div id="security-section" class="config-section" style="display: none;">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">
+                <div class="config-content-card mb-4">
+                    <div class="config-content-header">
+                        <h5 class="mb-0">
                             <i data-feather="shield" class="me-2"></i>
                             Security Settings
                         </h5>
                     </div>
-                    <div class="card-body">
+                    <div class="config-content-body">
                         <div class="alert alert-warning">
                             <i data-feather="clock" class="me-2"></i>
                             Advanced security settings will be available in a future update.
