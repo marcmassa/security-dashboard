@@ -21,15 +21,60 @@
         font-weight: 500 !important;
     }
     
-    .navbar .navbar-text, .navbar .nav-link, .navbar .navbar-brand {
+    .navbar .navbar-text, .navbar .nav-link {
         color: #ffffff !important;
     }
     
-    /* Ensure main container text is visible */
-    .main-container h1, .main-container h2, .main-container h3, 
+    /* Keep Security Dashboard brand color as original */
+    .navbar .navbar-brand {
+        color: inherit;
+    }
+    
+    /* Ensure main container text is visible - but exclude navbar */
+    .main-container h1:not(.navbar h1), .main-container h2, .main-container h3, 
     .main-container h4, .main-container h5, .main-container h6,
     .main-container p:not(.card p), .main-container span:not(.card span) {
         color: #f1f5f9 !important;
+    }
+    
+    /* Fix navigation menu styling */
+    .list-group-item {
+        background-color: #374151 !important;
+        border: 1px solid #4b5563 !important;
+        color: #f9fafb !important;
+        border-radius: 0.5rem !important;
+        margin-bottom: 0.25rem !important;
+        padding: 0.75rem 1rem !important;
+        transition: all 0.2s ease !important;
+    }
+    
+    .list-group-item:hover {
+        background-color: #4b5563 !important;
+        color: #ffffff !important;
+        transform: translateX(4px) !important;
+    }
+    
+    .list-group-item.active {
+        background-color: #3b82f6 !important;
+        border-color: #3b82f6 !important;
+        color: #ffffff !important;
+    }
+    
+    .list-group-flush .list-group-item {
+        border-left: 0 !important;
+        border-right: 0 !important;
+    }
+    
+    .list-group-flush .list-group-item:first-child {
+        border-top: 0 !important;
+        border-top-left-radius: 0.5rem !important;
+        border-top-right-radius: 0.5rem !important;
+    }
+    
+    .list-group-flush .list-group-item:last-child {
+        border-bottom: 0 !important;
+        border-bottom-left-radius: 0.5rem !important;
+        border-bottom-right-radius: 0.5rem !important;
     }
 </style>
 
@@ -1033,19 +1078,21 @@ document.addEventListener('DOMContentLoaded', function() {
             button.style.setProperty('color', '#000000', 'important');
         });
         
-        // Fix page title and subtitle with multiple selectors
-        const pageTitles = document.querySelectorAll('h1, .dashboard-title, h1.dashboard-title');
-        pageTitles.forEach(title => {
-            title.style.setProperty('color', '#ffffff', 'important');
-            title.style.setProperty('font-weight', '700', 'important');
-            title.style.setProperty('font-size', '2.5rem', 'important');
-        });
+        // Specifically fix Configuration page title and subtitle only
+        const configTitle = document.querySelector('.main-container .dashboard-title');
+        if (configTitle && configTitle.textContent.includes('Configuration')) {
+            configTitle.style.setProperty('color', '#ffffff', 'important');
+            configTitle.style.setProperty('font-weight', '700', 'important');
+            configTitle.style.setProperty('font-size', '2.5rem', 'important');
+            configTitle.style.setProperty('text-shadow', '1px 1px 2px rgba(0,0,0,0.5)', 'important');
+        }
         
-        const pageSubtitles = document.querySelectorAll('p.text-muted, .dashboard-subtitle, p.dashboard-subtitle');
-        pageSubtitles.forEach(subtitle => {
-            subtitle.style.setProperty('color', '#94a3b8', 'important');
-            subtitle.style.setProperty('font-size', '1.125rem', 'important');
-        });
+        const configSubtitle = document.querySelector('.main-container .dashboard-subtitle');
+        if (configSubtitle && configSubtitle.textContent.includes('Manage system settings')) {
+            configSubtitle.style.setProperty('color', '#94a3b8', 'important');
+            configSubtitle.style.setProperty('font-size', '1.125rem', 'important');
+            configSubtitle.style.setProperty('text-shadow', '1px 1px 2px rgba(0,0,0,0.3)', 'important');
+        }
         
         // Force all text in main container to be visible
         const mainContainer = document.querySelector('.main-container');
@@ -1065,9 +1112,9 @@ document.addEventListener('DOMContentLoaded', function() {
             adminIndicator.style.setProperty('font-weight', '500', 'important');
         }
         
-        // Fix all navbar elements
-        const navbarElements = document.querySelectorAll('.navbar .navbar-text, .navbar .nav-link, .navbar .navbar-brand');
-        navbarElements.forEach(element => {
+        // Fix navbar elements but preserve brand color
+        const navbarTexts = document.querySelectorAll('.navbar .navbar-text, .navbar .nav-link');
+        navbarTexts.forEach(element => {
             element.style.setProperty('color', '#ffffff', 'important');
         });
         
