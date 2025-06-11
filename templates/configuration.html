@@ -6,7 +6,7 @@
 <style>
     /* Force visibility of critical elements */
     .dashboard-title, h1.dashboard-title {
-        color: #ffffff !important;
+        color: #000000 !important;
         font-weight: 700 !important;
         font-size: 2.5rem !important;
     }
@@ -35,6 +35,30 @@
     .main-container h4, .main-container h5, .main-container h6,
     .main-container p:not(.card p), .main-container span:not(.card span) {
         color: #f1f5f9 !important;
+    }
+    
+    /* Apply consistent header styling like home page */
+    .dashboard-header {
+        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%) !important;
+        border-radius: 1rem !important;
+        padding: 2rem !important;
+        margin-bottom: 2rem !important;
+        text-align: center !important;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+    }
+    
+    .dashboard-header .dashboard-title {
+        color: #ffffff !important;
+        margin-bottom: 0.5rem !important;
+        font-weight: 700 !important;
+        font-size: 2.5rem !important;
+    }
+    
+    .dashboard-header .dashboard-subtitle {
+        color: #dbeafe !important;
+        margin-bottom: 0 !important;
+        font-size: 1.125rem !important;
+        opacity: 0.9 !important;
     }
     
     /* Fix navigation menu styling */
@@ -1078,20 +1102,32 @@ document.addEventListener('DOMContentLoaded', function() {
             button.style.setProperty('color', '#000000', 'important');
         });
         
-        // Specifically fix Configuration page title and subtitle only
-        const configTitle = document.querySelector('.main-container .dashboard-title');
-        if (configTitle && configTitle.textContent.includes('Configuration')) {
+        // Apply header styling consistent with home page
+        const header = document.querySelector('.dashboard-header');
+        if (header) {
+            header.style.setProperty('background', 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)', 'important');
+            header.style.setProperty('border-radius', '1rem', 'important');
+            header.style.setProperty('padding', '2rem', 'important');
+            header.style.setProperty('margin-bottom', '2rem', 'important');
+            header.style.setProperty('text-align', 'center', 'important');
+            header.style.setProperty('box-shadow', '0 10px 25px rgba(0, 0, 0, 0.15)', 'important');
+        }
+        
+        // Fix title and subtitle in header context
+        const configTitle = document.querySelector('.dashboard-header .dashboard-title');
+        if (configTitle) {
             configTitle.style.setProperty('color', '#ffffff', 'important');
             configTitle.style.setProperty('font-weight', '700', 'important');
             configTitle.style.setProperty('font-size', '2.5rem', 'important');
-            configTitle.style.setProperty('text-shadow', '1px 1px 2px rgba(0,0,0,0.5)', 'important');
+            configTitle.style.setProperty('margin-bottom', '0.5rem', 'important');
         }
         
-        const configSubtitle = document.querySelector('.main-container .dashboard-subtitle');
-        if (configSubtitle && configSubtitle.textContent.includes('Manage system settings')) {
-            configSubtitle.style.setProperty('color', '#94a3b8', 'important');
+        const configSubtitle = document.querySelector('.dashboard-header .dashboard-subtitle');
+        if (configSubtitle) {
+            configSubtitle.style.setProperty('color', '#dbeafe', 'important');
             configSubtitle.style.setProperty('font-size', '1.125rem', 'important');
-            configSubtitle.style.setProperty('text-shadow', '1px 1px 2px rgba(0,0,0,0.3)', 'important');
+            configSubtitle.style.setProperty('margin-bottom', '0', 'important');
+            configSubtitle.style.setProperty('opacity', '0.9', 'important');
         }
         
         // Force all text in main container to be visible
