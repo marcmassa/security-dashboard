@@ -4,20 +4,20 @@
 
 {% block content %}
 <div class="main-container">
-    <!-- Header -->
-    <div class="dashboard-header">
-        <h1 class="dashboard-title">Security Analysis Dashboard</h1>
-        <p class="dashboard-subtitle">
-            Manage your security analysis projects
-        </p>
-    </div>
-
-    <!-- Create Project Button -->
-    <div class="text-center mb-4">
-        <a href="{{ url_for('create_project_route') }}" class="btn btn-primary btn-lg">
-            <i data-feather="plus-circle"></i>
-            Create New Project
-        </a>
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="page-header-content">
+            <div class="page-title-section">
+                <h1 class="page-title">Security Analysis Dashboard</h1>
+                <p class="page-subtitle">Manage your security analysis projects and monitor security posture</p>
+            </div>
+            <div class="page-actions">
+                <a href="{{ url_for('create_project_route') }}" class="btn btn-primary">
+                    <i data-feather="plus-circle" class="me-1"></i>
+                    Create New Project
+                </a>
+            </div>
+        </div>
     </div>
 
     <!-- Projects Grid -->

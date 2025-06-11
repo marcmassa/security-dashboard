@@ -193,18 +193,31 @@
 
 <div class="main-container">
     <!-- Page Header -->
-    <div class="dashboard-header">
-        <h1 class="dashboard-title">Configuration</h1>
-        <p class="dashboard-subtitle">
-            Manage system settings and integrations
-        </p>
-    </div>
-    
-    <div class="d-flex justify-content-end mb-4">
-        <button class="btn btn-primary" onclick="saveAllConfiguration()">
-            <i data-feather="save" class="me-1"></i>
-            Save All Changes
-        </button>
+    <div class="page-header">
+        <div class="page-header-content">
+            <div class="page-title-section">
+                <div class="breadcrumb-nav">
+                    <a href="{{ url_for('home') }}" class="breadcrumb-link">
+                        <i data-feather="home" class="me-1"></i>
+                        Dashboard
+                    </a>
+                    <i data-feather="chevron-right" class="breadcrumb-separator"></i>
+                    <span class="breadcrumb-current">Configuration</span>
+                </div>
+                <h1 class="page-title">System Configuration</h1>
+                <p class="page-subtitle">Manage integrations, authentication, and system-wide settings</p>
+            </div>
+            <div class="page-actions">
+                <button class="btn btn-outline-secondary me-2" onclick="resetAllConfiguration()">
+                    <i data-feather="refresh-cw" class="me-1"></i>
+                    Reset
+                </button>
+                <button class="btn btn-primary" onclick="saveAllConfiguration()">
+                    <i data-feather="save" class="me-1"></i>
+                    Save Changes
+                </button>
+            </div>
+        </div>
     </div>
 
     <div class="config-row">

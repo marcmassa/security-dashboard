@@ -3,6 +3,40 @@
 {% block title %}SBOM Report Details - Security Dashboard{% endblock %}
 
 {% block content %}
+<div class="detail-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="page-header-content">
+            <div class="page-title-section">
+                <div class="breadcrumb-nav">
+                    <a href="{{ url_for('home') }}" class="breadcrumb-link">
+                        <i data-feather="home" class="me-1"></i>
+                        Dashboard
+                    </a>
+                    <i data-feather="chevron-right" class="breadcrumb-separator"></i>
+                    {% if project %}
+                    <a href="{{ url_for('project_dashboard', project_id=project.id) }}" class="breadcrumb-link">{{ project.name }}</a>
+                    <i data-feather="chevron-right" class="breadcrumb-separator"></i>
+                    {% endif %}
+                    <span class="breadcrumb-current">SBOM Analysis</span>
+                </div>
+                <h1 class="page-title">SBOM Report</h1>
+                <p class="page-subtitle">Software Bill of Materials analysis and component dependency tracking</p>
+            </div>
+            <div class="page-actions">
+                <button class="btn btn-outline-secondary me-2" onclick="exportToPDF()">
+                    <i data-feather="download" class="me-1"></i>
+                    Export PDF
+                </button>
+                <button class="btn btn-primary" onclick="window.print()">
+                    <i data-feather="printer" class="me-1"></i>
+                    Print Report
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <style>
 #component-details-table {
     font-size: 0.875rem;

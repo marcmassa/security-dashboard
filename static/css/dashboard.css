@@ -397,8 +397,148 @@
   left: 0 !important;
 }
 
+/* Unified Page Header Styling */
+.page-header {
+  background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%) !important;
+  color: #ffffff !important;
+  padding: 2rem 0 !important;
+  margin: -1rem -1rem 2rem -1rem !important;
+  border-radius: 0 0 1rem 1rem !important;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2) !important;
+}
+
+.page-header-content {
+  max-width: 1200px !important;
+  margin: 0 auto !important;
+  padding: 0 2rem !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 1.5rem !important;
+}
+
+.page-title-section {
+  flex: 1 !important;
+  min-width: 300px !important;
+}
+
+.breadcrumb-nav {
+  display: flex !important;
+  align-items: center !important;
+  margin-bottom: 0.75rem !important;
+  opacity: 0.9 !important;
+}
+
+.breadcrumb-link {
+  color: #ffffff !important;
+  text-decoration: none !important;
+  display: flex !important;
+  align-items: center !important;
+  transition: opacity 0.2s ease !important;
+  font-size: 0.9rem !important;
+}
+
+.breadcrumb-link:hover {
+  opacity: 0.8 !important;
+  color: #ffffff !important;
+}
+
+.breadcrumb-separator {
+  width: 16px !important;
+  height: 16px !important;
+  margin: 0 0.5rem !important;
+  opacity: 0.7 !important;
+}
+
+.breadcrumb-current {
+  color: #ffffff !important;
+  font-weight: 500 !important;
+  font-size: 0.9rem !important;
+}
+
+.page-title {
+  font-size: 2.5rem !important;
+  font-weight: 700 !important;
+  margin: 0 0 0.5rem 0 !important;
+  color: #ffffff !important;
+  line-height: 1.2 !important;
+}
+
+.page-subtitle {
+  font-size: 1.1rem !important;
+  margin: 0 !important;
+  opacity: 0.9 !important;
+  line-height: 1.4 !important;
+  color: #ffffff !important;
+}
+
+.page-actions {
+  display: flex !important;
+  gap: 0.75rem !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+}
+
+.page-actions .btn {
+  padding: 0.75rem 1.5rem !important;
+  font-weight: 600 !important;
+  border-radius: 0.5rem !important;
+  transition: all 0.2s ease !important;
+  white-space: nowrap !important;
+}
+
+.page-actions .btn-primary {
+  background: #ffffff !important;
+  border: 1px solid #ffffff !important;
+  color: #3b82f6 !important;
+}
+
+.page-actions .btn-primary:hover {
+  background: #f8fafc !important;
+  border-color: #f8fafc !important;
+  color: #1e40af !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3) !important;
+}
+
+.page-actions .btn-outline-secondary {
+  background: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  color: #ffffff !important;
+}
+
+.page-actions .btn-outline-secondary:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+  color: #ffffff !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Override old dashboard header styles */
+.dashboard-header,
+.dashboard-title,
+.dashboard-subtitle {
+  display: none !important;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
+  .page-header-content {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    text-align: left !important;
+  }
+  
+  .page-title {
+    font-size: 2rem !important;
+  }
+  
+  .page-actions {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+  
   .create-project-sidebar {
     position: relative !important;
     width: 100% !important;
