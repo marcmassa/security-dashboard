@@ -92,12 +92,14 @@ def create_project_route():
     if request.method == 'POST':
         project_name = request.form.get('project_name', '').strip()
         if not project_name:
-            flash('Project name is required.', 'error')
-            return render_template('create_project.html', user=user_context)
+            return jsonify({'success': False, 'message': 'Project name is required.'}), 400
         
         project_id = create_project(project_name)
-        flash(f'Project "{project_name}" created successfully.', 'success')
-        return redirect(url_for('project_dashboard', project_id=project_id))
+        return jsonify({
+            'success': True, 
+            'message': f'Project "{project_name}" created successfully.',
+            'redirect_url': url_for('project_dashboard', project_id=project_id)
+        })
     
     return render_template('create_project.html', user=user_context)
 

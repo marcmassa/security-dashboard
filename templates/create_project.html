@@ -238,57 +238,70 @@ document.addEventListener('DOMContentLoaded', function() {
         projectNameInput.focus();
     }
     
-    // Form validation enhancement
+    // Form validation and AJAX submission
     const form = document.querySelector('.project-form');
     if (form) {
-        form.addEventListener('submit', function(e) {
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
             const projectName = document.getElementById('project_name').value.trim();
             if (!projectName) {
-                e.preventDefault();
-                showNotification('error', 'Please enter a project name');
+                if (window.notificationManager) {
+                    window.notificationManager.error('Please enter a project name');
+                }
                 return false;
             }
             
             // Show loading state
             const submitBtn = form.querySelector('button[type="submit"]');
-            if (submitBtn) {
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i data-feather="loader" class="me-1"></i>Creating...';
+            const originalContent = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i data-feather="loader" class="me-1"></i>Creating...';
+            feather.replace();
+            
+            try {
+                const formData = new FormData(form);
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    if (window.notificationManager) {
+                        window.notificationManager.success(result.message);
+                    }
+                    // Redirect after a short delay to show the notification
+                    setTimeout(() => {
+                        window.location.href = result.redirect_url;
+                    }, 1000);
+                } else {
+                    if (window.notificationManager) {
+                        window.notificationManager.error(result.message);
+                    }
+                    // Restore button state
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalContent;
+                    feather.replace();
+                }
+            } catch (error) {
+                console.error('Error creating project:', error);
+                if (window.notificationManager) {
+                    window.notificationManager.error('An error occurred while creating the project');
+                }
+                // Restore button state
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalContent;
                 feather.replace();
             }
         });
     }
 });
 
-// Notification function (if not already available)
-function showNotification(type, message) {
-    // Create notification if it doesn't exist
-    let notification = document.querySelector('.notification-container');
-    if (!notification) {
-        notification = document.createElement('div');
-        notification.className = 'notification-container position-fixed top-0 end-0 p-3';
-        notification.style.zIndex = '1055';
-        document.body.appendChild(notification);
-    }
-    
-    const alertClass = type === 'error' ? 'alert-danger' : 'alert-success';
-    const alertHtml = `
-        <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    `;
-    
-    notification.innerHTML = alertHtml;
-    
-    // Auto-hide after 3 seconds
-    setTimeout(() => {
-        const alert = notification.querySelector('.alert');
-        if (alert) {
-            alert.classList.remove('show');
-            setTimeout(() => alert.remove(), 150);
-        }
-    }, 3000);
+// Initialize notification system
+if (typeof NotificationManager !== 'undefined') {
+    window.notificationManager = new NotificationManager();
 }
 </script>
 {% endblock %}

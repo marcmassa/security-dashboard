@@ -1,9 +1,11 @@
-// Global state
-let uploadedReports = {
-    sonarqube: false,
-    sbom: false,
-    trivy: false
-};
+// Dashboard module to avoid global variable conflicts
+const DashboardModule = (function() {
+    // Private state
+    let uploadedReports = {
+        sonarqube: false,
+        sbom: false,
+        trivy: false
+    };
 
 // Initialize dashboard
 document.addEventListener('DOMContentLoaded', function() {
@@ -329,7 +331,7 @@ function createSBOMChart(data) {
     
     canvas.chart = new Chart(ctx, {
         type: 'doughnut',
-        data: data,
+        data: chartConfig,
         options: {
             responsive: true,
             maintainAspectRatio: false,
