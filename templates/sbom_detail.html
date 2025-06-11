@@ -23,6 +23,28 @@
             </div>
         </div>
     </div>
+
+    <!-- Project Navigation -->
+    <div class="project-nav-section">
+        <div class="project-nav-tabs">
+            <a href="{{ url_for('project_dashboard', project_id=project.id) }}" class="project-nav-tab">
+                <i data-feather="bar-chart-2" class="me-1"></i>
+                Overview
+            </a>
+            <a href="{{ url_for('project_sonarqube_detail', project_id=project.id) }}" class="project-nav-tab">
+                <i data-feather="code" class="me-1"></i>
+                SonarQube
+            </a>
+            <a href="{{ url_for('project_sbom_detail', project_id=project.id) }}" class="project-nav-tab active">
+                <i data-feather="package" class="me-1"></i>
+                SBOM
+            </a>
+            <a href="{{ url_for('project_trivy_detail', project_id=project.id) }}" class="project-nav-tab">
+                <i data-feather="alert-triangle" class="me-1"></i>
+                Trivy
+            </a>
+        </div>
+    </div>
 </div>
 
 <style>
