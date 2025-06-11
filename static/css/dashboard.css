@@ -1192,6 +1192,62 @@ body {
   border: 1px solid hsl(var(--border)) !important;
 }
 
+/* ===== SPECIFIC FIXES FOR CONFIGURATION PAGE GREY BARS ===== */
+
+/* Force card headers to be blue with white text - highest specificity */
+body[data-bs-theme="dark"] .card .card-header,
+html[data-bs-theme="dark"] .card .card-header,
+[data-bs-theme="dark"] .card .card-header {
+  background-color: #3b82f6 !important; /* Direct blue color */
+  background: #3b82f6 !important;
+  color: #ffffff !important;
+  border-bottom: 1px solid #334155 !important;
+  border-radius: 12px 12px 0 0 !important;
+}
+
+/* Force header text and icons to be white */
+body[data-bs-theme="dark"] .card-header *,
+html[data-bs-theme="dark"] .card-header *,
+[data-bs-theme="dark"] .card-header * {
+  color: #ffffff !important;
+}
+
+/* Force list group items to have white text */
+body[data-bs-theme="dark"] .list-group-item,
+html[data-bs-theme="dark"] .list-group-item,
+[data-bs-theme="dark"] .list-group-item {
+  background-color: #1e293b !important;
+  color: #ffffff !important;
+  border: 1px solid #334155 !important;
+  border-radius: 8px !important;
+  margin-bottom: 4px !important;
+}
+
+/* Force active and hover states */
+body[data-bs-theme="dark"] .list-group-item.active,
+html[data-bs-theme="dark"] .list-group-item.active,
+[data-bs-theme="dark"] .list-group-item.active {
+  background-color: #3b82f6 !important;
+  border-color: #3b82f6 !important;
+  color: #ffffff !important;
+}
+
+body[data-bs-theme="dark"] .list-group-item:hover,
+html[data-bs-theme="dark"] .list-group-item:hover,
+[data-bs-theme="dark"] .list-group-item:hover {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+}
+
+/* Force all cards to have rounded corners */
+body[data-bs-theme="dark"] .card,
+html[data-bs-theme="dark"] .card,
+[data-bs-theme="dark"] .card {
+  border-radius: 12px !important;
+  border: 1px solid #334155 !important;
+  overflow: hidden !important;
+}
+
 /* Override Bootstrap's text utilities for dark theme */
 [data-bs-theme="dark"] .text-dark {
   color: hsl(var(--text-on-dark)) !important;

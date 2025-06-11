@@ -901,5 +901,73 @@ function showToast(message, type = 'info') {
     const bsToast = new bootstrap.Toast(toast);
     bsToast.show();
 }
+
+// Force configuration styling after DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    function forceConfigurationStyling() {
+        // Force card headers to be blue with white text
+        const cardHeaders = document.querySelectorAll('.card-header');
+        cardHeaders.forEach(header => {
+            header.style.setProperty('background-color', '#3b82f6', 'important');
+            header.style.setProperty('color', '#ffffff', 'important');
+            header.style.setProperty('border-bottom', '1px solid #334155', 'important');
+            header.style.setProperty('border-radius', '12px 12px 0 0', 'important');
+            
+            const children = header.querySelectorAll('*');
+            children.forEach(child => {
+                child.style.setProperty('color', '#ffffff', 'important');
+            });
+        });
+        
+        // Force list group items to have white text
+        const listItems = document.querySelectorAll('.list-group-item');
+        listItems.forEach(item => {
+            item.style.setProperty('background-color', '#1e293b', 'important');
+            item.style.setProperty('color', '#ffffff', 'important');
+            item.style.setProperty('border', '1px solid #334155', 'important');
+            item.style.setProperty('border-radius', '8px', 'important');
+            item.style.setProperty('margin-bottom', '4px', 'important');
+            
+            if (item.classList.contains('active')) {
+                item.style.setProperty('background-color', '#3b82f6', 'important');
+                item.style.setProperty('border-color', '#3b82f6', 'important');
+            }
+        });
+        
+        // Force all cards to have rounded corners
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+            card.style.setProperty('border-radius', '12px', 'important');
+            card.style.setProperty('border', '1px solid #334155', 'important');
+            card.style.setProperty('overflow', 'hidden', 'important');
+        });
+        
+        // Force headings to be white
+        const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6, .card-title, .form-label');
+        headings.forEach(heading => {
+            heading.style.setProperty('color', '#ffffff', 'important');
+            heading.style.setProperty('font-weight', '600', 'important');
+        });
+        
+        // Force muted text to be visible
+        const mutedElements = document.querySelectorAll('.text-muted, .form-text');
+        mutedElements.forEach(element => {
+            element.style.setProperty('color', '#cbd5e1', 'important');
+        });
+        
+        // Force form controls styling
+        const formControls = document.querySelectorAll('.form-control, .form-select');
+        formControls.forEach(control => {
+            control.style.setProperty('background-color', '#1e293b', 'important');
+            control.style.setProperty('color', '#ffffff', 'important');
+            control.style.setProperty('border', '1px solid #334155', 'important');
+            control.style.setProperty('border-radius', '8px', 'important');
+        });
+    }
+    
+    forceConfigurationStyling();
+    setTimeout(forceConfigurationStyling, 100);
+    setTimeout(forceConfigurationStyling, 500);
+});
 </script>
 {% endblock %}
