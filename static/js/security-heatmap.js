@@ -132,78 +132,134 @@ class SecurityHeatmap {
     }
 
     renderTreeMap(container) {
-        // Create a D3.js treemap visualization
-        container.innerHTML = '<div class="treemap-container"><canvas id="treemap-canvas"></canvas></div>';
+        if (!container) return;
+        
+        // Create a treemap visualization
+        container.innerHTML = '<div class="treemap-container"><canvas id="treemap-canvas" width="800" height="400"></canvas></div>';
         
         if (!this.currentData) return;
         
-        const canvas = document.getElementById('treemap-canvas');
-        const ctx = canvas.getContext('2d');
-        
-        // Set canvas size
-        canvas.width = container.offsetWidth;
-        canvas.height = 400;
-        
-        // Simple treemap implementation
-        const projects = this.currentData.projects || [];
-        this.drawTreeMap(ctx, projects, canvas.width, canvas.height);
+        // Wait for DOM update
+        setTimeout(() => {
+            const canvas = document.getElementById('treemap-canvas');
+            if (!canvas) {
+                console.warn('Treemap canvas not found');
+                return;
+            }
+            
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+                console.warn('Canvas context not available');
+                return;
+            }
+            
+            // Set canvas size
+            canvas.width = container.offsetWidth || 800;
+            canvas.height = 400;
+            
+            // Simple treemap implementation
+            const projects = this.currentData.projects || [];
+            this.drawTreeMap(ctx, projects, canvas.width, canvas.height);
+        }, 100);
     }
 
     renderBubbleChart(container) {
-        container.innerHTML = '<div class="bubble-container"><canvas id="bubble-canvas"></canvas></div>';
+        if (!container) return;
+        
+        container.innerHTML = '<div class="bubble-container"><canvas id="bubble-canvas" width="800" height="400"></canvas></div>';
         
         if (!this.currentData) return;
         
-        const canvas = document.getElementById('bubble-canvas');
-        const ctx = canvas.getContext('2d');
-        
-        canvas.width = container.offsetWidth;
-        canvas.height = 400;
-        
-        const projects = this.currentData.projects || [];
-        this.drawBubbleChart(ctx, projects, canvas.width, canvas.height);
+        // Wait for DOM update
+        setTimeout(() => {
+            const canvas = document.getElementById('bubble-canvas');
+            if (!canvas) {
+                console.warn('Bubble chart canvas not found');
+                return;
+            }
+            
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+                console.warn('Canvas context not available');
+                return;
+            }
+            
+            canvas.width = container.offsetWidth || 800;
+            canvas.height = 400;
+            
+            const projects = this.currentData.projects || [];
+            this.drawBubbleChart(ctx, projects, canvas.width, canvas.height);
+        }, 100);
     }
 
     drawTreeMap(ctx, projects, width, height) {
-        const cellWidth = width / Math.ceil(Math.sqrt(projects.length));
-        const cellHeight = height / Math.ceil(projects.length / Math.ceil(Math.sqrt(projects.length)));
+        if (!projects || projects.length === 0) {
+            ctx.fillStyle = '#94a3b8';
+            ctx.fillRect(0, 0, width, height);
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('No project data available', width/2, height/2);
+            return;
+        }
+        
+        const cols = Math.ceil(Math.sqrt(projects.length));
+        const rows = Math.ceil(projects.length / cols);
+        const cellWidth = width / cols;
+        const cellHeight = height / rows;
         
         projects.forEach((project, index) => {
-            const row = Math.floor(index / Math.ceil(Math.sqrt(projects.length)));
-            const col = index % Math.ceil(Math.sqrt(projects.length));
+            const row = Math.floor(index / cols);
+            const col = index % cols;
             
             const x = col * cellWidth;
             const y = row * cellHeight;
             
-            const overallRisk = this.calculateOverallRisk(project.risks);
+            const overallRisk = this.calculateOverallRisk(project.risks || {});
             const color = this.getRiskColor(overallRisk);
             
             ctx.fillStyle = color;
             ctx.fillRect(x, y, cellWidth - 2, cellHeight - 2);
             
-            // Add text
+            // Add text with better positioning
             ctx.fillStyle = '#ffffff';
-            ctx.font = '12px Arial';
+            ctx.font = `${Math.min(12, cellWidth/8)}px Arial`;
             ctx.textAlign = 'center';
-            ctx.fillText(project.name, x + cellWidth/2, y + cellHeight/2 - 10);
+            ctx.fillText(project.name || 'Unknown', x + cellWidth/2, y + cellHeight/2 - 5);
             ctx.fillText(overallRisk.toString(), x + cellWidth/2, y + cellHeight/2 + 10);
         });
     }
 
     drawBubbleChart(ctx, projects, width, height) {
+        if (!projects || projects.length === 0) {
+            ctx.fillStyle = '#94a3b8';
+            ctx.fillRect(0, 0, width, height);
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('No project data available', width/2, height/2);
+            return;
+        }
+        
         const centerX = width / 2;
         const centerY = height / 2;
         const maxRadius = Math.min(width, height) / 8;
         
         projects.forEach((project, index) => {
-            const overallRisk = this.calculateOverallRisk(project.risks);
-            const radius = (overallRisk / 10) * maxRadius + 10;
+            const overallRisk = this.calculateOverallRisk(project.risks || {});
+            const radius = Math.max(15, (overallRisk / 10) * maxRadius + 10);
             
-            // Position bubbles in a circle
-            const angle = (index / projects.length) * 2 * Math.PI;
-            const distance = Math.min(width, height) / 4;
-            const x = centerX + Math.cos(angle) * distance;
-            const y = centerY + Math.sin(angle) * distance;
+            // Position bubbles in a circle or grid for better spacing
+            let x, y;
+            if (projects.length === 1) {
+                x = centerX;
+                y = centerY;
+            } else {
+                const angle = (index / projects.length) * 2 * Math.PI;
+                const distance = Math.min(width, height) / 4;
+                x = centerX + Math.cos(angle) * distance;
+                y = centerY + Math.sin(angle) * distance;
+            }
             
             const color = this.getRiskColor(overallRisk);
             
@@ -216,11 +272,12 @@ class SecurityHeatmap {
             ctx.lineWidth = 2;
             ctx.stroke();
             
-            // Add text
+            // Add text with size constraints
             ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 12px Arial';
+            ctx.font = `bold ${Math.min(12, radius/3)}px Arial`;
             ctx.textAlign = 'center';
-            ctx.fillText(project.name, x, y - 5);
+            const projectName = (project.name || 'Unknown').substring(0, 10);
+            ctx.fillText(projectName, x, y - 5);
             ctx.fillText(overallRisk.toString(), x, y + 8);
         });
     }
@@ -276,7 +333,11 @@ class SecurityHeatmap {
         });
         
         tbody.innerHTML = html;
-        feather.replace();
+        
+        // Safely replace feather icons
+        if (typeof feather !== 'undefined' && feather.replace) {
+            feather.replace();
+        }
     }
 
     generateInsights() {
@@ -333,12 +394,25 @@ class SecurityHeatmap {
         
         html += '</div>';
         insights.innerHTML = html;
-        feather.replace();
+        
+        // Safely replace feather icons
+        if (typeof feather !== 'undefined' && feather.replace) {
+            feather.replace();
+        }
     }
 
     initializeCharts() {
         const ctx = document.getElementById('risk-timeline-chart');
-        if (!ctx) return;
+        if (!ctx) {
+            console.warn('Risk timeline chart canvas not found');
+            return;
+        }
+        
+        // Check if Chart.js is loaded
+        if (typeof Chart === 'undefined') {
+            console.error('Chart.js library not loaded');
+            return;
+        }
         
         this.riskScoreChart = new Chart(ctx, {
             type: 'line',
@@ -479,6 +553,11 @@ class SecurityHeatmap {
 
     showError(message) {
         const container = document.getElementById('heatmap-grid');
+        if (!container) {
+            console.error('Heatmap container not found');
+            return;
+        }
+        
         container.innerHTML = `
             <div class="error-state">
                 <i data-feather="alert-circle" class="error-icon"></i>
@@ -487,7 +566,11 @@ class SecurityHeatmap {
                 <button class="btn btn-primary btn-sm" onclick="heatmap.loadInitialData()">Retry</button>
             </div>
         `;
-        feather.replace();
+        
+        // Safely replace feather icons
+        if (typeof feather !== 'undefined' && feather.replace) {
+            feather.replace();
+        }
     }
 
     showRiskDetails(data) {
