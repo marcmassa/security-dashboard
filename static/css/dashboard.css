@@ -868,6 +868,7 @@ body {
 [data-bs-theme="dark"] .card-header {
   background-color: hsl(217 91% 60%) !important; /* Blue background instead of grey */
   border-bottom: 1px solid hsl(var(--border)) !important;
+  border-radius: 12px 12px 0 0 !important; /* Rounded top corners */
 }
 
 [data-bs-theme="dark"] .card-header h5, 
@@ -876,6 +877,10 @@ body {
   color: hsl(0 0% 100%) !important; /* White text on blue background */
   margin-bottom: 0;
   font-weight: 600;
+}
+
+[data-bs-theme="dark"] .card-header i {
+  color: hsl(0 0% 100%) !important; /* White icons in headers */
 }
 
 /* Light theme card headers */
@@ -1113,12 +1118,78 @@ body {
 
 /* Configuration page specific fixes */
 [data-bs-theme="dark"] .configuration-container *,
-[data-bs-theme="dark"] .card-header *,
 [data-bs-theme="dark"] .card-body *,
 [data-bs-theme="dark"] .form-group *,
 [data-bs-theme="dark"] .input-group *,
 [data-bs-theme="dark"] .help-text * {
   color: hsl(var(--text-on-dark)) !important;
+}
+
+/* Configuration list group styling */
+[data-bs-theme="dark"] .list-group-item {
+  background-color: hsl(var(--card)) !important;
+  border-color: hsl(var(--border)) !important;
+  color: hsl(0 0% 100%) !important; /* White text for menu items */
+  border-radius: 8px !important; /* Softer corners */
+  margin-bottom: 4px !important; /* Space between items */
+}
+
+[data-bs-theme="dark"] .list-group-item:hover {
+  background-color: hsl(217 91% 50%) !important; /* Blue on hover */
+  color: hsl(0 0% 100%) !important;
+}
+
+[data-bs-theme="dark"] .list-group-item.active {
+  background-color: hsl(217 91% 60%) !important; /* Blue for active item */
+  border-color: hsl(217 91% 60%) !important;
+  color: hsl(0 0% 100%) !important;
+}
+
+[data-bs-theme="dark"] .list-group-item.text-muted {
+  color: hsl(210 11% 75%) !important; /* Lighter for disabled items */
+}
+
+[data-bs-theme="dark"] .list-group-item small {
+  color: hsl(210 11% 70%) !important; /* Visible grey for small text */
+}
+
+/* Soften all card and menu corners */
+[data-bs-theme="dark"] .card {
+  border-radius: 12px !important; /* Rounded corners for cards */
+  border: 1px solid hsl(var(--border)) !important;
+}
+
+[data-bs-theme="dark"] .list-group {
+  border-radius: 0 0 12px 12px !important; /* Rounded bottom corners for list groups */
+}
+
+[data-bs-theme="dark"] .list-group-flush .list-group-item {
+  border-left: none !important;
+  border-right: none !important;
+}
+
+[data-bs-theme="dark"] .list-group-flush .list-group-item:first-child {
+  border-top: none !important;
+}
+
+[data-bs-theme="dark"] .list-group-flush .list-group-item:last-child {
+  border-bottom: none !important;
+  border-radius: 0 0 12px 12px !important;
+}
+
+/* Content area headers styling */
+[data-bs-theme="dark"] .content-section h3,
+[data-bs-theme="dark"] .content-section h4 {
+  color: hsl(0 0% 100%) !important; /* White headings in content */
+  font-weight: 600;
+  padding: 1rem 0 0.5rem 0;
+}
+
+[data-bs-theme="dark"] .content-section {
+  background-color: hsl(var(--card)) !important;
+  border-radius: 12px !important;
+  padding: 1.5rem !important;
+  border: 1px solid hsl(var(--border)) !important;
 }
 
 /* Override Bootstrap's text utilities for dark theme */
