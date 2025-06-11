@@ -574,8 +574,13 @@ class SecurityHeatmap {
     }
 
     showRiskDetails(data) {
-        const modal = new bootstrap.Modal(document.getElementById('riskDetailModal'));
+        const modalElement = document.getElementById('riskDetailModal');
         const content = document.getElementById('risk-detail-content');
+        
+        if (!modalElement || !content) {
+            console.error('Modal elements not found');
+            return;
+        }
         
         content.innerHTML = `
             <div class="risk-detail-header">
@@ -588,10 +593,16 @@ class SecurityHeatmap {
             </div>
         `;
         
-        modal.show();
-        
-        // Load detailed data asynchronously
-        this.loadRiskDetails(data.project, data.category);
+        // Check if Bootstrap is loaded before creating modal
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+            
+            // Load detailed data asynchronously
+            this.loadRiskDetails(data.project, data.category);
+        } else {
+            console.error('Bootstrap Modal not available');
+        }
     }
 
     async loadRiskDetails(project, category) {
