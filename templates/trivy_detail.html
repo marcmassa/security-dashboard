@@ -118,16 +118,7 @@
 }
 </style>
 <div class="detail-container">
-    <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
-            {% if project %}
-            <li class="breadcrumb-item"><a href="{{ url_for('project_dashboard', project_id=project.id) }}">{{ project.name }}</a></li>
-            {% endif %}
-            <li class="breadcrumb-item active">Trivy Details</li>
-        </ol>
-    </nav>
+
 
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
