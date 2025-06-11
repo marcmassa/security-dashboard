@@ -255,19 +255,20 @@ def delete_project(project_id):
     """Delete a project"""
     # Check admin permissions
     if not is_admin():
-        flash('Access denied. Administrator privileges required.', 'error')
-        return redirect(url_for('home'))
+        return jsonify({'success': False, 'message': 'Access denied. Administrator privileges required.'}), 403
     
     project = Project.query.get(project_id)
     if project:
         project_name = project.name
         db.session.delete(project)
         db.session.commit()
-        flash(f'Project "{project_name}" deleted successfully.', 'success')
+        return jsonify({
+            'success': True, 
+            'message': f'Project "{project_name}" deleted successfully.',
+            'redirect_url': url_for('home')
+        })
     else:
-        flash('Project not found.', 'error')
-    
-    return redirect(url_for('home'))
+        return jsonify({'success': False, 'message': 'Project not found.'}), 404
 
 @app.route('/health')
 def health_check():
