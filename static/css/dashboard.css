@@ -865,6 +865,20 @@ body {
 }
 
 /* Card header and help text fixes */
+[data-bs-theme="dark"] .card-header {
+  background-color: hsl(217 91% 60%) !important; /* Blue background instead of grey */
+  border-bottom: 1px solid hsl(var(--border)) !important;
+}
+
+[data-bs-theme="dark"] .card-header h5, 
+[data-bs-theme="dark"] .card-header h6,
+[data-bs-theme="dark"] .card-header .card-title {
+  color: hsl(0 0% 100%) !important; /* White text on blue background */
+  margin-bottom: 0;
+  font-weight: 600;
+}
+
+/* Light theme card headers */
 .card-header {
   background-color: hsl(var(--secondary) / 0.5) !important;
   border-bottom: 1px solid hsl(var(--border)) !important;
@@ -959,9 +973,20 @@ body {
 
 /* Override for elements that should have specific colors */
 [data-bs-theme="dark"] .navbar-brand,
-[data-bs-theme="dark"] .text-primary,
-[data-bs-theme="dark"] .btn-primary {
+[data-bs-theme="dark"] .text-primary {
   color: hsl(var(--primary)) !important;
+}
+
+[data-bs-theme="dark"] .btn-primary {
+  background-color: hsl(var(--primary)) !important;
+  border-color: hsl(var(--primary)) !important;
+  color: hsl(0 0% 0%) !important; /* Black text on green button */
+}
+
+[data-bs-theme="dark"] .btn-primary:hover {
+  background-color: hsl(94 100% 60%) !important; /* Darker green on hover */
+  border-color: hsl(94 100% 60%) !important;
+  color: hsl(0 0% 0%) !important;
 }
 
 [data-bs-theme="dark"] .text-success,
@@ -1026,26 +1051,64 @@ body {
 
 /* Navigation and menu items */
 [data-bs-theme="dark"] .navbar-nav .nav-link,
-[data-bs-theme="dark"] .navbar-text,
 [data-bs-theme="dark"] .dropdown-menu .dropdown-item {
   color: hsl(var(--text-on-dark)) !important;
 }
 
+/* User status indicator - make it highly visible */
+[data-bs-theme="dark"] .navbar-text {
+  color: hsl(0 0% 100%) !important; /* Pure white for maximum contrast */
+  background-color: hsl(217 91% 60%) !important; /* Blue background */
+  padding: 0.25rem 0.75rem !important;
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+  border: 1px solid hsl(217 91% 70%) !important;
+}
+
+[data-bs-theme="dark"] .navbar-text i {
+  color: hsl(0 0% 100%) !important; /* White icon */
+}
+
 /* Button text visibility */
-[data-bs-theme="dark"] .btn-outline-primary,
-[data-bs-theme="dark"] .btn-outline-secondary,
+[data-bs-theme="dark"] .btn-outline-primary {
+  color: hsl(0 0% 100%) !important; /* White text */
+  border-color: hsl(var(--primary)) !important;
+  background-color: transparent !important;
+}
+
+[data-bs-theme="dark"] .btn-outline-primary:hover {
+  background-color: hsl(var(--primary)) !important;
+  color: hsl(0 0% 0%) !important; /* Black text on green hover */
+}
+
+[data-bs-theme="dark"] .btn-outline-secondary {
+  color: hsl(0 0% 100%) !important; /* White text */
+  border-color: hsl(var(--border)) !important;
+  background-color: transparent !important;
+}
+
+[data-bs-theme="dark"] .btn-outline-secondary:hover {
+  background-color: hsl(var(--secondary)) !important;
+  color: hsl(0 0% 100%) !important;
+}
+
 [data-bs-theme="dark"] .btn-outline-success,
 [data-bs-theme="dark"] .btn-outline-danger,
 [data-bs-theme="dark"] .btn-outline-warning,
 [data-bs-theme="dark"] .btn-outline-info {
-  color: hsl(var(--text-on-dark)) !important;
+  color: hsl(0 0% 100%) !important; /* White text for all outline buttons */
 }
 
-/* Muted text should still be visible */
+/* Muted text should still be visible but not too dim */
 [data-bs-theme="dark"] .text-muted,
 [data-bs-theme="dark"] .small,
 [data-bs-theme="dark"] small {
-  color: hsl(var(--muted-text)) !important;
+  color: hsl(210 11% 80%) !important; /* Lighter than muted-text for better visibility */
+}
+
+/* Form help text visibility */
+[data-bs-theme="dark"] .form-text {
+  color: hsl(210 11% 75%) !important; /* Visible grey for help text */
 }
 
 /* Configuration page specific fixes */
@@ -1073,11 +1136,20 @@ body {
 
 /* Ensure links are visible */
 [data-bs-theme="dark"] a {
-  color: hsl(var(--info)) !important;
+  color: hsl(217 91% 70%) !important; /* Light blue for better visibility */
 }
 
 [data-bs-theme="dark"] a:hover {
   color: hsl(var(--primary)) !important;
+}
+
+/* Navigation links specific styling */
+[data-bs-theme="dark"] .nav-link {
+  color: hsl(0 0% 100%) !important; /* White navigation links */
+}
+
+[data-bs-theme="dark"] .nav-link:hover {
+  color: hsl(var(--primary)) !important; /* Green on hover */
 }
 
 /* Progress indicators and status elements */
@@ -1091,14 +1163,38 @@ body {
 }
 
 /* Specific fixes for dashboard elements */
-[data-bs-theme="dark"] .dashboard-title,
-[data-bs-theme="dark"] .dashboard-subtitle,
-[data-bs-theme="dark"] .card-title,
-[data-bs-theme="dark"] .metric-label,
-[data-bs-theme="dark"] .metric-value,
-[data-bs-theme="dark"] .upload-title,
+[data-bs-theme="dark"] .dashboard-title {
+  color: hsl(0 0% 100%) !important; /* Pure white for main titles */
+  font-weight: 700;
+}
+
+[data-bs-theme="dark"] .dashboard-subtitle {
+  color: hsl(217 91% 70%) !important; /* Light blue for subtitles */
+  font-weight: 500;
+}
+
+[data-bs-theme="dark"] .card-title {
+  color: hsl(0 0% 100%) !important; /* White for card titles */
+  font-weight: 600;
+}
+
+[data-bs-theme="dark"] .metric-label {
+  color: hsl(210 11% 85%) !important; /* Light grey for labels */
+  font-weight: 500;
+}
+
+[data-bs-theme="dark"] .metric-value {
+  color: hsl(0 0% 100%) !important; /* White for values */
+  font-weight: 700;
+}
+
+[data-bs-theme="dark"] .upload-title {
+  color: hsl(0 0% 100%) !important; /* White for upload titles */
+  font-weight: 600;
+}
+
 [data-bs-theme="dark"] .upload-description {
-  color: hsl(var(--text-on-dark)) !important;
+  color: hsl(210 11% 80%) !important; /* Light grey for descriptions */
 }
 
 /* Modal and popup text */
