@@ -3,7 +3,7 @@
 {% block title %}Security Risk Heatmap - Security Dashboard{% endblock %}
 
 {% block content %}
-<div class="main-container security-heatmap">
+<div class="main-container">
     <!-- Page Header -->
     <div class="page-header">
         <div class="page-header-content">
@@ -31,43 +31,51 @@
     <!-- Controls Panel -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="controls-panel">
-                <div class="row align-items-center">
-                    <div class="col-md-3">
-                        <label class="form-label">Time Range</label>
-                        <select class="form-select" id="timeRange" onchange="updateHeatmap()">
-                            <option value="24h" selected>Last 24 Hours</option>
-                            <option value="7d">Last 7 Days</option>
-                            <option value="30d">Last 30 Days</option>
-                            <option value="90d">Last 90 Days</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Severity Filter</label>
-                        <select class="form-select" id="severityFilter" onchange="updateHeatmap()">
-                            <option value="all" selected>All Severities</option>
-                            <option value="critical">Critical Only</option>
-                            <option value="high">High & Critical</option>
-                            <option value="medium+">Medium & Above</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Risk Category</label>
-                        <select class="form-select" id="categoryFilter" onchange="updateHeatmap()">
-                            <option value="all" selected>All Categories</option>
-                            <option value="vulnerabilities">Vulnerabilities</option>
-                            <option value="code_quality">Code Quality</option>
-                            <option value="dependencies">Dependencies</option>
-                            <option value="containers">Container Security</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">View Mode</label>
-                        <select class="form-select" id="viewMode" onchange="updateHeatmap()">
-                            <option value="grid" selected>Grid View</option>
-                            <option value="tree">Tree Map</option>
-                            <option value="bubble">Bubble Chart</option>
-                        </select>
+            <div class="summary-card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="card-icon" data-feather="filter"></i>
+                        Filter Controls
+                    </h3>
+                </div>
+                <div style="padding: 1.5rem;">
+                    <div class="row align-items-center">
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Time Range</label>
+                            <select class="form-select" id="timeRange" onchange="updateHeatmap()">
+                                <option value="24h" selected>Last 24 Hours</option>
+                                <option value="7d">Last 7 Days</option>
+                                <option value="30d">Last 30 Days</option>
+                                <option value="90d">Last 90 Days</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Severity Filter</label>
+                            <select class="form-select" id="severityFilter" onchange="updateHeatmap()">
+                                <option value="all" selected>All Severities</option>
+                                <option value="critical">Critical Only</option>
+                                <option value="high">High & Critical</option>
+                                <option value="medium+">Medium & Above</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Risk Category</label>
+                            <select class="form-select" id="categoryFilter" onchange="updateHeatmap()">
+                                <option value="all" selected>All Categories</option>
+                                <option value="vulnerabilities">Vulnerabilities</option>
+                                <option value="code_quality">Code Quality</option>
+                                <option value="dependencies">Dependencies</option>
+                                <option value="containers">Container Security</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">View Mode</label>
+                            <select class="form-select" id="viewMode" onchange="updateHeatmap()">
+                                <option value="grid" selected>Grid View</option>
+                                <option value="tree">Tree Map</option>
+                                <option value="bubble">Bubble Chart</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -90,34 +98,39 @@
     <!-- Main Heatmap Container -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="heatmap-container">
-                <div class="heatmap-header">
-                    <h5 class="mb-0">Risk Distribution Matrix</h5>
-                    <div class="heatmap-legend">
-                        <span class="legend-item">
-                            <span class="legend-color critical"></span>
+            <div class="summary-card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="card-icon" data-feather="grid"></i>
+                        Risk Distribution Matrix
+                    </h3>
+                    <div class="d-flex gap-3 flex-wrap align-items-center">
+                        <span class="d-flex align-items-center gap-1 small">
+                            <span class="badge bg-danger">■</span>
                             Critical (9-10)
                         </span>
-                        <span class="legend-item">
-                            <span class="legend-color high"></span>
+                        <span class="d-flex align-items-center gap-1 small">
+                            <span class="badge bg-warning">■</span>
                             High (7-8)
                         </span>
-                        <span class="legend-item">
-                            <span class="legend-color medium"></span>
+                        <span class="d-flex align-items-center gap-1 small">
+                            <span class="badge bg-info">■</span>
                             Medium (4-6)
                         </span>
-                        <span class="legend-item">
-                            <span class="legend-color low"></span>
+                        <span class="d-flex align-items-center gap-1 small">
+                            <span class="badge bg-success">■</span>
                             Low (1-3)
                         </span>
-                        <span class="legend-item">
-                            <span class="legend-color none"></span>
+                        <span class="d-flex align-items-center gap-1 small">
+                            <span class="badge bg-secondary">■</span>
                             None (0)
                         </span>
                     </div>
                 </div>
-                <div class="heatmap-content" id="heatmap-grid">
-                    <!-- Heatmap will be dynamically generated here -->
+                <div style="padding: 1.5rem;">
+                    <div id="heatmap-grid">
+                        <!-- Heatmap will be dynamically generated here -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -126,50 +139,66 @@
     <!-- Statistics Dashboard -->
     <div class="row mb-4">
         <div class="col-md-3">
-            <div class="stat-card critical">
-                <div class="stat-icon">
-                    <i data-feather="alert-circle"></i>
+            <div class="summary-card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="card-icon" data-feather="alert-circle"></i>
+                        Critical Risks
+                    </h3>
                 </div>
-                <div class="stat-content">
-                    <div class="stat-value" id="critical-count">0</div>
-                    <div class="stat-label">Critical Risks</div>
-                    <div class="stat-change" id="critical-change">+0 from yesterday</div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="stat-card high">
-                <div class="stat-icon">
-                    <i data-feather="alert-triangle"></i>
-                </div>
-                <div class="stat-content">
-                    <div class="stat-value" id="high-count">0</div>
-                    <div class="stat-label">High Risks</div>
-                    <div class="stat-change" id="high-change">+0 from yesterday</div>
+                <div class="metrics-grid">
+                    <div class="metric-item">
+                        <div class="metric-value severity-critical" id="critical-count">0</div>
+                        <div class="metric-label" id="critical-change">+0 from yesterday</div>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="stat-card medium">
-                <div class="stat-icon">
-                    <i data-feather="info"></i>
+            <div class="summary-card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="card-icon" data-feather="alert-triangle"></i>
+                        High Risks
+                    </h3>
                 </div>
-                <div class="stat-content">
-                    <div class="stat-value" id="medium-count">0</div>
-                    <div class="stat-label">Medium Risks</div>
-                    <div class="stat-change" id="medium-change">+0 from yesterday</div>
+                <div class="metrics-grid">
+                    <div class="metric-item">
+                        <div class="metric-value severity-high" id="high-count">0</div>
+                        <div class="metric-label" id="high-change">+0 from yesterday</div>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="stat-card trend">
-                <div class="stat-icon">
-                    <i data-feather="trending-up"></i>
+            <div class="summary-card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="card-icon" data-feather="info"></i>
+                        Medium Risks
+                    </h3>
                 </div>
-                <div class="stat-content">
-                    <div class="stat-value" id="trend-score">0</div>
-                    <div class="stat-label">Risk Trend Score</div>
-                    <div class="stat-change" id="trend-change">Stable</div>
+                <div class="metrics-grid">
+                    <div class="metric-item">
+                        <div class="metric-value severity-medium" id="medium-count">0</div>
+                        <div class="metric-label" id="medium-change">+0 from yesterday</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="summary-card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="card-icon" data-feather="trending-up"></i>
+                        Risk Trend Score
+                    </h3>
+                </div>
+                <div class="metrics-grid">
+                    <div class="metric-item">
+                        <div class="metric-value severity-low" id="trend-score">0</div>
+                        <div class="metric-label" id="trend-change">Stable</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -178,17 +207,29 @@
     <!-- Detailed Risk Timeline -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="timeline-container">
-                <div class="timeline-header">
-                    <h5 class="mb-0">Risk Timeline (24h)</h5>
-                    <div class="timeline-controls">
-                        <button class="btn btn-sm btn-outline-secondary" onclick="zoomTimeline('6h')">6H</button>
-                        <button class="btn btn-sm btn-outline-secondary active" onclick="zoomTimeline('24h')">24H</button>
-                        <button class="btn btn-sm btn-outline-secondary" onclick="zoomTimeline('7d')">7D</button>
+            <div class="summary-card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="card-icon" data-feather="activity"></i>
+                        Risk Timeline (24h)
+                    </h3>
+                    <div class="btn-group btn-group-sm" role="group">
+                        <button type="button" class="btn btn-outline-secondary" onclick="zoomTimeline('6h')">6H</button>
+                        <button type="button" class="btn btn-outline-secondary active" onclick="zoomTimeline('24h')">24H</button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="zoomTimeline('7d')">7D</button>
                     </div>
                 </div>
-                <div class="timeline-chart">
-                    <canvas id="risk-timeline-chart" height="200"></canvas>
+                <div style="padding: 1.5rem;">
+                    <div class="mb-3">
+                        <small class="text-muted">
+                            <strong>Gráfico:</strong> Muestra la evolución del riesgo de seguridad a lo largo del tiempo. 
+                            <strong>Eje Y:</strong> Puntuación de riesgo (0-10). 
+                            <strong>Eje X:</strong> Tiempo según el período seleccionado.
+                        </small>
+                    </div>
+                    <div style="height: 300px; position: relative;">
+                        <canvas id="risk-timeline-chart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
@@ -197,46 +238,65 @@
     <!-- Project Risk Breakdown -->
     <div class="row">
         <div class="col-md-8">
-            <div class="project-risk-table">
-                <div class="table-header">
-                    <h5 class="mb-0">Project Risk Breakdown</h5>
-                    <div class="table-actions">
-                        <button class="btn btn-sm btn-outline-secondary" onclick="sortTable('risk-score')">
+            <div class="summary-card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="card-icon" data-feather="list"></i>
+                        Project Risk Breakdown
+                    </h3>
+                    <div class="btn-group btn-group-sm">
+                        <button class="btn btn-outline-secondary" onclick="sortTable('risk-score')" title="Sort by Risk Score">
                             <i data-feather="bar-chart-2"></i>
                         </button>
-                        <button class="btn btn-sm btn-outline-secondary" onclick="sortTable('name')">
+                        <button class="btn btn-outline-secondary" onclick="sortTable('name')" title="Sort by Name">
                             <i data-feather="type"></i>
                         </button>
                     </div>
                 </div>
-                <div class="table-responsive">
-                    <table class="table table-hover" id="project-risk-table">
-                        <thead>
-                            <tr>
-                                <th>Project</th>
-                                <th>Risk Score</th>
-                                <th>Critical</th>
-                                <th>High</th>
-                                <th>Medium</th>
-                                <th>Trend</th>
-                                <th>Last Updated</th>
-                            </tr>
-                        </thead>
-                        <tbody id="project-risk-tbody">
-                            <!-- Dynamic content -->
-                        </tbody>
-                    </table>
+                <div style="padding: 1.5rem;">
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="project-risk-table">
+                            <thead>
+                                <tr>
+                                    <th style="cursor: pointer;" onclick="sortHeatmapTable('name')" title="Ordenar por nombre">
+                                        Project <i data-feather="chevron-up" class="ms-1"></i>
+                                    </th>
+                                    <th style="cursor: pointer;" onclick="sortHeatmapTable('risk-score')" title="Ordenar por puntuación de riesgo">
+                                        Risk Score <i data-feather="chevron-up" class="ms-1"></i>
+                                    </th>
+                                    <th style="cursor: pointer;" onclick="sortHeatmapTable('critical')" title="Ordenar por críticos">
+                                        Critical <i data-feather="chevron-up" class="ms-1"></i>
+                                    </th>
+                                    <th style="cursor: pointer;" onclick="sortHeatmapTable('high')" title="Ordenar por altos">
+                                        High <i data-feather="chevron-up" class="ms-1"></i>
+                                    </th>
+                                    <th style="cursor: pointer;" onclick="sortHeatmapTable('medium')" title="Ordenar por medios">
+                                        Medium <i data-feather="chevron-up" class="ms-1"></i>
+                                    </th>
+                                    <th>Trend</th>
+                                    <th>Last Updated</th>
+                                </tr>
+                            </thead>
+                            <tbody id="project-risk-tbody">
+                                <!-- Dynamic content -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="risk-insights">
-                <div class="insights-header">
-                    <h5 class="mb-0">Risk Insights</h5>
-                    <i data-feather="zap" class="text-primary"></i>
+            <div class="summary-card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="card-icon" data-feather="zap"></i>
+                        Risk Insights
+                    </h3>
                 </div>
-                <div class="insights-content" id="risk-insights-content">
-                    <!-- AI-powered insights will be loaded here -->
+                <div style="padding: 1.5rem;">
+                    <div id="risk-insights-content">
+                        <!-- AI-powered insights will be loaded here -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -264,4 +324,5 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="{{ url_for('static', filename='js/security-heatmap.js') }}"></script>
+<script src="{{ url_for('static', filename='js/heatmap-tests.js') }}"></script>
 {% endblock %}
